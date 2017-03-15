@@ -38,7 +38,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 set(SRCS
     src/main.cc)
 
-add_executable(${MLOGO_PROGRAM} ${SRCS}
+add_executable(${MLOGO_PROGRAM} ${SRCS})
   
 target_link_libraries(${MLOGO_PROGRAM} ${MLOGO_DEPS})
 
