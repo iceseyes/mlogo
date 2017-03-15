@@ -1,0 +1,164 @@
+# CMakeLists.txt for testing
+# 0. Define test framework and sources
+# 1. Build simple programs and tools for manual testing
+# 2. Download Google Test and compile it
+# 3. Build libgpexe_test from ${TEST_SRC} sources
+
+# Set-up
+set(GTEST_VERSION release-1.8.0)
+set(GTEST_DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}/lib/gtest-src)
+set(GTEST_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/lib/gtest)
+
+if(WIN32)
+  set (gtest_disable_pthreads ON CACHE BOOL "" FORCE)
+  set (CMAKE_USE_PTHREADS_INIT OFF)
+  set (CMAKE_THREAD_LIBS_INIT OFF)
+  add_definitions(-DGTEST_OS_WINDOWS_MINGW)
+endif(WIN32)
+
+set(BUILD_SHARED_LIBS no)
+
+# Sorgenti dei test per il framework
+set(TEST_SRC
+  src/test_gtest.cpp            # test for gtest framework is working
+  src/test_defines.cpp          # test dei tipi base
+  src/test_common.cpp           # test delle funzioni base
+  src/test_rawbytearrayconverter.cpp  # test for union RawByteArrayConverter
+  src/test_ltkey_imu.cpp        # test per IMU su ltkey
+  src/test_gpexe_import.cpp     # test per gpexe_import
+  src/test_dataframe.cpp        # test per Dataframe
+  src/test_memoryqueue.cpp      # test dimensioni su memoryqueu
+  src/test_memory_queue_hpp.cpp # test dimensioni su memoryqueu
+)
+
+# Tool e programmi di testing di varia natura
+set(SERIAL_CONN_TEST_SRCS tools/serial_conn_test.cpp)
+set(ULIST_SRCS tools/ulist.cpp)
+set(SLIST_SRCS tools/slist.cpp)
+set(LOG_EXAMPLES_SRCS tools/log_examples.cpp)
+set(DFLOAT_SRCS tools/dfloat.cpp)
+set(GPEXE_FILTER_TEST_SRCS tools/gpexe_filter_test.c)
+set(GPEXE_CALIBRATION_TEST_SRCS tools/gpexe_calibration_test.c)
+set(GPEXE_IMPORT_TEST_SRCS tools/gpexe_import_test.c)
+set(GAUSS_ELIMINATION_TEST_SRCS tools/gauss_elimination_test.cpp)
+set(ELLIPSOID_FIT_TEST_SRCS tools/ellipsoid_fit_test.cpp)
+set(GPEXE_CALIBRATION_SRCS tools/gpexe_calibration.c)
+set(GPEXE_SYMMETRY_SRCS tools/gpexe_symmetry.c)
+set(GPEXE_SERIAL_SRCS tools/gpexe_serial.cpp)
+set(IMU_GPS_TEST tools/imu_gps_test.cpp)
+set(PRAGMA_TEST_SRC tools/pragma_test.cpp)
+set(GENERATE_EVENT_TRACK_SRC tools/generate_event_track.cpp)
+
+# usato per identificare il path assoluto dei file in test_data e
+# altre proprietà specifiche del build
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test_build_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/test_build_config.h @ONLY)
+
+# usato per configurare ws-server.js in test
+set(LIB_IMUGPS_OUTPUT_LIB_PATH ../libgpexe_imugps.so CACHE STRING "Path della libreria gpexe_imugps.so per ws-server.js test program")
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/tools/gpexe_imu/ws-server.js.in ${CMAKE_CURRENT_BINARY_DIR}/ws-server.js @ONLY)
+
+# Compile Test programs and tools for testing
+add_executable(gauss_elimination_test ${GAUSS_ELIMINATION_TEST_SRCS})
+
+if(WITH_LIBGPEXE_IMUGPS_MODULE)
+  add_executable(imu_gps_test ${IMU_GPS_TEST})
+  target_link_libraries(imu_gps_test ${LIB_IMUGPS_TARGET} m)
+endif(WITH_LIBGPEXE_IMUGPS_MODULE)
+
+if(WITH_LIBGPEXE_IMPORT_MODULE)
+  add_executable(gpexe_import_test ${GPEXE_IMPORT_TEST_SRCS})
+  target_link_libraries(gpexe_import_test ${LIB_IMPORT_TARGET})
+endif(WITH_LIBGPEXE_IMPORT_MODULE)
+
+if(WITH_LIBGPEXE_FILTER_MODULE)
+  add_executable(gpexe_filter_test ${GPEXE_FILTER_TEST_SRCS})
+  target_link_libraries(gpexe_filter_test ${LIB_FILTER_TARGET} m)
+
+  add_executable(gpexe_symmetry ${GPEXE_SYMMETRY_SRCS})
+  target_link_libraries(gpexe_symmetry ${LIB_FILTER_TARGET} m)
+endif(WITH_LIBGPEXE_FILTER_MODULE)
+
+add_executable(pragma_test ${PRAGMA_TEST_SRC})
+
+add_executable(generate_event_track ${GENERATE_EVENT_TRACK_SRC})
+
+add_executable(ulist ${ULIST_SRCS})
+target_link_libraries(ulist ${LIB_TARGET} ${LIBGPEXE_DEPS})
+      
+add_executable(slist ${SLIST_SRCS})
+target_link_libraries(slist ${LIB_TARGET} ${LIBGPEXE_DEPS})
+
+add_executable(serial_conn_test ${SERIAL_CONN_TEST_SRCS})
+target_link_libraries(serial_conn_test ${LIB_TARGET} ${LIBGPEXE_DEPS})
+
+add_executable(log_examples ${LOG_EXAMPLES_SRCS})
+target_link_libraries(log_examples ${LIB_TARGET} ${LIBGPEXE_DEPS})
+
+add_executable(dfloat ${DFLOAT_SRCS})
+target_link_libraries(dfloat ${LIB_TARGET} ${LIBGPEXE_DEPS})
+
+add_executable(gpexe_calibration_test ${GPEXE_CALIBRATION_TEST_SRCS})
+target_link_libraries(gpexe_calibration_test ${LIB_TARGET} ${LIBGPEXE_DEPS})
+
+add_executable(ellipsoid_fit_test ${ELLIPSOID_FIT_TEST_SRCS})
+target_link_libraries(ellipsoid_fit_test ${LIB_TARGET} ${LIBGPEXE_DEPS})
+
+add_executable(gpexe_calibration ${GPEXE_CALIBRATION_SRCS})
+target_link_libraries(gpexe_calibration ${LIB_TARGET} ${LIBGPEXE_DEPS})
+  
+# gpexe_serial non compila!
+#add_executable(gpexe_serial ${GPEXE_SERIAL_SRCS})
+#target_link_libraries(gpexe_serial ${LIB_TARGET} ${LIBGPEXE_DEPS})
+
+
+enable_testing()
+
+# Download and unpack googletest at configure time
+configure_file(lib/CMakeLists.txt.in lib/CMakeLists.txt)
+
+execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+  RESULT_VARIABLE result
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib )
+
+if(result)
+  message(FATAL_ERROR "CMake step for googletest failed: ${result}")
+endif()
+
+execute_process(COMMAND ${CMAKE_COMMAND} --build .
+  RESULT_VARIABLE result
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib )
+
+if(result)
+  message(FATAL_ERROR "Build step for googletest failed: ${result}")
+endif()
+
+# Prevent overriding the parent project's compiler/linker
+# settings on Windows
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+  
+# Add googletest directly to our build. This defines
+# the gtest and gtest_main targets.
+add_subdirectory(${GTEST_DOWNLOAD_DIR} ${GTEST_BUILD_DIR} EXCLUDE_FROM_ALL)
+
+# The gtest/gtest_main targets carry header search path
+# dependencies automatically when using CMake 2.8.11 or
+# later. Otherwise we have to add them here ourselves.
+if (CMAKE_VERSION VERSION_LESS 2.8.11)
+  include_directories("${gtest_SOURCE_DIR}/include")
+endif()
+
+# include la directory corrente nel build tree per rendere
+# accessibile test_build_config.h
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
+# Now simply link against gtest or gtest_main as needed. Eg
+add_executable(libgpexe_test ${TEST_SRC})
+target_link_libraries(libgpexe_test ${LIB_TARGET} ${LIBGPEXE_DEPS} gtest_main)
+add_test(NAME "Libgpexe automatic test" COMMAND libgpexe_test)
+
+# copia i file per i test, di test_data nella build dir
+add_custom_command(
+        TARGET libgpexe_test POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/test_data ${CMAKE_CURRENT_BINARY_DIR}/test_data)
+
