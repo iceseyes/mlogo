@@ -9,6 +9,7 @@ option(USE_BOOST_STATIC  "Static link for boost librerees" OFF)
 
 # Basic Configuration
 set(MLOGO_PROGRAM mlogo)
+set(MLOGO_LIBRARY logo)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 set(CMAKE_CXX_STANDARD 14)
@@ -37,10 +38,15 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 set(SRCS
     src/main.cpp)
+    
+set(LIBLOGO_SRCS
+    src/parser.cpp)
+
+add_library(${MLOGO_LIBRARY} ${LIBLOGO_SRCS})
 
 add_executable(${MLOGO_PROGRAM} ${SRCS})
   
-target_link_libraries(${MLOGO_PROGRAM} ${MLOGO_DEPS})
+target_link_libraries(${MLOGO_PROGRAM} ${MLOGO_DEPS} ${MLOGO_LIBRARY})
 
 if(WITH_TESTS)
   add_subdirectory(test)

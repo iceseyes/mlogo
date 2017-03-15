@@ -65,7 +65,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # setup mlogo_test
 add_executable(mlogo_test ${TEST_SRC})
-target_link_libraries(mlogo_test ${MLOGO_DEPS} gtest_main)
+target_link_libraries(mlogo_test ${MLOGO_DEPS} ${MLOGO_LIBRARY} gtest_main)
 add_test(NAME "mLogo automatic test" COMMAND mlogo_test)
 
 
