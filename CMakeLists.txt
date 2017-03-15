@@ -36,7 +36,7 @@ set(MLOGO_DEPS
 include_directories(${Boost_INCLUDE_DIRS})
 
 set(SRCS
-    src/main.cc)
+    src/main.cpp)
 
 add_executable(${MLOGO_PROGRAM} ${SRCS})
   
