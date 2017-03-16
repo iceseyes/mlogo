@@ -1,24 +1,49 @@
 /**
  * @file: parser.hpp
  *
+ *  Created on: 16 mar 2017
+ *      Author: Massimo Bianchi <bianchi.massimo@gmail.com>
  */
 #include <string>
 #include <vector>
 
-namespace mlogo { namespace parser {
+#include <boost/fusion/include/adapt_struct.hpp>
 
-    struct Argument {
-      std::string name;
-    };
-      
-    struct Statement {
-      std::string name;
-      std::vector<Argument> arguments;
+namespace mlogo {
+namespace parser {
 
-      Statement() {}
-      Statement(const std::string &name) { this->name = name; }
-      
-    };
+struct Argument {
+	std::string name;
 
-    Statement parse(const std::string &line);
-}}
+	Argument() {}
+	Argument(const std::string &name) :
+			name(name) {}
+};
+
+struct Statement {
+	std::string name;
+	std::vector<Argument> arguments;
+
+	Statement() {}
+	Statement(const std::string &name) {
+		this->name = name;
+	}
+
+};
+
+Statement parse(const std::string &line);
+
+}
+
+}
+
+BOOST_FUSION_ADAPT_STRUCT(
+	mlogo::parser::Argument,
+	(std::string, name)
+)
+
+BOOST_FUSION_ADAPT_STRUCT(
+	mlogo::parser::Statement,
+	(std::string, name)
+	(std::vector<mlogo::parser::Argument>, arguments)
+)

@@ -6,71 +6,89 @@
  */
 #include "parser.hpp"
 
-#include <boost/config/warning_disable.hpp>
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
-#include <boost/spirit/include/phoenix_object.hpp>
-
 #include <iostream>
 #include <string>
+#include <stdexcept>
 
-namespace mlogo { namespace parser {
+#include <boost/spirit/include/qi_core.hpp>
+#include <boost/spirit/include/qi_grammar.hpp>
+#include <boost/spirit/include/qi_rule.hpp>
+#include <boost/spirit/include/qi_char_.hpp>
+#include <boost/spirit/include/qi_char_class.hpp>
+#include <boost/spirit/include/phoenix_core.hpp>
+#include <boost/spirit/include/phoenix_operator.hpp>
+#include <boost/spirit/include/phoenix_fusion.hpp>
+#include <boost/spirit/include/phoenix_stl.hpp>
+#include <boost/spirit/include/phoenix_object.hpp>
+
+namespace mlogo {
+namespace parser {
 
 namespace qi = boost::spirit::qi;
 namespace ascii = boost::spirit::ascii;
+namespace phoenix = boost::phoenix;
 
-template <typename Iterator>
-struct StatementParser : qi::grammar<Iterator, Statement(), ascii::space_type> {
-     StatementParser() : StatementParser::base_type(start) {
-	 using ascii::char_;
+template<typename Iterator>
+struct StatementParser: qi::grammar<Iterator, Statement(), ascii::space_type> {
+	StatementParser() : StatementParser::base_type(start, "statement") {
+		using qi::lit;
+		using qi::lexeme;
+		using qi::on_error;
+		using qi::fail;
+		using ascii::char_;
+		using ascii::alpha;
+		using ascii::alnum;
+		using ascii::digit;
+		using ascii::space;
+		using ascii::punct;
 
-	 word %= +(char_ - ' ');
-	 
-	 start %= word >> *(' ' >> word);
-     }
+		using phoenix::val;
+		using phoenix::construct;
+		using phoenix::at_c;
+		using phoenix::push_back;
 
-     qi::rule<Iterator, std::string(), ascii::space_type> word;
-     qi::rule<Iterator, Statement(), ascii::space_type> start;
+		using namespace qi::labels;
+
+		word = lexeme['"' >> +(alnum|punct)];
+		variable = lexeme[':' >> +(alnum|punct)];
+		proc_name = lexeme[+alpha];
+		list = '[' >> *(+(alnum|punct)) >> ']';
+		number = lexeme[+digit];
+
+		argument = word|proc_name|variable|list|number;
+
+		start =
+			proc_name 	[at_c<0>(_val) = _1] >>
+			*argument 	[push_back(at_c<1>(_val), _1)];
+	}
+
+	qi::rule<Iterator, std::string(), ascii::space_type> word;
+	qi::rule<Iterator, std::string(), ascii::space_type> variable;
+	qi::rule<Iterator, std::string(), ascii::space_type> proc_name;
+	qi::rule<Iterator, std::string(), ascii::space_type> list;
+	qi::rule<Iterator, std::string(), ascii::space_type> number;
+	qi::rule<Iterator, Argument(), ascii::space_type> argument;
+	qi::rule<Iterator, Statement(), ascii::space_type> start;
 };
 
 Statement parse(const std::string &line) {
-    typedef std::string::const_iterator iterator_type;
+	using iterator_type = std::string::const_iterator;
 
-    StatementParser<iterator_type> parser; // Our grammar
+	Statement stmt;
+	StatementParser<iterator_type> parser;
+	iterator_type iter = line.begin();
+	iterator_type end = line.end();
 
-    std::string str;
-    Statement stmt;
-    while (std::getline(std::cin, str)) {
-        if (str.empty() || str[0] == 'q' || str[0] == 'Q') break;
-
-	std::string::const_iterator iter = str.begin();
-	std::string::const_iterator end = str.end();
-	
 	bool r = phrase_parse(iter, end, parser, ascii::space, stmt);
 
-	if (r && iter == end) {
-	     std::cout << "-------------------------\n";
-	     std::cout << "Parsing succeeded\n";
-	     std::cout << "result = " << stmt.name << std::endl;
-	     std::cout << "-------------------------\n";
-	} else {
-	     std::string rest(iter, end);
-	     std::cout << "-------------------------\n";
-	     std::cout << "Parsing failed\n";
-	     std::cout << "stopped at: \": " << rest << "\"\n";
-	     std::cout << "-------------------------\n";
+	if (!r || iter != end) {
+		std::string rest(iter, end);
+		throw std::logic_error("Syntax Error at input line from: " + rest);
 	}
 
-    }
-
-    std::cout << "Bye... :-) \n\n";
-    return stmt;
+	return stmt;
 }
-	  
-}}
 
-
-
-
+}
+}
 
