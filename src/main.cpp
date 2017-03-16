@@ -7,12 +7,13 @@
 
 #include <iostream>
 
+#include "parser.hpp"
+
 using namespace std;
 
 int main(int argc, char **argv) {
-	cout << "Hello World!" << endl;
-
-	return 0;
+    mlogo::parser::parse("hello world");
+    return 0;
 }
 
 
