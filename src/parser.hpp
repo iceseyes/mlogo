@@ -19,6 +19,7 @@ struct Argument {
 	std::string name;
 
 	Argument() {}
+
 	Argument(const std::string &name) :
 			name(name) {}
 };
@@ -28,6 +29,7 @@ struct Statement {
 	std::vector<Argument> arguments;
 
 	Statement() {}
+
 	Statement(const std::string &name) {
 		this->name = name;
 	}

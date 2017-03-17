@@ -27,31 +27,34 @@ namespace phoenix = boost::phoenix;
 
 template<typename Iterator>
 struct WordParser: qi::grammar<Iterator, std::string()> {
-  WordParser() : WordParser::base_type(start, "Word") {
-    using ascii::alnum;
-    using ascii::punct;
+	WordParser() :
+			WordParser::base_type(start, "Word") {
+		using ascii::alnum;
+		using ascii::punct;
 
-    start = '"' >> alnum >> *(alnum|punct);
-  }
+		start = '"' >> alnum >> *(alnum | punct);
+	}
 
-  qi::rule<Iterator, std::string()> start;
+	qi::rule<Iterator, std::string()> start;
 };
 
 template<typename Iterator>
 struct NumberParser: qi::grammar<Iterator, std::string()> {
-  NumberParser() : NumberParser::base_type(start, "Number") {
-    using ascii::digit;
-    using ascii::char_;
+	NumberParser() :
+			NumberParser::base_type(start, "Number") {
+		using ascii::digit;
+		using ascii::char_;
 
-    start = -(char_('-')|char_('+')) >> ((+digit) || (char_('.') >> *digit));
-  }
+		start = -(char_('-') | char_('+')) >> ((+digit) || (char_('.') >> *digit));
+	}
 
-  qi::rule<Iterator, std::string()> start;
+	qi::rule<Iterator, std::string()> start;
 };
-  
+
 template<typename Iterator>
 struct StatementParser: qi::grammar<Iterator, Statement(), ascii::space_type> {
-	StatementParser() : StatementParser::base_type(start, "statement") {
+	StatementParser() :
+			StatementParser::base_type(start, "statement") {
 		using qi::lit;
 		using qi::lexeme;
 		using qi::on_error;
@@ -70,19 +73,19 @@ struct StatementParser: qi::grammar<Iterator, Statement(), ascii::space_type> {
 
 		using namespace qi::labels;
 
-		variable = lexeme[':' >> +(alnum|punct)];
+		variable = lexeme[':' >> +(alnum | punct)];
 		proc_name = lexeme[+alpha];
-		list = '[' >> *(+(alnum|punct)) >> ']';
+		list = '[' >> *(+(alnum | punct)) >> ']';
 
-		argument = word|proc_name|variable|list|number;
+		argument = word | proc_name | variable | list | number;
 
 		start =
-			proc_name 	[at_c<0>(_val) = _1] >>
-			*argument 	[push_back(at_c<1>(_val), _1)];
+				proc_name[at_c<0>(_val) = _1] >>
+						*argument[push_back(at_c<1>(_val), _1)];
 	}
 
-  WordParser<Iterator> word;
-  NumberParser<Iterator> number;
+	WordParser<Iterator> word;
+	NumberParser<Iterator> number;
 	qi::rule<Iterator, std::string(), ascii::space_type> variable;
 	qi::rule<Iterator, std::string(), ascii::space_type> proc_name;
 	qi::rule<Iterator, std::string(), ascii::space_type> list;
@@ -90,9 +93,8 @@ struct StatementParser: qi::grammar<Iterator, Statement(), ascii::space_type> {
 	qi::rule<Iterator, Statement(), ascii::space_type> start;
 };
 
+} /* ns parser */
 
-}
-  
-}
+} /* ns mlogo */
 
 #endif
