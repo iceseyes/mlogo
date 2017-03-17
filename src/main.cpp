@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
 
 		auto stmt = mlogo::parser::parse(str);
 		cout << "Read statement: " << stmt.name << " with arguments: ";
-		for(auto a : stmt.arguments) cout << a.name << " ";
+		for(auto a : stmt.arguments) cout << a.name << ", ";
 		cout << endl;
 	}
 

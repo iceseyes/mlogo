@@ -4,6 +4,9 @@
  *  Created on: 16 mar 2017
  *      Author: Massimo Bianchi <bianchi.massimo@gmail.com>
  */
+#ifndef PARSER_HPP
+#define PARSER_HPP
+
 #include <string>
 #include <vector>
 
@@ -47,3 +50,5 @@ BOOST_FUSION_ADAPT_STRUCT(
 	(std::string, name)
 	(std::vector<mlogo::parser::Argument>, arguments)
 )
+
+#endif
