@@ -17,9 +17,9 @@ int main(int argc, char **argv) {
 		if(str.empty() || str[0] == 'q' || str[0] == 'Q') break;
 
 		auto stmt = mlogo::parser::parse(str);
-		cout << "Read statement: " << stmt.name << " with arguments: ";
-		for (auto a : stmt.arguments)
-			cout << a.name << ", ";
+		cout << "Read statement: " << stmt.name.name << " with arguments: ";
+		//for (auto a : stmt.arguments)
+		//	cout << a.name << ", ";
 		cout << endl;
 	}
 

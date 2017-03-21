@@ -4,6 +4,13 @@
 # 2. Download Google Test and compile it
 # 3. Build mlogo_test from ${TEST_SRC} sources
 
+# Sources
+set(TEST_SRC
+  src/test_gtest.cpp            # test for gtest framework is working
+  src/test_parser.cpp           # test for parser
+)
+
+
 # Set-up
 set(GTEST_VERSION release-1.8.0)
 set(GTEST_DOWNLOAD_DIR ${CMAKE_CURRENT_BINARY_DIR}/lib/gtest-src)
@@ -17,11 +24,6 @@ if(WIN32)
 endif(WIN32)
 
 set(BUILD_SHARED_LIBS no)
-
-# Sources
-set(TEST_SRC
-  src/test_gtest.cpp            # test for gtest framework is working
-)
 
 enable_testing()
 
@@ -62,6 +64,7 @@ endif()
 # include la directory corrente nel build tree per rendere
 # accessibile test_build_config.h
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(../src)
 
 # setup mlogo_test
 add_executable(mlogo_test ${TEST_SRC})
