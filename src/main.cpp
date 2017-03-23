@@ -13,14 +13,15 @@ using namespace std;
 
 int main(int argc, char **argv) {
 	std::string str;
+	cout << endl << "? ";
 	while(std::getline(std::cin, str)) {
 		if(str.empty() || str[0] == 'q' || str[0] == 'Q') break;
 
 		auto stmt = mlogo::parser::parse(str);
 		cout << "Read statement: " << stmt.name.name << " with arguments: ";
-		//for (auto a : stmt.arguments)
-		//	cout << a.name << ", ";
-		cout << endl;
+		for (auto a : stmt.arguments)
+			cout << boost::apply_visitor(mlogo::parser::DisplayArgumentVisitor(), a) << ", ";
+		cout << endl << "? ";
 	}
 
 	return 0;

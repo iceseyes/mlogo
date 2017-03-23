@@ -9,6 +9,7 @@
 
 #include <string>
 #include <vector>
+#include <sstream>
 
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/variant.hpp>
@@ -52,10 +53,17 @@ struct ProcName {
 			name(name) {}
 };
 
-using Argument_t = boost::variant<ProcName, Word, Number, Variable>;
+using Argument = boost::variant<ProcName, Word, Number, Variable>;
 
-struct Argument {
- Argument_t arg;
+struct DisplayArgumentVisitor : boost::static_visitor<std::string> {
+	template<typename Value>
+	std::string operator()(Value &&v) const {
+		return v.name;
+	}
+
+	std::string operator()(Number &v) const {
+		return v.value;
+	}
 };
 
 struct Statement {
@@ -75,11 +83,6 @@ Statement parse(const std::string &line);
 }
 
 }
-
-BOOST_FUSION_ADAPT_STRUCT(
-	mlogo::parser::Argument,
-	(mlogo::parser::Argument_t, arg)
-)
 
 BOOST_FUSION_ADAPT_STRUCT(
 	mlogo::parser::Statement,

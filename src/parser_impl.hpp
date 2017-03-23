@@ -105,15 +105,7 @@ template<typename Iterator>
 struct StatementParser: qi::grammar<Iterator, Statement(), ascii::space_type> {
 	StatementParser() :
 			StatementParser::base_type(start, "statement") {
-		using qi::lit;
-		using qi::lexeme;
-		using qi::on_error;
-		using qi::fail;
-		using ascii::char_;
-		using ascii::alpha;
 		using ascii::alnum;
-		using ascii::digit;
-		using ascii::space;
 		using ascii::punct;
 
 		using phoenix::val;
