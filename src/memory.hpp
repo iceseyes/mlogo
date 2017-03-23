@@ -8,11 +8,21 @@
 #ifndef MEMORY_HPP_
 #define MEMORY_HPP_
 
+#include <map>
+#include <vector>
+#include <string>
+#include <functional>
+
 namespace mlogo {
 
 namespace memory {
 
-class Frame {}
+class Frame {
+public:
+	std::map<std::string, std::function<void (Frame *)>> procedures;
+	std::map<std::string, std::string> variables;
+	std::vector<std::string> arguments;
+};
 
 } /* ns memory */
 
