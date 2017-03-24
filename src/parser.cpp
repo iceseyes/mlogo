@@ -26,6 +26,11 @@ Statement parse(const std::string &line) {
 	return s;
 }
 
+::std::ostream &operator<<(::std::ostream &s, const Word &n) {
+	s << n.name;
+	return s;
+}
+
 }
 }
 

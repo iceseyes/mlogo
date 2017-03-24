@@ -24,23 +24,25 @@ TEST(Parser, parseNumber) {
 	ASSERT_ANY_THROW(f("4532 test"));
 }
 
-#ifdef TODO
 TEST(Parser, parseWord) {
-	ASSERT_EQ("3", parse<WordParser>("\"3"));
-	ASSERT_EQ("1c", parse<WordParser>("\"1c"));
-	ASSERT_EQ("hello", parse<WordParser>("\"hello"));
-	ASSERT_EQ("h45.32", parse<WordParser>("\"h45.32"));
-	ASSERT_EQ(";h45.32", parse<WordParser>("\";h45.32"));
-	ASSERT_EQ(",max.32", parse<WordParser>("\",max.32"));
-	ASSERT_ANY_THROW(parse<WordParser>("1c"));
-	ASSERT_ANY_THROW(parse<WordParser>("hello"));
-	ASSERT_ANY_THROW(parse<WordParser>("h4532"));
-	ASSERT_ANY_THROW(parse<WordParser>("h45.32"));
-	ASSERT_ANY_THROW(parse<WordParser>("4532 test"));
-	ASSERT_ANY_THROW(parse<WordParser>("\"4532 test"));
-	ASSERT_ANY_THROW(parse<WordParser>("\"test test"));
+	auto f = [](const std::string &v) { return parse<WordParser, Word>(v); };
+	ASSERT_EQ(Word("3"), f("\"3"));
+	ASSERT_EQ(Word("3.14"), f("\"3.14"));
+	ASSERT_EQ(Word("1c"), f("\"1c"));
+	ASSERT_EQ(Word("hello"), f("\"hello"));
+	ASSERT_EQ(Word("h45.32"), f("\"h45.32"));
+	ASSERT_EQ(Word(";h45.32"), f("\";h45.32"));
+	ASSERT_EQ(Word(",max.32"), f("\",max.32"));
+	ASSERT_ANY_THROW(f("1c"));
+	ASSERT_ANY_THROW(f("hello"));
+	ASSERT_ANY_THROW(f("h4532"));
+	ASSERT_ANY_THROW(f("h45.32"));
+	ASSERT_ANY_THROW(f("4532 test"));
+	ASSERT_ANY_THROW(f("\"4532 test"));
+	ASSERT_ANY_THROW(f("\"test test"));
 }
 
+#ifdef TODO
 TEST(Parser, parseVariable) {
 	ASSERT_EQ("3", parse<VariableParser>(":3"));
 	ASSERT_EQ("1c", parse<VariableParser>(":1c"));

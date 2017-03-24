@@ -24,6 +24,9 @@ struct Word {
 
 	Word(const std::string &name) :
 			name(name) {}
+
+	bool operator!=(const Word &b) const { return !(*this == b); }
+	bool operator==(const Word &b) const { return name==b.name; }
 };
 
 struct Number {
@@ -37,8 +40,6 @@ struct Number {
 	bool operator!=(const Number &b) const { return !(*this == b); }
 	bool operator==(const Number &b) const { return value==b.value; }
 };
-
-::std::ostream &operator<<(::std::ostream &s, const Number &n);
 
 struct Variable {
 	std::string name;
@@ -84,6 +85,10 @@ struct Statement {
 };
 
 Statement parse(const std::string &line);
+
+::std::ostream &operator<<(::std::ostream &s, const Word &n);
+::std::ostream &operator<<(::std::ostream &s, const Number &n);
+
 
 }
 
