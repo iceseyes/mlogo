@@ -11,22 +11,27 @@
 
 using namespace mlogo::parser;
 
-#ifdef TODO
 TEST(Parser, parseNumber) {
-	ASSERT_EQ("3", parse<NumberParser>("3"));
-	ASSERT_EQ("12345", parse<NumberParser>("12345"));
-	ASSERT_ANY_THROW(parse<NumberParser>("1c"));
-	ASSERT_ANY_THROW(parse<NumberParser>("hello"));
-	ASSERT_ANY_THROW(parse<NumberParser>("h4532"));
-	ASSERT_ANY_THROW(parse<NumberParser>("h 4532"));
-	ASSERT_ANY_THROW(parse<NumberParser>("4532 test"));
+	auto f = [](const std::string &v) { return parse<NumberParser, Number>(v); };
+	ASSERT_EQ(Number("3"), f("3"));
+	ASSERT_EQ(Number("12345"), f("12345"));
+	ASSERT_EQ(Number("12.345"), f("12.345"));
+	ASSERT_EQ(Number(".345"), f(".345"));
+	ASSERT_ANY_THROW(f("1c"));
+	ASSERT_ANY_THROW(f("hello"));
+	ASSERT_ANY_THROW(f("h4532"));
+	ASSERT_ANY_THROW(f("h 4532"));
+	ASSERT_ANY_THROW(f("4532 test"));
 }
 
+#ifdef TODO
 TEST(Parser, parseWord) {
 	ASSERT_EQ("3", parse<WordParser>("\"3"));
 	ASSERT_EQ("1c", parse<WordParser>("\"1c"));
 	ASSERT_EQ("hello", parse<WordParser>("\"hello"));
 	ASSERT_EQ("h45.32", parse<WordParser>("\"h45.32"));
+	ASSERT_EQ(";h45.32", parse<WordParser>("\";h45.32"));
+	ASSERT_EQ(",max.32", parse<WordParser>("\",max.32"));
 	ASSERT_ANY_THROW(parse<WordParser>("1c"));
 	ASSERT_ANY_THROW(parse<WordParser>("hello"));
 	ASSERT_ANY_THROW(parse<WordParser>("h4532"));

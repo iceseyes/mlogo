@@ -33,7 +33,12 @@ struct Number {
 
 	Number(const std::string &value) :
 			value(value) {}
+
+	bool operator!=(const Number &b) const { return !(*this == b); }
+	bool operator==(const Number &b) const { return value==b.value; }
 };
+
+::std::ostream &operator<<(::std::ostream &s, const Number &n);
 
 struct Variable {
 	std::string name;

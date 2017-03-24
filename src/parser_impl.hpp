@@ -32,7 +32,7 @@ struct SimpleWordParser: qi::grammar<Iterator, std::string()> {
 		using ascii::alnum;
 		using ascii::punct;
 
-		start = alnum >> *(alnum | punct);
+		start = +(alnum | punct);
 	}
 
 	qi::rule<Iterator, std::string()> start;
@@ -42,10 +42,6 @@ template<typename Iterator>
 struct WordParser: qi::grammar<Iterator, Word()> {
 	WordParser() :
 		WordParser::base_type(start, "Word") {
-		using phoenix::val;
-		using phoenix::at_c;
-		using namespace qi::labels;
-
 		start = '"' >> simpleWord;
 	}
 
@@ -57,10 +53,6 @@ template<typename Iterator>
 struct VariableParser: qi::grammar<Iterator, Variable()> {
 	VariableParser() :
 		VariableParser::base_type(start, "Variable") {
-		using phoenix::val;
-		using phoenix::at_c;
-		using namespace qi::labels;
-
 		start = ':' >> simpleWord;
 	}
 
@@ -74,9 +66,6 @@ struct ProcNameParser: qi::grammar<Iterator, ProcName()> {
 		ProcNameParser::base_type(start, "ProcName") {
 		using ascii::alnum;
 		using ascii::alpha;
-		using phoenix::val;
-		using phoenix::at_c;
-		using namespace qi::labels;
 
 		procname = alpha >> *alnum;
 		start = procname;
@@ -91,9 +80,14 @@ struct NumberParser: qi::grammar<Iterator, Number()> {
 	NumberParser() :
 			NumberParser::base_type(start, "Number") {
 		using ascii::digit;
+		using ascii::char_;
+		using phoenix::val;
+		using namespace qi::labels;
 
-
-		number = +digit;
+		number = +digit [ref(_val) += _1] ||
+					+(char_('.') [ref(_val) += _1] >>
+					digit [ref(_val) += _1] >>
+					*digit [ref(_val) += _1]);
 		start = number;
 	}
 

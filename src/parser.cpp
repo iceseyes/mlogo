@@ -21,6 +21,11 @@ Statement parse(const std::string &line) {
 	return parse<StatementParser, Statement>(line);
 }
 
+::std::ostream &operator<<(::std::ostream &s, const Number &n) {
+	s << n.value;
+	return s;
+}
+
 }
 }
 
