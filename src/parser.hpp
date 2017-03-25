@@ -48,6 +48,9 @@ struct Variable {
 
 	Variable(const std::string &name) :
 			name(name) {}
+
+	bool operator!=(const Variable &b) const { return !(*this == b); }
+	bool operator==(const Variable &b) const { return name==b.name; }
 };
 
 struct ProcName {
@@ -57,6 +60,9 @@ struct ProcName {
 
 	ProcName(const std::string &name) :
 			name(name) {}
+
+	bool operator!=(const ProcName &b) const { return !(*this == b); }
+	bool operator==(const ProcName &b) const { return name==b.name; }
 };
 
 using Argument = boost::variant<ProcName, Word, Number, Variable>;
@@ -88,7 +94,8 @@ Statement parse(const std::string &line);
 
 ::std::ostream &operator<<(::std::ostream &s, const Word &n);
 ::std::ostream &operator<<(::std::ostream &s, const Number &n);
-
+::std::ostream &operator<<(::std::ostream &s, const Variable &n);
+::std::ostream &operator<<(::std::ostream &s, const ProcName &n);
 
 }
 
