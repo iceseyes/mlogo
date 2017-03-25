@@ -65,18 +65,19 @@ struct ProcName {
 	bool operator==(const ProcName &b) const { return name==b.name; }
 };
 
-using Argument = boost::variant<ProcName, Word, Number, Variable>;
+struct List {
+	std::vector<Word> items;
 
-struct DisplayArgumentVisitor : boost::static_visitor<std::string> {
-	template<typename Value>
-	std::string operator()(Value &&v) const {
-		return v.name;
-	}
+	List() {}
 
-	std::string operator()(Number &v) const {
-		return v.value;
-	}
+	bool operator!=(const List &b) const { return !(*this == b); }
+	bool operator==(const List &b) const { return items==b.items; }
+
+	void push_back(const Word &w) { items.push_back(w); }
+	void push_back(Word &&w) { items.push_back(w); }
 };
+
+    using Argument = boost::variant<ProcName, Word, Number, Variable, List>;
 
 struct Statement {
 	ProcName name;
@@ -96,7 +97,26 @@ Statement parse(const std::string &line);
 ::std::ostream &operator<<(::std::ostream &s, const Number &n);
 ::std::ostream &operator<<(::std::ostream &s, const Variable &n);
 ::std::ostream &operator<<(::std::ostream &s, const ProcName &n);
+::std::ostream &operator<<(::std::ostream &s, const List &n);
 
+struct DisplayArgumentVisitor : boost::static_visitor<std::string> {
+	template<typename Value>
+	std::string operator()(Value &&v) const {
+		return v.name;
+	}
+
+	std::string operator()(Number &v) const {
+		return v.value;
+	}
+
+    std::string operator()(List &v) const {
+        std::stringstream ss;
+        ss << v;
+		return ss.str();
+    }
+	
+};
+    
 }
 
 }

@@ -32,7 +32,7 @@ struct SimpleWordParser: qi::grammar<Iterator, std::string()> {
 		using ascii::alnum;
 		using ascii::punct;
 
-		start = +(alnum | punct);
+		start = +(alnum | (punct - '[' - ']'));
 	}
 
 	qi::rule<Iterator, std::string()> start;
@@ -58,6 +58,28 @@ struct VariableParser: qi::grammar<Iterator, Variable()> {
 
 	SimpleWordParser<Iterator> simpleWord;
 	qi::rule<Iterator, Variable()> start;
+};
+
+template<typename Iterator>
+struct ListParser: qi::grammar<Iterator, List()> {
+	ListParser() :
+		ListParser::base_type(start, "List") {
+		using qi::lexeme;
+		using qi::char_;
+		using ascii::alnum;
+		using ascii::alpha;
+		using ascii::space;
+		using ascii::punct;
+		using phoenix::val;
+		using phoenix::construct;
+		using phoenix::push_back;
+		using namespace qi::labels;
+
+		start = '[' >> *space >> +(word [push_back(ref(_val), _1)] >> *space) >> ']';
+	}
+
+    SimpleWordParser<Iterator> word;
+	qi::rule<Iterator, List()> start;
 };
 
 template<typename Iterator>
@@ -109,10 +131,7 @@ struct StatementParser: qi::grammar<Iterator, Statement(), ascii::space_type> {
 
 		using namespace qi::labels;
 
-		list = '[' >> *(+(alnum | punct)) >> ']';
-
-		argument = word | proc_name | variable | number;
-
+		argument = word | proc_name | variable | number | list;
 		start = proc_name[at_c<0>(_val) = _1] >>
 				*argument[push_back(at_c<1>(_val), _1)];
 	}
@@ -121,7 +140,7 @@ struct StatementParser: qi::grammar<Iterator, Statement(), ascii::space_type> {
 	NumberParser<Iterator> number;
 	VariableParser<Iterator> variable;
 	ProcNameParser<Iterator> proc_name;
-	qi::rule<Iterator, std::string(), ascii::space_type> list;
+	ListParser<Iterator> list;
 	qi::rule<Iterator, Argument(), ascii::space_type> argument;
 	qi::rule<Iterator, Statement(), ascii::space_type> start;
 };

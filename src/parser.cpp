@@ -41,6 +41,13 @@ Statement parse(const std::string &line) {
 	return s;
 }
 
+::std::ostream &operator<<(::std::ostream &s, const List &n) {
+    s << "[";
+    for(auto &v : n.items) s << v;
+    s << "]";
+    return s;
+}
+
 }
 }
 
