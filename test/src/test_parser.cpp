@@ -76,3 +76,25 @@ TEST(Parser, parseProcName) {
 	ASSERT_ANY_THROW(f("test test"));
 }
 
+TEST(Parser, parseStatement) {
+	auto stmt = parse("fd 10");
+	ASSERT_EQ(ProcName("fd"), stmt.name);
+	ASSERT_EQ(1u, stmt.arguments.size());
+	ASSERT_EQ(Number("10"), boost::get<Number>(stmt.arguments[0]));
+
+	stmt = parse("fd 10 rt 90 fd 10 rt 90 fd 10 rt 90 fd 10");
+	ASSERT_EQ(ProcName("fd"), stmt.name);
+	ASSERT_EQ(13u, stmt.arguments.size());
+
+	stmt = parse("print \"Hello");
+	ASSERT_EQ(ProcName("fd"), stmt.name);
+	ASSERT_EQ(1u, stmt.arguments.size());
+	ASSERT_EQ(Word("Hello"), boost::get<Word>(stmt.arguments[0]));
+
+	stmt = parse("print SUM 1 2");
+	ASSERT_EQ(ProcName("fd"), stmt.name);
+	ASSERT_EQ(3u, stmt.arguments.size());
+	ASSERT_EQ(ProcName("SUM"), boost::get<ProcName>(stmt.arguments[0]));
+
+	FAIL() << "Incomplete Test";
+}
