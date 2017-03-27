@@ -16,7 +16,7 @@ namespace parser {
 
 using iterator_type = std::string::const_iterator;
 using Parser = StatementParser<iterator_type>;
-  
+
 Statement parse(const std::string &line) {
 	return parse<StatementParser, Statement>(line);
 }

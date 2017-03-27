@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
 		cout << f->arguments.front() << endl;
 	};
 
-	std::string str;
+	string str;
 	cout << endl << "? ";
 	while(std::getline(std::cin, str)) {
 		if(str.empty() || str[0] == 'q' || str[0] == 'Q') break;

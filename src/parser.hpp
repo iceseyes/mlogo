@@ -114,9 +114,8 @@ struct DisplayArgumentVisitor : boost::static_visitor<std::string> {
         ss << v;
 		return ss.str();
     }
-	
 };
-    
+
 }
 
 }
