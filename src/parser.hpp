@@ -77,7 +77,7 @@ struct List {
 	void push_back(Word &&w) { items.push_back(w); }
 };
 
-    using Argument = boost::variant<ProcName, Word, Number, Variable, List>;
+using Argument = boost::variant<ProcName, Word, Number, Variable, List>;
 
 struct Statement {
 	ProcName name;

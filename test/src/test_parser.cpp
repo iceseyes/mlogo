@@ -116,5 +116,12 @@ TEST(Parser, parseStatement) {
 	ASSERT_EQ(3u, stmt.arguments.size());
 	ASSERT_EQ(ProcName("SUM"), boost::get<ProcName>(stmt.arguments[0]));
 
-	FAIL() << "Incomplete Test";
+	List list;
+	list.push_back({"Hello"});
+	list.push_back({"World"});
+
+	stmt = parse("print [Hello World]");
+	ASSERT_EQ(ProcName("print"), stmt.name);
+	ASSERT_EQ(1u, stmt.arguments.size());
+	ASSERT_EQ(list, boost::get<List>(stmt.arguments[0]));
 }

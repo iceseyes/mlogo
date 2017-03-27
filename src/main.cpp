@@ -27,7 +27,9 @@ int main(int argc, char **argv) {
 
 		f.arguments.clear();
 		for (auto a : stmt.arguments) {
-			f.arguments.push_back(boost::apply_visitor(mlogo::parser::DisplayArgumentVisitor(), a));
+			f.arguments.push_back(
+				boost::apply_visitor(
+					mlogo::parser::DisplayArgumentVisitor(), a));
 		}
 
 		f.procedures[stmt.name.name](&f);
