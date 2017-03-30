@@ -8,20 +8,39 @@
 #ifndef MEMORY_HPP_
 #define MEMORY_HPP_
 
+#include <cinttypes>
 #include <map>
 #include <vector>
 #include <string>
-#include <functional>
+
+#include "types.hpp"
 
 namespace mlogo {
 
 namespace memory {
 
 class Frame {
+	using ProcedurePtr = types::BasicProcedure *;
+	using ActualArguments = types::ActualArguments;
+
 public:
-	std::map<std::string, std::function<void (Frame *)>> procedures;
+	Frame();
+	Frame(Frame &parent);
+
+	void pushProcedure(const std::string &name, ProcedurePtr *procObj);
+	void callProcedure(const std::string &name, ActualArguments args);
+
+	std::string &getVariable(const std::string &name);
+	const std::string &getVariable(const std::string &name) const;
+
+protected:
+	ProcedurePtr _procByName(const std::string &name);
+
+private:
+	std::map<std::string, ProcedurePtr> procedures;
 	std::map<std::string, std::string> variables;
-	std::vector<std::string> arguments;
+
+	Frame *_parent;
 };
 
 } /* ns memory */

@@ -8,53 +8,54 @@
 #ifndef TYPES_HPP_
 #define TYPES_HPP_
 
+#include <cinttypes>
 #include <string>
+#include <tuple>
+#include <vector>
 
 namespace mlogo {
 
+namespace memory {
+
+class Frame;
+
+} /* ns: Frame */
+
 namespace types {
 
-class Value;
-
-class ValueType {
+class ActualArguments {
 public:
-	ValueType();
-	ValueType(const std::string &name);
-	virtual ~ValueType();
+	ActualArguments() {}
 
-	virtual Value evaluate() = 0;
+	ActualArguments &push_back(const std::string &value);
+	ActualArguments &push_back(std::string &&value);
 
-	std::string name;
+	std::string at(uint8_t index) const;
+
+private:
+	std::vector<std::string> arguments;
 };
 
-class Procedure : public ValueType {
+class BasicProcedure {
 public:
-	Procedure();
-	Procedure(const std::string &name);
+	BasicProcedure(uint8_t args, bool funct = false);
+	virtual void operator()(memory::Frame *frame) const = 0;
 
-	Value evaluate() override;
+	uint8_t nArgs() const { return _nArgs; }
+	bool isFunction() const { return _funct; }
 
-	Procedure &setNextArgument(const Value &v);
+private:
+	uint8_t _nArgs;
+	bool _funct;
 };
 
-class Variable : public ValueType {
+class Block {
 public:
-	Variable();
-	Variable(const std::string &name);
+	Block();
+	virtual void operator()(memory::Frame *frame) const;
 
-	Value evaluate() override;
-
-	std::string name;
-};
-
-class Constant : public ValueType {
-public:
-	Constant();
-	Constant(const std::string &name);
-
-	Value evaluate() override;
-
-	std::string name;
+private:
+	std::vector<std::pair<std::string, ActualArguments>> statements;
 };
 
 } /* ns types */
