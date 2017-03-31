@@ -15,12 +15,6 @@
 
 namespace mlogo {
 
-namespace memory {
-
-class Frame;
-
-} /* ns: Frame */
-
 namespace types {
 
 class ActualArguments {
@@ -39,7 +33,7 @@ private:
 class BasicProcedure {
 public:
 	BasicProcedure(uint8_t args, bool funct = false);
-	virtual void operator()(memory::Frame *frame) const = 0;
+	virtual void operator()() const = 0;
 
 	uint8_t nArgs() const { return _nArgs; }
 	bool isFunction() const { return _funct; }
@@ -52,7 +46,7 @@ private:
 class Block {
 public:
 	Block();
-	virtual void operator()(memory::Frame *frame) const;
+	virtual void operator()() const;
 
 private:
 	std::vector<std::pair<std::string, ActualArguments>> statements;
