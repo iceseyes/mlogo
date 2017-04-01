@@ -55,13 +55,12 @@ void Stack::callProcedure(const std::string &name, ActualArguments args) {
         auto &func = *iter->getProcedure(name);
 
         // open a new frame and store arguments
-        auto f = Frame();
+        auto f = openFrame().currentFrame();
         for(int i=0; i<func.nArgs(); ++i) {
             stringstream ss;
             ss << "_p" << i;
             f.setVariable(ss.str(), args.at(i));
         }
-        frames.push_back(f);
 
         // call the procedure
         func();
@@ -79,6 +78,11 @@ std::string &Stack::getVariable(const std::string &name) {
     }
 
     throw std::logic_error("Variable Undefined");
+}
+
+Stack &Stack::openFrame() {
+    frames.push_back(Frame());
+    return *this;
 }
 
 } /* ns: memory */

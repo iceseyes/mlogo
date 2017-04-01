@@ -55,8 +55,10 @@ public:
 	Frame &globalFrame() { return frames.front(); }
 	const Frame &globalFrame() const { return frames.front(); }
 
-	Frame &currentFrame() { return frames.front(); }
-	const Frame &currentFrame() const { return frames.front(); }
+	Frame &currentFrame() { return frames.back(); }
+	const Frame &currentFrame() const { return frames.back(); }
+
+	Stack &openFrame();
 
 private:
 	Stack();
