@@ -49,10 +49,10 @@ Stack::Stack() : frames(1) {
 void Stack::callProcedure(const std::string &name, ActualArguments args) {
     auto iter = find_if(
         frames.rbegin(), frames.rend(),
-        [&this, &name](Frame &f) { return f.hasProcedure(name); });
+        [this, &name](Frame &f) { return f.hasProcedure(name); });
 
     if(iter!=frames.rend()) {
-        auto func = *iter->getProcedure(name);
+        auto &func = *iter->getProcedure(name);
 
         // open a new frame and store arguments
         auto f = Frame();
@@ -72,7 +72,7 @@ void Stack::callProcedure(const std::string &name, ActualArguments args) {
 std::string &Stack::getVariable(const std::string &name) {
     auto iter = find_if(
         frames.rbegin(), frames.rend(),
-        [&this, &name](Frame &f) { return f.hasVariable(name); });
+        [this, &name](Frame &f) { return f.hasVariable(name); });
 
     if(iter!=frames.rend()) {
         return iter->getVariable(name);

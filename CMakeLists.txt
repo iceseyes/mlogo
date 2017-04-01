@@ -40,7 +40,8 @@ set(SRCS
     src/main.cpp)
     
 set(LIBLOGO_SRCS
-    src/parser.cpp)
+  src/parser.cpp src/memory.cpp
+  src/types.cpp)
 
 add_library(${MLOGO_LIBRARY} ${LIBLOGO_SRCS})
 
