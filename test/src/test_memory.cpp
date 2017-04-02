@@ -167,5 +167,34 @@ TEST(Memory, ProcedureWithArgs) {
     mem::Stack::instance().callProcedure("simple_print_1", args1);
     ASSERT_EQ("test", mem::Stack::instance().getVariable("__simple_print_result__"));
 
-    FAIL() << "Incomplete Test";
+    mem::ActualArguments args2;
+    args2.push_back("tset");
+    mem::Stack::instance().callProcedure("simple_print_1", args2);
+    ASSERT_EQ("tset", mem::Stack::instance().getVariable("__simple_print_result__"));
+
+    struct SimplePrint2: mlogo::types::BasicProcedure {
+        SimplePrint2() :
+                mlogo::types::BasicProcedure(2) {}
+
+        void operator()() const override {
+            std::string arg0 = fetchArg(0);
+            std::string arg1 = fetchArg(1);
+
+            mem::Stack::instance().globalFrame()
+                    .setVariable("__simple_print_result__", arg0 + " " + arg1);
+        }
+    };
+
+    mem::Stack::instance().currentFrame()
+            .setProcedure<SimplePrint2>("simple_print_2");
+
+    mem::ActualArguments args3;
+    args3.push_back("alpha");
+    args3.push_back("beta");
+    mem::Stack::instance().callProcedure("simple_print_2", args3);
+    ASSERT_EQ("alpha beta", mem::Stack::instance().getVariable("__simple_print_result__"));
+
+    mem::Stack::instance().callProcedure("simple_print_1", args3);
+    ASSERT_EQ("alpha", mem::Stack::instance().getVariable("__simple_print_result__"));
+    ASSERT_THROW(mem::Stack::instance().callProcedure("simple_print_2", args2), std::logic_error);
 }

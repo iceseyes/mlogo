@@ -33,6 +33,7 @@ private:
 class BasicProcedure {
 public:
 	BasicProcedure(uint8_t args, bool funct = false);
+	virtual ~BasicProcedure() {}
 	virtual void operator()() const = 0;
 
 	uint8_t nArgs() const { return _nArgs; }
@@ -49,6 +50,7 @@ private:
 class Block {
 public:
 	Block();
+	virtual ~Block() {}
 	virtual void operator()() const;
 
 private:

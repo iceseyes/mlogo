@@ -43,22 +43,23 @@ Frame &Frame::setProcedure(const std::string &name, ProcedurePtr ptr) {
     throw invalid_argument("Function Pointer Must be a not null.");
 }
 
-Stack::Stack() : frames(1) {
+Stack::Stack() :
+        frames(1) {
     // Populate global frame with internal symbols.
     // initInternalSymbols();
 }
 
 void Stack::callProcedure(const std::string &name, ActualArguments args) {
     auto iter = find_if(
-        frames.rbegin(), frames.rend(),
-        [this, &name](Frame &f) { return f.hasProcedure(name); });
+            frames.rbegin(), frames.rend(),
+            [this, &name](Frame &f) {return f.hasProcedure(name);});
 
-    if(iter!=frames.rend()) {
+    if(iter != frames.rend()) {
         auto &func = *iter->getProcedure(name);
 
         // open a new frame and store arguments
-        auto f = openFrame().currentFrame();
-        for(int i=0; i<func.nArgs(); ++i) {
+        auto &f = openFrame().currentFrame();
+        for (int i = 0; i < func.nArgs(); ++i) {
             f.setVariable(argumentName(i), args.at(i));
         }
 
@@ -68,15 +69,15 @@ void Stack::callProcedure(const std::string &name, ActualArguments args) {
         // destroy function frame
         closeFrame();
     } else
-        throw std::logic_error("Procedure Undefined or invalid arguments");
+    throw std::logic_error("Procedure Undefined or invalid arguments");
 }
 
 std::string &Stack::getVariable(const std::string &name) {
     auto iter = find_if(
-        frames.rbegin(), frames.rend(),
-        [this, &name](Frame &f) { return f.hasVariable(name); });
+            frames.rbegin(), frames.rend(),
+            [this, &name](Frame &f) {return f.hasVariable(name);});
 
-    if(iter!=frames.rend()) {
+    if(iter != frames.rend()) {
         return iter->getVariable(name);
     }
 
@@ -93,7 +94,7 @@ Stack &Stack::openFrame() {
 }
 
 Stack &Stack::closeFrame() {
-    if(nFrames()>1) { // current frame is not global frame
+    if(nFrames() > 1) {  // current frame is not global frame
         frames.pop_back();
         return *this;
     }

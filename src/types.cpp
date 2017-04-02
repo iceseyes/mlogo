@@ -5,7 +5,6 @@
  *      author: Massimo Bianchi <bianchi.massimo@gmail.com>
  */
 
-
 #include "types.hpp"
 
 #include "memory.hpp"
@@ -29,7 +28,7 @@ std::string ActualArguments::at(uint8_t index) const {
 }
 
 BasicProcedure::BasicProcedure(uint8_t args, bool funct) :
-    _nArgs {args}, _funct {funct} {}
+        _nArgs { args }, _funct { funct } {}
 
 std::string BasicProcedure::fetchArg(uint8_t index) const {
     return memory::Stack::instance().getArgument(index);
