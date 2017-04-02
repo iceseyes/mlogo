@@ -53,6 +53,8 @@ TEST(Memory, globalFrameVariables) {
     // a new frame was opened, so reference to global frame is changed.
     ASSERT_TRUE(&frame != &mem::Stack::instance().globalFrame())
         << "Stack has opened e new stack causing a realloc for the stack itself";
+
+    mem::Stack::instance().closeFrame();
 }
 
 TEST(Memory, nonGlobalFrameVariables) {
@@ -99,4 +101,71 @@ TEST(Memory, nonGlobalFrameVariables) {
 
     ASSERT_TRUE(&frame != &mem::Stack::instance().currentFrame())
         << "Stack has opened e new stack causing a realloc for the stack itself";
+
+    mem::Stack::instance().closeFrame();
+    mem::Stack::instance().closeFrame();
+}
+
+TEST(Memory, globalFrameProcedureNoArgs) {
+    auto &frame = mem::Stack::instance().globalFrame();
+
+    ASSERT_FALSE(frame.hasProcedure("f_test"));
+    ASSERT_FALSE(frame.hasProcedure("f_test2"));
+    ASSERT_THROW(mem::Stack::instance().callProcedure("f_test", {}), std::logic_error);
+    ASSERT_THROW(mem::Stack::instance().callProcedure("f_test2", {}), std::logic_error);
+
+    struct Nop : mlogo::types::BasicProcedure {
+        Nop() : mlogo::types::BasicProcedure(0) {}
+        void operator()() const override { /* empty procedure */ }
+    };
+
+    ASSERT_EQ(1u, mem::Stack::instance().nFrames());
+    mem::Stack::instance().globalFrame().setProcedure<Nop>("nop");
+    ASSERT_TRUE(mem::Stack::instance().globalFrame().hasProcedure("nop"));
+    ASSERT_NO_THROW(mem::Stack::instance().callProcedure("nop", {}));
+    ASSERT_EQ(1u, mem::Stack::instance().nFrames());
+
+    mem::Stack::instance().globalFrame().setVariable("globalLocalVar2", "empty");
+    struct updateGlobal : mlogo::types::BasicProcedure {
+        updateGlobal() : mlogo::types::BasicProcedure(0) {}
+        void operator()() const override {
+            ASSERT_EQ(2u, mem::Stack::instance().nFrames());
+            mem::Stack::instance().globalFrame().setVariable("globalNewVar1", "123");
+            mem::Stack::instance().globalFrame().setVariable("globalLocalVar2", "321");
+        }
+    };
+
+    ASSERT_EQ(1u, mem::Stack::instance().nFrames());
+    mem::Stack::instance().globalFrame().setProcedure<updateGlobal>("update_global");
+    ASSERT_TRUE(mem::Stack::instance().globalFrame().hasProcedure("update_global"));
+
+    ASSERT_EQ("empty", mem::Stack::instance().getVariable("globalLocalVar2"));
+    ASSERT_THROW(mem::Stack::instance().getVariable("globalNewVar1"), std::logic_error);
+    ASSERT_NO_THROW(mem::Stack::instance().callProcedure("update_global", {}));
+    ASSERT_EQ("321", mem::Stack::instance().getVariable("globalLocalVar2"));
+    ASSERT_EQ("123", mem::Stack::instance().getVariable("globalNewVar1"));
+    ASSERT_EQ(1u, mem::Stack::instance().nFrames());
+}
+
+TEST(Memory, ProcedureWithArgs) {
+    struct SimplePrint1 : mlogo::types::BasicProcedure {
+        SimplePrint1() : mlogo::types::BasicProcedure(1) {}
+        void operator()() const override {
+            std::string arg0 = fetchArg(0);
+            mem::Stack::instance().globalFrame()
+                .setVariable("__simple_print_result__", arg0);
+        }
+    };
+
+    mem::Stack::instance().currentFrame()
+        .setProcedure<SimplePrint1>("simple_print_1");
+
+    ASSERT_THROW(mem::Stack::instance().getVariable("__simple_print_result__"), std::logic_error);
+
+    mem::ActualArguments args1;
+    args1.push_back("test");
+    mem::Stack::instance().callProcedure("simple_print_1", args1);
+    ASSERT_EQ("test", mem::Stack::instance().getVariable("__simple_print_result__"));
+
+    FAIL() << "Incomplete Test";
 }

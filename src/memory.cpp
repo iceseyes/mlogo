@@ -17,6 +17,8 @@ using namespace std;
 namespace mlogo {
 namespace memory {
 
+const char Stack::__ARGUMENT_PREFIX[] { "_p" };
+
 bool Frame::hasVariable(const std::string &name) const {
     auto iter = variables.find(name);
     return iter != variables.end();
@@ -57,13 +59,14 @@ void Stack::callProcedure(const std::string &name, ActualArguments args) {
         // open a new frame and store arguments
         auto f = openFrame().currentFrame();
         for(int i=0; i<func.nArgs(); ++i) {
-            stringstream ss;
-            ss << "_p" << i;
-            f.setVariable(ss.str(), args.at(i));
+            f.setVariable(argumentName(i), args.at(i));
         }
 
         // call the procedure
         func();
+
+        // destroy function frame
+        closeFrame();
     } else
         throw std::logic_error("Procedure Undefined or invalid arguments");
 }
@@ -80,9 +83,29 @@ std::string &Stack::getVariable(const std::string &name) {
     throw std::logic_error("Variable Undefined");
 }
 
+std::string &Stack::getArgument(uint8_t index) {
+    return currentFrame().getVariable(argumentName(index));
+}
+
 Stack &Stack::openFrame() {
     frames.push_back(Frame());
     return *this;
+}
+
+Stack &Stack::closeFrame() {
+    if(nFrames()>1) { // current frame is not global frame
+        frames.pop_back();
+        return *this;
+    }
+
+    throw std::logic_error("Global Frame cannot be closed.");
+}
+
+std::string Stack::argumentName(uint8_t index) const {
+    stringstream ss;
+    ss << __ARGUMENT_PREFIX << index;
+
+    return ss.str();
 }
 
 } /* ns: memory */

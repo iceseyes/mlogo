@@ -38,6 +38,9 @@ public:
 	uint8_t nArgs() const { return _nArgs; }
 	bool isFunction() const { return _funct; }
 
+protected:
+	std::string fetchArg(uint8_t index) const;
+
 private:
 	uint8_t _nArgs;
 	bool _funct;
