@@ -41,6 +41,7 @@ public:
 
 protected:
 	std::string fetchArg(uint8_t index) const;
+	void setReturnValue(const std::string output) const;
 
 private:
 	uint8_t _nArgs;

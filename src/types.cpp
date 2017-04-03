@@ -34,6 +34,14 @@ std::string BasicProcedure::fetchArg(uint8_t index) const {
     return memory::Stack::instance().getArgument(index);
 }
 
+void BasicProcedure::setReturnValue(const std::string output) const {
+    if(!_funct) {
+        throw std::logic_error("Pure procedure can not return a value");
+    }
+
+    memory::Stack::instance().storeResult(output);
+}
+
 } /* ns: types */
 
 } /* ns: mlogo */

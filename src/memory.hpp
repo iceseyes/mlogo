@@ -40,9 +40,19 @@ public:
 		return setProcedure(name, new Proc(std::forward<Args>(args)...));
 	}
 
+	Frame &storeResult(const std::string &result);
+	Frame &setResultVariable(const Frame &child);
+	Frame &waitForValueIn(const std::string &varName) { _lastResultVariable = varName; return *this; }
+
+	bool hasResult() const { return hasResultSetted; }
+	bool waitForValue() const { return !_lastResultVariable.empty(); }
+
 private:
 	std::map<std::string, ProcedurePtr> procedures;
 	std::map<std::string, std::string> variables;
+	std::string _lastResult;
+	std::string _lastResultVariable;
+	mutable bool hasResultSetted { false };
 };
 using FrameList = std::vector<Frame>;
 
@@ -53,7 +63,7 @@ public:
 		return _instance;
 	}
 
-	void callProcedure(const std::string &name, ActualArguments args);
+	void callProcedure(const std::string &name, ActualArguments args, const std::string &returnIn = "___discard_return_value__");
 	std::string &getVariable(const std::string &name);
 	std::string &getArgument(uint8_t index);
 
@@ -66,6 +76,8 @@ public:
 	Stack &openFrame();
 	std::size_t nFrames() const { return frames.size(); }
 	Stack &closeFrame();
+
+	Stack &storeResult(const std::string &result);
 
 private:
 	static const char __ARGUMENT_PREFIX[];

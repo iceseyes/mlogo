@@ -43,19 +43,39 @@ Frame &Frame::setProcedure(const std::string &name, ProcedurePtr ptr) {
     throw invalid_argument("Function Pointer Must be a not null.");
 }
 
+Frame &Frame::storeResult(const std::string &result) {
+    hasResultSetted = true;
+    _lastResult = result;
+    return *this;
+}
+
+Frame &Frame::setResultVariable(const Frame &child) {
+    if(!_lastResultVariable.empty()) {
+        if(!child.hasResultSetted) throw std::logic_error("Current Frame does not mantain a return value.");
+        setVariable(_lastResultVariable, child._lastResult);
+        child.hasResultSetted = false;
+        _lastResultVariable = "";
+    }
+
+    return *this;
+}
+
 Stack::Stack() :
         frames(1) {
     // Populate global frame with internal symbols.
     // initInternalSymbols();
 }
 
-void Stack::callProcedure(const std::string &name, ActualArguments args) {
+void Stack::callProcedure(const std::string &name, ActualArguments args, const std::string &returnIn) {
     auto iter = find_if(
             frames.rbegin(), frames.rend(),
             [this, &name](Frame &f) {return f.hasProcedure(name);});
 
     if(iter != frames.rend()) {
         auto &func = *iter->getProcedure(name);
+
+        if(func.isFunction())
+            currentFrame().waitForValueIn(returnIn);
 
         // open a new frame and store arguments
         auto &f = openFrame().currentFrame();
@@ -94,6 +114,18 @@ Stack &Stack::openFrame() {
 }
 
 Stack &Stack::closeFrame() {
+    if(nFrames() > 2) {  // current frame is not global frame
+        auto &current = frames[frames.size()-1];
+        auto &parent = frames[frames.size()-2];
+        if(current.hasResult() && parent.waitForValue()) {
+            parent.setResultVariable(current);
+        } else if(current.hasResult()) {
+            throw std::logic_error("Procedure can not return a value to none.");
+        } else if(parent.waitForValue()) {
+            throw std::logic_error("Expected a function, found procedure instead.");
+        }
+    }
+
     if(nFrames() > 1) {  // current frame is not global frame
         frames.pop_back();
         return *this;
@@ -107,6 +139,11 @@ std::string Stack::argumentName(uint8_t index) const {
     ss << __ARGUMENT_PREFIX << index;
 
     return ss.str();
+}
+
+Stack &Stack::storeResult(const std::string &result) {
+    currentFrame().storeResult(result);
+    return *this;
 }
 
 } /* ns: memory */
