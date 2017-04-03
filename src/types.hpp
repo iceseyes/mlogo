@@ -48,16 +48,6 @@ private:
 	bool _funct;
 };
 
-class Block {
-public:
-	Block();
-	virtual ~Block() {}
-	virtual void operator()() const;
-
-private:
-	std::vector<std::pair<std::string, ActualArguments>> statements;
-};
-
 } /* ns types */
 
 } /* ns mlogo */

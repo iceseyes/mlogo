@@ -7,6 +7,9 @@
 
 
 #include <gtest/gtest.h>
+
+#include <sstream>
+
 #include "memory.hpp"
 
 namespace mem = mlogo::memory;
@@ -197,4 +200,39 @@ TEST(Memory, ProcedureWithArgs) {
     mem::Stack::instance().callProcedure("simple_print_1", args3);
     ASSERT_EQ("alpha", mem::Stack::instance().getVariable("__simple_print_result__"));
     ASSERT_THROW(mem::Stack::instance().callProcedure("simple_print_2", args2), std::logic_error);
+}
+
+TEST(Memory, ProcedureWithArgsAndReturnValue) {
+    struct Sum : mlogo::types::BasicProcedure {
+        Sum() : mlogo::types::BasicProcedure(2, true) {}
+        void operator()() const override {
+            std::stringstream ss;
+            std::string arg0 = fetchArg(0);
+            std::string arg1 = fetchArg(1);
+            ss << (std::stoi(arg0) + std::stoi(arg1));
+            mem::Stack::instance().storeResult(ss.str());
+        }
+    };
+
+    struct SimplePrint3 : mlogo::types::BasicProcedure {
+        SimplePrint3() : mlogo::types::BasicProcedure(0) {}
+        void operator()() const override {
+            mem::ActualArguments args;
+            args.push_back("2");
+            args.push_back("3");
+
+            mem::Stack::instance().callProcedure("sum", args, "res");
+            std::string arg0 = mem::Stack::instance().getVariable("res");
+            mem::Stack::instance().globalFrame()
+                .setVariable("__simple_print_result__", arg0);
+        }
+    };
+
+    mem::Stack::instance().currentFrame()
+        .setProcedure<Sum>("sum")
+        .setProcedure<SimplePrint3>("simple_print_3");
+
+    mem::ActualArguments args;
+    mem::Stack::instance().callProcedure("simple_print_3", args);
+    ASSERT_EQ("5", mem::Stack::instance().getVariable("__simple_print_result__"));
 }
