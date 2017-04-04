@@ -30,11 +30,12 @@ endif(USE_BOOST_STATIC)
 
 find_package(Threads)
 find_package(Boost REQUIRED COMPONENTS thread log_setup log filesystem program_options system)
+find_package(SDL2 REQUIRED)
 
 set(MLOGO_DEPS
-    ${Boost_LIBRARIES} rt ${CMAKE_THREAD_LIBS_INIT})
+    ${Boost_LIBRARIES} rt ${CMAKE_THREAD_LIBS_INIT} ${SDL2_LIBRARY})
 
-include_directories(${Boost_INCLUDE_DIRS})
+include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIR})
 
 set(SRCS
     src/main.cpp)
