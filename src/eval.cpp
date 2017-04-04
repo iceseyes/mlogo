@@ -8,13 +8,28 @@
 
 #include "eval.hpp"
 
+#include <boost/variant.hpp>
+
 #include "memory.hpp"
+
+#include "eval_impl.hpp"
 
 namespace mlogo {
 
 namespace eval {
 
 using Stack = memory::Stack;
+
+Statement *make_statement(mlogo::parser::Statement &stmt) {
+    auto s = new mlogo::eval::Statement ( new mlogo::eval::Statement::Procedure(stmt.name.name) );
+    impl::EvalStmtBuilderVisitor v(s);
+
+    for(auto a : stmt.arguments) {
+        boost::apply_visitor(v, a);
+    }
+
+    return s;
+}
 
 Statement::Procedure::Procedure(const std::string &name) :
     procName(name) {}

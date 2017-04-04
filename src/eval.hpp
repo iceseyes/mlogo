@@ -14,6 +14,12 @@
 
 namespace mlogo {
 
+namespace parser {
+
+class Statement;
+
+} /* ns: parser */
+
 namespace eval {
 
 class Statement {
@@ -61,6 +67,8 @@ private:
 
     friend struct Statement::Procedure;
 };
+
+Statement *make_statement(mlogo::parser::Statement &stmt);
 
 } /* ns: eval */
 
