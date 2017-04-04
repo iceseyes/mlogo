@@ -28,6 +28,8 @@ public:
         virtual ~Type() {};
 
         virtual std::string value(const Statement *) const = 0;
+
+        virtual std::size_t nArgs() const { return 0; }
     };
 
     struct Procedure : Type {
@@ -35,6 +37,10 @@ public:
         std::string value(const Statement *) const override;
 
         const std::string procName;
+        std::size_t nArgs() const override { return _nargs; }
+
+    private:
+        std::size_t _nargs;
     };
 
     struct Variable : Type {
@@ -56,9 +62,13 @@ public:
     Statement(Type *t, Statement *parent = nullptr);
     ~Statement();
 
-    std::string operator()() const;
+    std::string apply() const;
+    std::string operator()() const { return apply(); }
 
     Statement *parent() { return _parent; }
+    std::size_t nArgs() const { return type->nArgs(); }
+    std::size_t size() const { return children.size(); }
+    bool completed() const { return nArgs() == size(); }
 
 private:
     Type *type;
@@ -69,6 +79,7 @@ private:
 };
 
 Statement *make_statement(mlogo::parser::Statement &stmt);
+Statement *make_statement(mlogo::parser::Statement &&stmt);
 
 } /* ns: eval */
 

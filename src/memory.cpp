@@ -92,6 +92,18 @@ void Stack::callProcedure(const std::string &name, ActualArguments args, const s
         throw std::logic_error("Procedure Undefined or invalid arguments");
 }
 
+std::size_t Stack::getProcedureNArgs(const std::string &name) {
+    auto iter = find_if(
+        frames.rbegin(), frames.rend(),
+        [this, &name](Frame &f) {return f.hasProcedure(name);});
+
+    if(iter != frames.rend()) {
+        auto &func = *iter->getProcedure(name);
+        return func.nArgs();
+    } else
+        throw std::logic_error("Procedure Undefined");
+}
+
 std::string &Stack::getVariable(const std::string &name) {
     auto iter = find_if(
             frames.rbegin(), frames.rend(),

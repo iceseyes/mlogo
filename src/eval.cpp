@@ -31,8 +31,19 @@ Statement *make_statement(mlogo::parser::Statement &stmt) {
     return s;
 }
 
+Statement *make_statement(mlogo::parser::Statement &&stmt) {
+    auto s = new mlogo::eval::Statement ( new mlogo::eval::Statement::Procedure(stmt.name.name) );
+    impl::EvalStmtBuilderVisitor v(s);
+
+    for(auto a : stmt.arguments) {
+        boost::apply_visitor(v, a);
+    }
+
+    return s;
+}
+
 Statement::Procedure::Procedure(const std::string &name) :
-    procName(name) {}
+    procName(name), _nargs(Stack::instance().getProcedureNArgs(name)) {}
 
 std::string Statement::Procedure::value(const Statement *current) const {
     memory::ActualArguments args;
@@ -67,10 +78,10 @@ Statement::~Statement() {
     delete type;
 }
 
-std::string Statement::operator()() const {
+std::string Statement::apply() const {
     return type->value(this);
 }
 
-}
+} /* ns: eval */
 
-}
+} /* ns: mlogo */

@@ -64,6 +64,7 @@ public:
 	}
 
 	void callProcedure(const std::string &name, ActualArguments args, const std::string &returnIn = "___discard_return_value__");
+	std::size_t getProcedureNArgs(const std::string &name);
 	std::string &getVariable(const std::string &name);
 	std::string &getArgument(uint8_t index);
 

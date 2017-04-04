@@ -17,6 +17,7 @@
 
 #include "parser.hpp"
 
+
 namespace mlogo {
 
 namespace eval {
@@ -29,16 +30,14 @@ struct EvalStmtBuilderVisitor : boost::static_visitor<void> {
 
 	template<typename Value>
 	void operator()(Value &&v) const {
-		if(!counter) node = node->parent();
-		counter--;
+		setParent();
 
 		new mlogo::eval::Statement (
 			new mlogo::eval::Statement::Const(v.name), node);
 	}
 
 	void operator()(mlogo::parser::Number &v) const {
-		if(!counter) node = node->parent();
-		counter--;
+		setParent();
 
 		new mlogo::eval::Statement (
 			new mlogo::eval::Statement::Const(v.value), node);
@@ -46,16 +45,15 @@ struct EvalStmtBuilderVisitor : boost::static_visitor<void> {
 	}
 
 	void operator()(mlogo::parser::ProcName &v) const {
+		setParent();
+
 		node = new mlogo::eval::Statement (
 			new mlogo::eval::Statement::Procedure(v.name), node);
-
-		auto *f = mlogo::memory::Stack::instance().globalFrame().getProcedure(v.name);
-		counter = f->nArgs();
 	}
 
     void operator()(mlogo::parser::List &v) const {
-		if(!counter) node = node->parent();
-		counter--;
+		setParent();
+
 		std::stringstream ss;
         ss << v;
 
@@ -63,8 +61,17 @@ struct EvalStmtBuilderVisitor : boost::static_visitor<void> {
 			new mlogo::eval::Statement::Const(ss.str()), node);
     }
 
+private:
+	void setParent() const {
+		while(node && node->completed())
+			node = node->parent();
+
+		if(!node) {
+			throw std::logic_error("Exceed Procedure Arguments.");
+		}
+	}
+
 	mutable mlogo::eval::Statement *node;
-	mutable int counter { -1 };
 };
 
 
