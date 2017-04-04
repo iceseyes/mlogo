@@ -21,8 +21,9 @@ Statement::Procedure::Procedure(const std::string &name) :
 
 std::string Statement::Procedure::value(const Statement *current) const {
     memory::ActualArguments args;
-    for(auto child : current->children)
+    for(auto child : current->children) {
         args.push_back((*child)());
+    }
 
     Stack::instance().currentFrame().setVariable("__internal__returned__value__captured__", "");
     Stack::instance().callProcedure(procName, args, "__internal__returned__value__captured__");

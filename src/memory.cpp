@@ -9,6 +9,7 @@
 #include "memory.hpp"
 
 #include <sstream>
+#include <iostream>
 #include <algorithm>
 #include <stdexcept>
 
@@ -74,8 +75,7 @@ void Stack::callProcedure(const std::string &name, ActualArguments args, const s
     if(iter != frames.rend()) {
         auto &func = *iter->getProcedure(name);
 
-        if(func.isFunction())
-            currentFrame().waitForValueIn(returnIn);
+        if(func.isFunction()) currentFrame().waitForValueIn(returnIn);
 
         // open a new frame and store arguments
         auto &f = openFrame().currentFrame();
@@ -89,7 +89,7 @@ void Stack::callProcedure(const std::string &name, ActualArguments args, const s
         // destroy function frame
         closeFrame();
     } else
-    throw std::logic_error("Procedure Undefined or invalid arguments");
+        throw std::logic_error("Procedure Undefined or invalid arguments");
 }
 
 std::string &Stack::getVariable(const std::string &name) {
@@ -114,24 +114,23 @@ Stack &Stack::openFrame() {
 }
 
 Stack &Stack::closeFrame() {
-    if(nFrames() > 2) {  // current frame is not global frame
-        auto &current = frames[frames.size()-1];
-        auto &parent = frames[frames.size()-2];
-        if(current.hasResult() && parent.waitForValue()) {
-            parent.setResultVariable(current);
-        } else if(current.hasResult()) {
-            throw std::logic_error("Procedure can not return a value to none.");
-        } else if(parent.waitForValue()) {
-            throw std::logic_error("Expected a function, found procedure instead.");
-        }
+    if(nFrames() <= 1) {  // current frame is global frame or no frames at all!
+        throw std::logic_error("Global Frame cannot be closed.");
     }
 
-    if(nFrames() > 1) {  // current frame is not global frame
-        frames.pop_back();
-        return *this;
+    auto &current = frames[frames.size()-1];
+    auto &parent = frames[frames.size()-2];
+
+    if(current.hasResult() && parent.waitForValue()) {
+        parent.setResultVariable(current);
+    } else if(current.hasResult()) {
+        throw std::logic_error("Procedure can not return a value to none.");
+    } else if(parent.waitForValue()) {
+        throw std::logic_error("Expected a function, found procedure instead.");
     }
 
-    throw std::logic_error("Global Frame cannot be closed.");
+    frames.pop_back();
+    return *this;
 }
 
 std::string Stack::argumentName(uint8_t index) const {
