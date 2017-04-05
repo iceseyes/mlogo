@@ -43,6 +43,7 @@ set(SRCS
 set(LIBLOGO_SRCS
   src/parser.cpp src/memory.cpp
   src/types.cpp src/eval.cpp
+  src/graphics.cpp src/turtle.cpp
   src/builtin.cpp)
 
 add_library(${MLOGO_LIBRARY} ${LIBLOGO_SRCS})
@@ -50,6 +51,7 @@ add_library(${MLOGO_LIBRARY} ${LIBLOGO_SRCS})
 add_executable(${MLOGO_PROGRAM} ${SRCS})
   
 target_link_libraries(${MLOGO_PROGRAM} ${MLOGO_DEPS} ${MLOGO_LIBRARY})
+target_link_libraries(${MLOGO_LIBRARY} ${MLOGO_DEPS})
 
 if(WITH_TESTS)
   add_subdirectory(test)
