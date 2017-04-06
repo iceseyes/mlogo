@@ -23,12 +23,13 @@ using Path = graphics::Path;
 using GC = graphics::Context;
 
 struct Turtle::_pImpl {
+    static constexpr float START_ANGLE { 180.0 };
     static constexpr int TURTLE_HEIGHT { 10 };
     static constexpr int TURTLE_BASE   { 10 };
     static constexpr int TURTLE_HEAD_X { GC::SCREEN_WIDTH / 2 };
     static constexpr int TURTLE_HEAD_Y { (GC::SCREEN_HEIGHT - TURTLE_HEIGHT) / 2};
 
-    _pImpl() : angle(180.0) {
+    _pImpl() : angle(START_ANGLE) {
         createTurle();
         initPaths();
     }
@@ -49,12 +50,16 @@ struct Turtle::_pImpl {
 
     void initPaths() {
         clearPaths();
-        paths.push_back(GC::instance().createPath(GC::SCREEN_WIDTH/2, GC::SCREEN_HEIGHT/2));
+        newPath();
     }
 
     void clearPaths() {
         for(auto p : paths) delete p;
         paths.clear();
+    }
+
+    void newPath() {
+        paths.push_back(GC::instance().createPath(GC::SCREEN_WIDTH/2, GC::SCREEN_HEIGHT/2));
     }
 
     Path *turtle { nullptr };
@@ -72,8 +77,11 @@ Turtle::~Turtle() {
 }
 
 Turtle &Turtle::home() {
+    impl->angle = _pImpl::START_ANGLE;
     impl->createTurle();
+    if(!impl->paths.back()->empty()) impl->newPath();
     render();
+
     return *this;
 }
 

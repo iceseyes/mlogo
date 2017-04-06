@@ -86,6 +86,7 @@ struct Path {
     virtual const void *data() const = 0;
     virtual size_t size() const = 0;
     virtual std::pair<int, int> last() = 0;
+    virtual bool empty() const { return size() == 0; }
 };
 
 double deg2rad(double deg);
