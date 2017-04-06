@@ -18,9 +18,6 @@
 #include <vector>
 #include <tuple>
 
-#include <iostream>
-#include <iomanip>
-
 #include <SDL2/SDL.h>
 
 namespace mlogo {

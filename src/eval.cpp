@@ -42,6 +42,18 @@ Statement *make_statement(mlogo::parser::Statement &&stmt) {
     return s;
 }
 
+AST make_ast(mlogo::parser::Statement &stmt) {
+    AST ast;
+    /* TODO */
+    return ast;
+}
+
+AST make_ast(mlogo::parser::Statement &&stmt) {
+    AST ast;
+    /* TODO */
+    return ast;
+}
+
 Statement::Procedure::Procedure(const std::string &name) :
     procName(name), _nargs(Stack::instance().getProcedureNArgs(name)) {}
 
@@ -80,6 +92,28 @@ Statement::~Statement() {
 
 std::string Statement::apply() const {
     return type->value(this);
+}
+
+AST::AST(AST &&ast) :
+    statements(std::move(ast.statements)) {
+    ast.statements.clear();
+}
+
+AST::~AST() {
+    for(auto s : statements) delete s;
+}
+
+AST &AST::operator=(AST &&ast) {
+    statements = std::move(ast.statements);
+    ast.statements.clear();
+    return *this;
+}
+
+void AST::apply() const {
+    for(auto s : statements) {
+        std::string v = s->apply();
+        if(!v.empty()) throw std::logic_error("You don't say what to do with " + v);
+    }
 }
 
 } /* ns: eval */

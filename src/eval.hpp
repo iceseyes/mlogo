@@ -78,8 +78,31 @@ private:
     friend struct Statement::Procedure;
 };
 
+class AST {
+public:
+    AST() {};
+    AST(AST &&ast);
+    ~AST();
+
+    AST &operator=(AST &&ast);
+
+    void apply() const;
+    void operator()() const { apply(); }
+
+private:
+    AST(const AST &) = delete;
+    AST &operator=(const AST &) = delete;
+
+    std::vector<Statement *> statements;
+
+    friend AST make_ast(mlogo::parser::Statement &stmt);
+    friend AST make_ast(mlogo::parser::Statement &&stmt);
+};
+
 Statement *make_statement(mlogo::parser::Statement &stmt);
 Statement *make_statement(mlogo::parser::Statement &&stmt);
+AST make_ast(mlogo::parser::Statement &stmt);
+AST make_ast(mlogo::parser::Statement &&stmt);
 
 } /* ns: eval */
 

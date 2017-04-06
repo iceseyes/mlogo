@@ -8,12 +8,15 @@
 #include <cmath>
 #include <iostream>
 
+#include <boost/algorithm/string.hpp>
+
 #include "parser.hpp"
 #include "memory.hpp"
 #include "eval.hpp"
 #include "turtle.hpp"
 
 using namespace std;
+using namespace boost;
 
 namespace mlogo { namespace builtin {
 
@@ -26,17 +29,24 @@ int main(int argc, char **argv) {
 	mlogo::builtin::initBuiltInProcedures();
 
 	string str;
+	cout << "Welcome to myLogo v0.0" << endl;
+
 	cout << endl << "? ";
 	while(std::getline(std::cin, str)) {
-		if(str.empty() || str[0] == 'q' || str[0] == 'Q') break;
+		if(to_lower_copy(str) == "bye") break;
 
-		auto stmt = mlogo::parser::parse(str);
-		auto s = mlogo::eval::make_statement(stmt);
+		mlogo::eval::Statement *s { nullptr };
+		try {
+			auto stmt = mlogo::parser::parse(str);
+			s = mlogo::eval::make_statement(stmt);
 
-		(*s)();
+			(*s)();
+		} catch(std::logic_error &e) {
+			cerr << "I don't know how to " << str << " (" << e.what() << ")" << endl;
+		}
 
 		delete s;
-		cout << endl << "? ";
+		cout << "? ";
 	}
 
 	return 0;
