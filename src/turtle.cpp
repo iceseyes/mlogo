@@ -110,8 +110,10 @@ Turtle &Turtle::forward(int steps) {
 }
 
 Turtle &Turtle::right(double angle) {
+    int x,y;
+    std::tie(x,y) = impl->paths.back()->last();
     impl->angle -= angle;
-    impl->turtle->rotate(impl->angle);
+    impl->turtle->rotate(angle, x, y);
     render();
     return *this;
 }

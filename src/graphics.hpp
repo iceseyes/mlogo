@@ -81,7 +81,7 @@ struct Path {
 
     virtual Path &addPoint(int x, int y) = 0;
     virtual Path &move(int shift_x, int shift_y) = 0;
-    virtual Path &rotate(double angle) = 0;
+    virtual Path &rotate(double angle, int ox=0, int oy=0) = 0;
 
     virtual const void *data() const = 0;
     virtual size_t size() const = 0;

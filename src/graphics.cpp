@@ -49,7 +49,10 @@ Path *Context::createPath(int ox, int oy) const {
 }
 
 double deg2rad(double deg) {
-    return deg*rad_coef;
+    int d = static_cast<int>(deg);
+    while(d<0) d+=360;
+    d %= 360;
+    return d*rad_coef;
 }
 
 } /* ns: graphics */

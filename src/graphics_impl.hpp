@@ -18,6 +18,9 @@
 #include <vector>
 #include <tuple>
 
+#include <iostream>
+#include <iomanip>
+
 #include <SDL2/SDL.h>
 
 namespace mlogo {
@@ -25,6 +28,15 @@ namespace mlogo {
 namespace graphics {
 
 namespace impl {
+
+static constexpr double EPSILON  { 10e-5 };
+
+inline double zeroif(double val) {
+    if(fabs(val)<EPSILON)
+        return 0.0;
+
+    return val;
+}
 
 struct SDLPath : Path {
     SDLPath(int ox, int oy) {
@@ -46,14 +58,23 @@ struct SDLPath : Path {
         return *this;
     }
 
-    Path &rotate(double angle) override {
+    Path &rotate(double angle, int ox=0, int oy=0) override {
         double rad = deg2rad(angle);
-        double sin_a = sin(rad);
-        double cos_a = cos(rad);
+        double sin_a = zeroif(sin(rad));
+        double cos_a = zeroif(cos(rad));
 
         for(auto &p : points) {
-            p.x = p.x * cos_a - p.y * sin_a;
-            p.y = p.x * sin_a + p.y * cos_a;
+            // move path to the origin
+            int x=p.x-ox;
+            int y=p.y-oy;
+
+            // rotate path
+            double x1 = x * cos_a - y * sin_a;
+            double y1 = x * sin_a + y * cos_a;
+
+            // move in original position
+            p.x = static_cast<int>(round(x1)) + ox;
+            p.y = static_cast<int>(round(y1)) + oy;
         }
 
         return *this;
