@@ -57,6 +57,13 @@ struct EvalStmtBuilderVisitor : boost::static_visitor<void> {
 		}
 	}
 
+	void operator()(mlogo::parser::Variable &v) const {
+        setParent();
+
+        new mlogo::eval::Statement (
+            new mlogo::eval::Statement::Variable(v.name), node);
+    }
+
     void operator()(mlogo::parser::List &v) const {
 		setParent();
 

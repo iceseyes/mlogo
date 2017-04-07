@@ -24,12 +24,38 @@ using BuiltinProcedure = types::BasicProcedure;
 using Stack = memory::Stack;
 using Turtle = turtle::Turtle;
 
+struct Make : BuiltinProcedure {
+    Make() : BuiltinProcedure(2) {}
+    void operator()() const override {
+        string varName = fetchArg(0);
+        string value = fetchArg(1);
+        Stack::instance().globalFrame().setVariable(varName, value);
+    }
+};
+
+struct Thing : BuiltinProcedure {
+    Thing() : BuiltinProcedure(1, true) {}
+    void operator()() const override {
+        string varName = fetchArg(0);
+        setReturnValue(Stack::instance().getVariable(varName));
+    }
+};
+
 struct Print : BuiltinProcedure {
 	Print() : BuiltinProcedure(1) {}
 	void operator()() const override {
 		string arg = fetchArg(0);
 		cout << arg << endl;
 	}
+};
+
+struct First : BuiltinProcedure {
+    First() : BuiltinProcedure(1, true) {}
+    void operator()() const override {
+        std::string arg0 = fetchArg(0);
+
+        setReturnValue(arg0.substr(0, 1));
+    }
 };
 
 struct Sum : BuiltinProcedure {
@@ -122,7 +148,10 @@ struct ClearScreen : BuiltinProcedure {
  */
 
 void initBuiltInProcedures() {
+    Stack::instance().globalFrame().setProcedure<Make>("make");
+    Stack::instance().globalFrame().setProcedure<Thing>("thing");
     Stack::instance().globalFrame().setProcedure<Print>("print");
+    Stack::instance().globalFrame().setProcedure<First>("first");
 	Stack::instance().globalFrame().setProcedure<Sum>("sum");
 	Stack::instance().globalFrame().setProcedure<Repeat>("repeat");
 
