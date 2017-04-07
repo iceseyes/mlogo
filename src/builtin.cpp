@@ -12,6 +12,8 @@
 
 #include "types.hpp"
 #include "memory.hpp"
+#include "parser.hpp"
+#include "eval.hpp"
 #include "turtle.hpp"
 
 using namespace std;
@@ -47,6 +49,22 @@ struct Sum : BuiltinProcedure {
 
 		setReturnValue(ss.str());
 	}
+};
+
+struct Repeat : BuiltinProcedure {
+    Repeat() : BuiltinProcedure(2) {}
+    void operator()() const override {
+        stringstream ss;
+        int arg0 = stoi(fetchArg(0));
+        std::string arg1 = fetchArg(1);
+
+        for(int i=0; i<arg0; ++i) {
+            auto stmt = parser::parse(arg1);
+            auto ast = eval::make_ast(stmt);
+
+            ast();
+        }
+    }
 };
 
 /**
@@ -106,6 +124,7 @@ struct ClearScreen : BuiltinProcedure {
 void initBuiltInProcedures() {
     Stack::instance().globalFrame().setProcedure<Print>("print");
 	Stack::instance().globalFrame().setProcedure<Sum>("sum");
+	Stack::instance().globalFrame().setProcedure<Repeat>("repeat");
 
 	// Turtle Graphics
 	Stack::instance().globalFrame().setProcedure<Forward>("forward");

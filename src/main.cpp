@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
 	string str;
 	cout << "Welcome to myLogo v0.0" << endl;
 
-	cout << endl << "? ";
+	cerr << endl << "? ";
 	while(std::getline(std::cin, str)) {
 		if(to_lower_copy(str) == "bye") break;
 
@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
 			cerr << "I don't know how to " << str << " (" << e.what() << ")" << endl;
 		}
 
-		cout << "? ";
+		cerr << "? ";
 	}
 
 	return 0;
