@@ -21,7 +21,7 @@ namespace eval {
 using Stack = memory::Stack;
 
 Statement *make_statement(mlogo::parser::Statement &stmt) {
-    auto s = new mlogo::eval::Statement ( new mlogo::eval::Statement::Procedure(stmt.name.name) );
+    auto s = new Statement ( new Statement::Procedure(stmt.name.name) );
     impl::EvalStmtBuilderVisitor v(s);
 
     for(auto a : stmt.arguments) {
@@ -32,7 +32,7 @@ Statement *make_statement(mlogo::parser::Statement &stmt) {
 }
 
 Statement *make_statement(mlogo::parser::Statement &&stmt) {
-    auto s = new mlogo::eval::Statement ( new mlogo::eval::Statement::Procedure(stmt.name.name) );
+    auto s = new Statement ( new Statement::Procedure(stmt.name.name) );
     impl::EvalStmtBuilderVisitor v(s);
 
     for(auto a : stmt.arguments) {
@@ -44,13 +44,28 @@ Statement *make_statement(mlogo::parser::Statement &&stmt) {
 
 AST make_ast(mlogo::parser::Statement &stmt) {
     AST ast;
-    /* TODO */
+    mlogo::parser::Argument proc { stmt.name };
+    impl::EvalStmtBuilderVisitor v(&ast);
+
+
+    boost::apply_visitor(v, proc);
+    for(auto a : stmt.arguments) {
+        boost::apply_visitor(v, a);
+    }
+
     return ast;
 }
 
 AST make_ast(mlogo::parser::Statement &&stmt) {
     AST ast;
-    /* TODO */
+    mlogo::parser::Argument proc { stmt.name };
+    impl::EvalStmtBuilderVisitor v(&ast);
+
+    boost::apply_visitor(v, proc);
+    for(auto a : stmt.arguments) {
+        boost::apply_visitor(v, a);
+    }
+
     return ast;
 }
 
@@ -114,6 +129,13 @@ void AST::apply() const {
         std::string v = s->apply();
         if(!v.empty()) throw std::logic_error("You don't say what to do with " + v);
     }
+}
+
+Statement *AST::createStatement(const std::string &name) {
+    Statement *s = new Statement(new Statement::Procedure(name));
+    statements.push_back(s);
+
+    return s;
 }
 
 } /* ns: eval */

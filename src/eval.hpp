@@ -89,6 +89,8 @@ public:
     void apply() const;
     void operator()() const { apply(); }
 
+    Statement *createStatement(const std::string &name);
+
 private:
     AST(const AST &) = delete;
     AST &operator=(const AST &) = delete;

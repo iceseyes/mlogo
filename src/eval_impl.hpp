@@ -25,8 +25,11 @@ namespace eval {
 namespace impl {
 
 struct EvalStmtBuilderVisitor : boost::static_visitor<void> {
-	EvalStmtBuilderVisitor(mlogo::eval::Statement *node) :
+	EvalStmtBuilderVisitor(Statement *node) :
 		node(node) {}
+
+	EvalStmtBuilderVisitor(AST *node) :
+	    ast(node) {}
 
 	template<typename Value>
 	void operator()(Value &&v) const {
@@ -45,10 +48,13 @@ struct EvalStmtBuilderVisitor : boost::static_visitor<void> {
 	}
 
 	void operator()(mlogo::parser::ProcName &v) const {
-		setParent();
+		setParent(true);
 
-		node = new mlogo::eval::Statement (
-			new mlogo::eval::Statement::Procedure(v.name), node);
+		if(!node) node = ast->createStatement(v.name);
+		else {
+            node = new mlogo::eval::Statement (
+                new mlogo::eval::Statement::Procedure(v.name), node);
+		}
 	}
 
     void operator()(mlogo::parser::List &v) const {
@@ -62,16 +68,17 @@ struct EvalStmtBuilderVisitor : boost::static_visitor<void> {
     }
 
 private:
-	void setParent() const {
+	void setParent(bool procedure=false) const {
 		while(node && node->completed())
 			node = node->parent();
 
-		if(!node) {
+		if(!node && (!ast || !procedure)) {
 			throw std::logic_error("Exceed Procedure Arguments.");
 		}
 	}
 
-	mutable mlogo::eval::Statement *node;
+	mutable Statement *node { nullptr };
+	mutable AST *ast { nullptr };
 };
 
 

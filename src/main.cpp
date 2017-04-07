@@ -35,17 +35,16 @@ int main(int argc, char **argv) {
 	while(std::getline(std::cin, str)) {
 		if(to_lower_copy(str) == "bye") break;
 
-		mlogo::eval::Statement *s { nullptr };
+		mlogo::eval::AST ast;
 		try {
 			auto stmt = mlogo::parser::parse(str);
-			s = mlogo::eval::make_statement(stmt);
+			ast = mlogo::eval::make_ast(stmt);
 
-			(*s)();
+			ast();
 		} catch(std::logic_error &e) {
 			cerr << "I don't know how to " << str << " (" << e.what() << ")" << endl;
 		}
 
-		delete s;
 		cout << "? ";
 	}
 
