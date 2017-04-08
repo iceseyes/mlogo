@@ -24,6 +24,114 @@ using BuiltinProcedure = types::BasicProcedure;
 using Stack = memory::Stack;
 using Turtle = turtle::Turtle;
 
+/*
+ * Constructors
+ */
+
+struct Word : BuiltinProcedure {
+    Word() : BuiltinProcedure(2, true) {}
+    void operator()() const override {
+        std::string arg0 = fetchArg(0);
+        std::string arg1 = fetchArg(1);
+
+        setReturnValue(arg0 + arg1);
+    }
+};
+
+struct List : BuiltinProcedure {
+    List() : BuiltinProcedure(2, true) {}
+    void operator()() const override {
+        std::string arg0 = fetchArg(0);
+        std::string arg1 = fetchArg(1);
+
+        setReturnValue(arg0 + " " + arg1);
+    }
+};
+
+struct Sentence : BuiltinProcedure {
+    Sentence() : BuiltinProcedure(2, true) {}
+    void operator()() const override {
+        std::string arg0 = fetchArg(0);
+        std::string arg1 = fetchArg(1);
+
+        setReturnValue(arg0 + " " + arg1);
+    }
+};
+
+struct Fput : BuiltinProcedure {
+    Fput() : BuiltinProcedure(2, true) {}
+    void operator()() const override {
+        std::string arg0 = fetchArg(0);
+        std::string arg1 = fetchArg(1);
+
+        setReturnValue(arg0 + arg1);
+    }
+};
+
+struct Lput : BuiltinProcedure {
+    Lput() : BuiltinProcedure(2, true) {}
+    void operator()() const override {
+        std::string arg0 = fetchArg(0);
+        std::string arg1 = fetchArg(1);
+
+        setReturnValue(arg1 + arg0);
+    }
+};
+
+/*
+ * Data Selector
+ */
+
+struct First : BuiltinProcedure {
+    First() : BuiltinProcedure(1, true) {}
+    void operator()() const override {
+        std::string arg0 = fetchArg(0);
+
+        setReturnValue(arg0.substr(0, 1));
+    }
+};
+
+struct Last : BuiltinProcedure {
+    Last() : BuiltinProcedure(1, true) {}
+    void operator()() const override {
+        std::string arg0 = fetchArg(0);
+
+        setReturnValue(arg0.substr(arg0.size()-1, 1));
+    }
+};
+
+struct ButFirst : BuiltinProcedure {
+    ButFirst() : BuiltinProcedure(1, true) {}
+    void operator()() const override {
+        std::string arg0 = fetchArg(0);
+
+        setReturnValue(arg0.substr(1));
+    }
+};
+
+struct ButLast : BuiltinProcedure {
+    ButLast() : BuiltinProcedure(1, true) {}
+    void operator()() const override {
+        std::string arg0 = fetchArg(0);
+
+        setReturnValue(arg0.substr(0, arg0.size()-1));
+    }
+};
+
+struct Item : BuiltinProcedure {
+    Item() : BuiltinProcedure(2, true) {}
+    void operator()() const override {
+        size_t arg0 = stoi(fetchArg(0));
+        std::string arg1 = fetchArg(1);
+
+        setReturnValue(arg1.substr(arg0, 1));
+    }
+};
+
+/*
+ *
+ */
+
 struct Make : BuiltinProcedure {
     Make() : BuiltinProcedure(2) {}
     void operator()() const override {
@@ -47,15 +155,6 @@ struct Print : BuiltinProcedure {
 		string arg = fetchArg(0);
 		cout << arg << endl;
 	}
-};
-
-struct First : BuiltinProcedure {
-    First() : BuiltinProcedure(1, true) {}
-    void operator()() const override {
-        std::string arg0 = fetchArg(0);
-
-        setReturnValue(arg0.substr(0, 1));
-    }
 };
 
 struct Sum : BuiltinProcedure {
@@ -148,11 +247,24 @@ struct ClearScreen : BuiltinProcedure {
  */
 
 void initBuiltInProcedures() {
+    /* Constructors */
+    Stack::instance().globalFrame().setProcedure<Word>("word");
+    Stack::instance().globalFrame().setProcedure<List>("list");
+    Stack::instance().globalFrame().setProcedure<Fput>("Fput");
+    Stack::instance().globalFrame().setProcedure<Lput>("Lput");
+
+    /* Data Selector*/
+    Stack::instance().globalFrame().setProcedure<First>("first");
+    Stack::instance().globalFrame().setProcedure<Last>("last");
+    Stack::instance().globalFrame().setProcedure<ButFirst>("butfirst");
+    Stack::instance().globalFrame().setProcedure<ButLast>("butlast");
+    Stack::instance().globalFrame().setProcedure<Item>("item");
+
+    /* */
     Stack::instance().globalFrame().setProcedure<Make>("make");
     Stack::instance().globalFrame().setProcedure<Thing>("thing");
     Stack::instance().globalFrame().setProcedure<Print>("print");
-    Stack::instance().globalFrame().setProcedure<First>("first");
-	Stack::instance().globalFrame().setProcedure<Sum>("sum");
+    Stack::instance().globalFrame().setProcedure<Sum>("sum");
 	Stack::instance().globalFrame().setProcedure<Repeat>("repeat");
 
 	// Turtle Graphics

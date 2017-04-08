@@ -20,9 +20,9 @@ namespace eval {
 
 using Stack = memory::Stack;
 
-Statement *make_statement(mlogo::parser::Statement &stmt) {
-    auto s = new Statement ( new Statement::Procedure(stmt.name.name) );
-    impl::EvalStmtBuilderVisitor v(s);
+Statement make_statement(const mlogo::parser::Statement &stmt) {
+    Statement s { new Statement::Procedure(stmt.name.name) };
+    impl::EvalStmtBuilderVisitor v(&s);
 
     for(auto a : stmt.arguments) {
         boost::apply_visitor(v, a);
@@ -31,32 +31,7 @@ Statement *make_statement(mlogo::parser::Statement &stmt) {
     return s;
 }
 
-Statement *make_statement(mlogo::parser::Statement &&stmt) {
-    auto s = new Statement ( new Statement::Procedure(stmt.name.name) );
-    impl::EvalStmtBuilderVisitor v(s);
-
-    for(auto a : stmt.arguments) {
-        boost::apply_visitor(v, a);
-    }
-
-    return s;
-}
-
-AST make_ast(mlogo::parser::Statement &stmt) {
-    AST ast;
-    mlogo::parser::Argument proc { stmt.name };
-    impl::EvalStmtBuilderVisitor v(&ast);
-
-
-    boost::apply_visitor(v, proc);
-    for(auto a : stmt.arguments) {
-        boost::apply_visitor(v, a);
-    }
-
-    return ast;
-}
-
-AST make_ast(mlogo::parser::Statement &&stmt) {
+AST make_ast(const mlogo::parser::Statement &stmt) {
     AST ast;
     mlogo::parser::Argument proc { stmt.name };
     impl::EvalStmtBuilderVisitor v(&ast);
@@ -87,6 +62,7 @@ std::string Statement::Procedure::value(const Statement *current) const {
 Statement::Variable::Variable(const std::string &name) :
     varName(name) {}
 
+
 std::string Statement::Variable::value(const Statement *) const {
     return Stack::instance().getVariable(varName);
 }
@@ -98,11 +74,30 @@ Statement::Statement(Type *t, Statement *parent) :
     }
 }
 
+Statement::Statement(Statement &&stmt) :
+    type(stmt.type), _parent(stmt._parent),
+    children(std::move(stmt.children)){
+    stmt.type = nullptr;
+    stmt._parent = nullptr;
+    stmt.children.clear();
+}
+
 Statement::~Statement() {
     for(auto ptr : children)
         delete ptr;
 
     delete type;
+}
+
+Statement &Statement::operator=(Statement &&stmt) {
+    type = stmt.type;
+    _parent = stmt._parent;
+    children = std::move(stmt.children);
+    stmt.type = nullptr;
+    stmt._parent = nullptr;
+    stmt.children.clear();
+
+    return *this;
 }
 
 std::string Statement::apply() const {

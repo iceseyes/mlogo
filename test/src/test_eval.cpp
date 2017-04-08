@@ -69,49 +69,98 @@ TEST(Eval, makeStatementFromParser) {
 
     initProcedures();
 
-    auto *s = make_statement(parse("eNop eSum 1 2"));
+    auto s = make_statement(parse("eNop eSum 1 2"));
     clearValue();
-    s->apply();
+    s();
     ASSERT_EQ(3, readValue());
-    delete s;
 
     s = make_statement(parse("eNop eSum 1 eSum 2 3"));
     clearValue();
-    s->apply();
+    s();
     ASSERT_EQ(6, readValue());
-    delete s;
 
     s = make_statement(parse("eNop eSum eSum 2 3 1"));
     clearValue();
-    s->apply();
+    s();
     ASSERT_EQ(6, readValue());
-    delete s;
 
     s = make_statement(parse("eNop eSum eSum 2 3 eSum 4 5"));
     clearValue();
-    s->apply();
+    s();
     ASSERT_EQ(14, readValue());
-    delete s;
 
     s = make_statement(parse("eNop eSum eSum eSum 2 1 3 eSum 4 5"));
     clearValue();
-    s->apply();
+    s();
     ASSERT_EQ(15, readValue());
-    delete s;
 
     s = make_statement(parse("eNop eSum eSum eSum 2 1 3 eSum 4 eSum 5 6"));
     clearValue();
-    s->apply();
+    s();
     ASSERT_EQ(21, readValue());
-    delete s;
 
     s = make_statement(parse("eNop eSum eSum eSum 2 1 eSum 3 7 eSum 4 eSum 5 6"));
     clearValue();
-    s->apply();
+    s();
     ASSERT_EQ(28, readValue());
-    delete s;
 
     ASSERT_THROW(make_statement(parse("eNop eSum eSum eSum 2 1 eSum 3 7 eSum 4 eSum 5 6 7")), std::logic_error);
     ASSERT_THROW(make_statement(parse("eNop eSum 4 5 eSum 6 7")), std::logic_error);
     ASSERT_THROW(make_statement(parse("eNop \"Hello \"World")), std::logic_error);
+}
+
+TEST(Eval, makeASTFromParser) {
+    using eval::make_ast;
+    using parser::parse;
+
+    initProcedures();
+
+    auto ast = make_ast(parse("eNop eSum 1 2"));
+    clearValue();
+    ast();
+    ASSERT_EQ(3, readValue());
+
+    ast = make_ast(parse("eNop eSum 1 eSum 2 3"));
+    clearValue();
+    ast();
+    ASSERT_EQ(6, readValue());
+
+    ast = make_ast(parse("eNop eSum eSum 2 3 1"));
+    clearValue();
+    ast();
+    ASSERT_EQ(6, readValue());
+
+    ast = make_ast(parse("eNop eSum eSum 2 3 eSum 4 5"));
+    clearValue();
+    ast();
+    ASSERT_EQ(14, readValue());
+
+    ast = make_ast(parse("eNop eSum eSum eSum 2 1 3 eSum 4 5"));
+    clearValue();
+    ast();
+    ASSERT_EQ(15, readValue());
+
+    ast = make_ast(parse("eNop eSum eSum eSum 2 1 3 eSum 4 eSum 5 6"));
+    clearValue();
+    ast();
+    ASSERT_EQ(21, readValue());
+
+    ast = make_ast(parse("eNop eSum eSum eSum 2 1 eSum 3 7 eSum 4 eSum 5 6"));
+    clearValue();
+    ast();
+    ASSERT_EQ(28, readValue());
+
+    ast = make_ast(parse("eNop 2 eNop eSum 5 6"));
+    clearValue();
+    ast();
+    ASSERT_EQ(11, readValue());
+
+    ast = make_ast(parse("eNop sum 2 sum 2 sum 2 2 eNop eSum eSum eSum 2 1 eSum 3 7 eSum 4 eSum 5 6"));
+    clearValue();
+    ast();
+    ASSERT_EQ(28, readValue());
+
+    ASSERT_THROW(make_ast(parse("eNop eSum eSum eSum 2 1 eSum 3 7 eSum 4 eSum 5 6 7")), std::logic_error);
+    ASSERT_THROW(make_ast(parse("eNop eSum 4 5 eSum 6 7")), std::logic_error);
+    ASSERT_THROW(make_ast(parse("eNop \"Hello \"World")), std::logic_error);
 }

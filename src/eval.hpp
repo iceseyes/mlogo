@@ -60,7 +60,10 @@ public:
     };
 
     Statement(Type *t, Statement *parent = nullptr);
+    Statement(Statement &&stmt);
     ~Statement();
+
+    Statement &operator=(Statement &&stmt);
 
     std::string apply() const;
     std::string operator()() const { return apply(); }
@@ -71,6 +74,9 @@ public:
     bool completed() const { return nArgs() == size(); }
 
 private:
+    Statement(const Statement &stmt) = delete;
+    Statement &operator=(const Statement &stmt) = delete;
+
     Type *type;
     Statement *_parent { nullptr };
     std::vector<Statement *> children;
@@ -101,10 +107,8 @@ private:
     friend AST make_ast(mlogo::parser::Statement &&stmt);
 };
 
-Statement *make_statement(mlogo::parser::Statement &stmt);
-Statement *make_statement(mlogo::parser::Statement &&stmt);
-AST make_ast(mlogo::parser::Statement &stmt);
-AST make_ast(mlogo::parser::Statement &&stmt);
+Statement make_statement(const mlogo::parser::Statement &stmt);
+AST make_ast(const mlogo::parser::Statement &stmt);
 
 } /* ns: eval */
 
