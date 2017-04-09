@@ -11,7 +11,6 @@
 #include <string>
 #include <stdexcept>
 #include <sstream>
-#include <iostream>
 
 #include <boost/variant.hpp>
 
