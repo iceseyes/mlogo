@@ -9,7 +9,8 @@ set(TEST_SRC
   src/test_gtest.cpp            # test for gtest framework is working
   src/test_parser.cpp           # test for parser
   src/test_memory.cpp           # test for memory
-  src/test_eval.cpp           # test for eval
+  src/test_eval.cpp             # test for eval
+  src/test_value.cpp            # test for value
 )
 
 

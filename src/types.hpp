@@ -9,23 +9,13 @@
 #define TYPES_HPP_
 
 #include <cinttypes>
-#include <string>
-#include <tuple>
 #include <vector>
 
-#include <boost/variant.hpp>
+#include "value.hpp"
 
 namespace mlogo {
 
 namespace types {
-
-using WordValue = std::string;
-
-using Value = boost::make_recursive_variant<
-	WordValue,
-	std::vector<boost::recursive_variant_>>::type;
-
-std::string toString(const Value &v);
 
 class ActualArguments {
 public:
@@ -62,14 +52,6 @@ private:
 } /* ns types */
 
 } /* ns mlogo */
-
-namespace std {
-    template<typename S, typename T>
-    S &operator<<(S &s, const std::vector<T> &v) {
-        for(auto &i : v) s << i;
-        return s;
-	}
-} /* ns: std */
 
 
 #endif /* TYPES_HPP_ */
