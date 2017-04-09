@@ -9,6 +9,8 @@
 #ifndef __EVAL_HPP__
 #define __EVAL_HPP__
 
+#include "types.hpp"
+
 #include <string>
 #include <vector>
 
@@ -16,25 +18,27 @@ namespace mlogo {
 
 namespace parser {
 
-class Statement;
+struct Statement;
 
 } /* ns: parser */
 
 namespace eval {
 
-class Statement {
+using Value = types::Value;
+
+class ASTNode {
 public:
     struct Type {
         virtual ~Type() {};
 
-        virtual std::string value(const Statement *) const = 0;
+        virtual Value value(const ASTNode *) const = 0;
 
         virtual std::size_t nArgs() const { return 0; }
     };
 
     struct Procedure : Type {
         Procedure(const std::string &name);
-        std::string value(const Statement *) const override;
+        Value value(const ASTNode *) const override;
 
         const std::string procName;
         std::size_t nArgs() const override { return _nargs; }
@@ -45,7 +49,7 @@ public:
 
     struct Variable : Type {
         Variable(const std::string &name);
-        std::string value(const Statement *) const override;
+        Value value(const ASTNode *) const override;
 
         const std::string varName;
     };
@@ -54,34 +58,34 @@ public:
         Const(const std::string &value) :
             _value (value) {}
 
-        std::string value(const Statement *) const override { return _value; }
+        Value value(const ASTNode *) const override { return _value; }
 
         const std::string _value;
     };
 
-    Statement(Type *t, Statement *parent = nullptr);
-    Statement(Statement &&stmt);
-    ~Statement();
+    ASTNode(Type *t, ASTNode *parent = nullptr);
+    ASTNode(ASTNode &&stmt);
+    ~ASTNode();
 
-    Statement &operator=(Statement &&stmt);
+    ASTNode &operator=(ASTNode &&stmt);
 
-    std::string apply() const;
-    std::string operator()() const { return apply(); }
+    Value apply() const;
+    Value operator()() const { return apply(); }
 
-    Statement *parent() { return _parent; }
+    ASTNode *parent() { return _parent; }
     std::size_t nArgs() const { return type->nArgs(); }
     std::size_t size() const { return children.size(); }
     bool completed() const { return nArgs() == size(); }
 
 private:
-    Statement(const Statement &stmt) = delete;
-    Statement &operator=(const Statement &stmt) = delete;
+    ASTNode(const ASTNode &stmt) = delete;
+    ASTNode &operator=(const ASTNode &stmt) = delete;
 
     Type *type;
-    Statement *_parent { nullptr };
-    std::vector<Statement *> children;
+    ASTNode *_parent { nullptr };
+    std::vector<ASTNode *> children;
 
-    friend struct Statement::Procedure;
+    friend struct ASTNode::Procedure;
 };
 
 class AST {
@@ -95,19 +99,20 @@ public:
     void apply() const;
     void operator()() const { apply(); }
 
-    Statement *createStatement(const std::string &name);
+    ASTNode *createNode(const std::string &name);
+
+    std::size_t size() const { return statements.size(); }
 
 private:
     AST(const AST &) = delete;
     AST &operator=(const AST &) = delete;
 
-    std::vector<Statement *> statements;
+    std::vector<ASTNode *> statements;
 
-    friend AST make_ast(mlogo::parser::Statement &stmt);
-    friend AST make_ast(mlogo::parser::Statement &&stmt);
+    friend AST make_ast(const mlogo::parser::Statement &stmt);
 };
 
-Statement make_statement(const mlogo::parser::Statement &stmt);
+ASTNode make_statement(const mlogo::parser::Statement &stmt);
 AST make_ast(const mlogo::parser::Statement &stmt);
 
 } /* ns: eval */

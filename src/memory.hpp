@@ -20,6 +20,7 @@ namespace mlogo {
 
 namespace memory {
 
+using Value = types::Value;
 using ProcedurePtr = types::BasicProcedure *;
 using ActualArguments = types::ActualArguments;
 
@@ -28,9 +29,9 @@ public:
 	Frame() {}
 
 	bool hasVariable(const std::string &name) const;
-	std::string &getVariable(const std::string &name) { return variables.at(name); }
-	const std::string &getVariable(const std::string &name) const { return variables.at(name); }
-	Frame &setVariable(const std::string &name, const std::string &value);
+	Value &getVariable(const std::string &name) { return variables.at(name); }
+	const Value &getVariable(const std::string &name) const { return variables.at(name); }
+	Frame &setVariable(const std::string &name, const Value &value);
 
 	bool hasProcedure(const std::string &name) const;
 	ProcedurePtr getProcedure(const std::string &name) { return procedures.at(name); }
@@ -40,7 +41,7 @@ public:
 		return setProcedure(name, new Proc(std::forward<Args>(args)...));
 	}
 
-	Frame &storeResult(const std::string &result);
+	Frame &storeResult(const Value &result);
 	Frame &setResultVariable(const Frame &child);
 	Frame &waitForValueIn(const std::string &varName) { _lastResultVariable = varName; return *this; }
 
@@ -49,8 +50,8 @@ public:
 
 private:
 	std::map<std::string, ProcedurePtr> procedures;
-	std::map<std::string, std::string> variables;
-	std::string _lastResult;
+	std::map<std::string, Value> variables;
+	Value _lastResult;
 	std::string _lastResultVariable;
 	mutable bool hasResultSetted { false };
 };
@@ -64,9 +65,10 @@ public:
 	}
 
 	void callProcedure(const std::string &name, ActualArguments args, const std::string &returnIn = "___discard_return_value__");
+	ProcedurePtr getProcedure(const std::string &name);
 	std::size_t getProcedureNArgs(const std::string &name);
-	std::string &getVariable(const std::string &name);
-	std::string &getArgument(uint8_t index);
+	Value &getVariable(const std::string &name);
+	Value &getArgument(uint8_t index);
 
 	Frame &globalFrame() { return frames.front(); }
 	const Frame &globalFrame() const { return frames.front(); }
@@ -78,7 +80,7 @@ public:
 	std::size_t nFrames() const { return frames.size(); }
 	Stack &closeFrame();
 
-	Stack &storeResult(const std::string &result);
+	Stack &storeResult(const Value &result);
 
 private:
 	static const char __ARGUMENT_PREFIX[];

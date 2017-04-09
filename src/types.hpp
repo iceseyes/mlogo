@@ -13,21 +13,32 @@
 #include <tuple>
 #include <vector>
 
+#include <boost/variant.hpp>
+
 namespace mlogo {
 
 namespace types {
+
+using WordValue = std::string;
+
+using Value = boost::make_recursive_variant<
+	WordValue,
+	std::vector<boost::recursive_variant_>>::type;
+
+std::string toString(const Value &v);
 
 class ActualArguments {
 public:
 	ActualArguments() {}
 
-	ActualArguments &push_back(const std::string &value);
-	ActualArguments &push_back(std::string &&value);
+	ActualArguments &push_back(const Value &value);
+	ActualArguments &push_back(Value &&value);
 
-	std::string at(uint8_t index) const;
+	const Value &at(uint8_t index) const;
+	Value &at(uint8_t index);
 
 private:
-	std::vector<std::string> arguments;
+	std::vector<Value> arguments;
 };
 
 class BasicProcedure {
@@ -40,8 +51,8 @@ public:
 	bool isFunction() const { return _funct; }
 
 protected:
-	std::string fetchArg(uint8_t index) const;
-	void setReturnValue(const std::string output) const;
+	Value &fetchArg(uint8_t index) const;
+	void setReturnValue(const Value &output) const;
 
 private:
 	uint8_t _nArgs;
@@ -52,6 +63,13 @@ private:
 
 } /* ns mlogo */
 
+namespace std {
+    template<typename S, typename T>
+    S &operator<<(S &s, const std::vector<T> &v) {
+        for(auto &i : v) s << i;
+        return s;
+	}
+} /* ns: std */
 
 
 #endif /* TYPES_HPP_ */

@@ -25,7 +25,7 @@ bool Frame::hasVariable(const std::string &name) const {
     return iter != variables.end();
 }
 
-Frame &Frame::setVariable(const std::string &name, const std::string &value) {
+Frame &Frame::setVariable(const std::string &name, const Value &value) {
     variables[name] = value;
     return *this;
 }
@@ -44,7 +44,7 @@ Frame &Frame::setProcedure(const std::string &name, ProcedurePtr ptr) {
     throw invalid_argument("Function Pointer Must be a not null.");
 }
 
-Frame &Frame::storeResult(const std::string &result) {
+Frame &Frame::storeResult(const Value &result) {
     hasResultSetted = true;
     _lastResult = result;
     return *this;
@@ -92,6 +92,17 @@ void Stack::callProcedure(const std::string &name, ActualArguments args, const s
         throw std::logic_error("Procedure Undefined or invalid arguments");
 }
 
+ProcedurePtr Stack::getProcedure(const std::string &name) {
+    auto iter = find_if(
+        frames.rbegin(), frames.rend(),
+        [this, &name](Frame &f) {return f.hasProcedure(name);});
+
+    if(iter != frames.rend()) {
+        return iter->getProcedure(name);
+    } else
+        throw std::logic_error("Procedure Undefined");
+}
+
 std::size_t Stack::getProcedureNArgs(const std::string &name) {
     auto iter = find_if(
         frames.rbegin(), frames.rend(),
@@ -104,7 +115,7 @@ std::size_t Stack::getProcedureNArgs(const std::string &name) {
         throw std::logic_error("Procedure Undefined");
 }
 
-std::string &Stack::getVariable(const std::string &name) {
+Value &Stack::getVariable(const std::string &name) {
     auto iter = find_if(
             frames.rbegin(), frames.rend(),
             [this, &name](Frame &f) {return f.hasVariable(name);});
@@ -116,7 +127,7 @@ std::string &Stack::getVariable(const std::string &name) {
     throw std::logic_error("Variable Undefined");
 }
 
-std::string &Stack::getArgument(uint8_t index) {
+Value &Stack::getArgument(uint8_t index) {
     return currentFrame().getVariable(argumentName(index));
 }
 
@@ -152,7 +163,7 @@ std::string Stack::argumentName(uint8_t index) const {
     return ss.str();
 }
 
-Stack &Stack::storeResult(const std::string &result) {
+Stack &Stack::storeResult(const Value &result) {
     currentFrame().storeResult(result);
     return *this;
 }

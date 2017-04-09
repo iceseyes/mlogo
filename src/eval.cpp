@@ -8,11 +8,18 @@
 
 #include "eval.hpp"
 
+#include <string>
+#include <stdexcept>
+#include <sstream>
+#include <iostream>
+
 #include <boost/variant.hpp>
 
 #include "memory.hpp"
 
 #include "eval_impl.hpp"
+
+using namespace std;
 
 namespace mlogo {
 
@@ -20,8 +27,8 @@ namespace eval {
 
 using Stack = memory::Stack;
 
-Statement make_statement(const mlogo::parser::Statement &stmt) {
-    Statement s { new Statement::Procedure(stmt.name.name) };
+ASTNode make_statement(const mlogo::parser::Statement &stmt) {
+    ASTNode s { new ASTNode::Procedure(stmt.name.name) };
     impl::EvalStmtBuilderVisitor v(&s);
 
     for(auto a : stmt.arguments) {
@@ -44,10 +51,10 @@ AST make_ast(const mlogo::parser::Statement &stmt) {
     return ast;
 }
 
-Statement::Procedure::Procedure(const std::string &name) :
+ASTNode::Procedure::Procedure(const string &name) :
     procName(name), _nargs(Stack::instance().getProcedureNArgs(name)) {}
 
-std::string Statement::Procedure::value(const Statement *current) const {
+Value ASTNode::Procedure::value(const ASTNode *current) const {
     memory::ActualArguments args;
     for(auto child : current->children) {
         args.push_back((*child)());
@@ -59,40 +66,40 @@ std::string Statement::Procedure::value(const Statement *current) const {
 }
 
 
-Statement::Variable::Variable(const std::string &name) :
+ASTNode::Variable::Variable(const string &name) :
     varName(name) {}
 
 
-std::string Statement::Variable::value(const Statement *) const {
+Value ASTNode::Variable::value(const ASTNode *) const {
     return Stack::instance().getVariable(varName);
 }
 
-Statement::Statement(Type *t, Statement *parent) :
+ASTNode::ASTNode(Type *t, ASTNode *parent) :
     type(t), _parent(parent) {
     if(_parent) {
         _parent->children.push_back(this);
     }
 }
 
-Statement::Statement(Statement &&stmt) :
+ASTNode::ASTNode(ASTNode &&stmt) :
     type(stmt.type), _parent(stmt._parent),
-    children(std::move(stmt.children)){
+    children(move(stmt.children)){
     stmt.type = nullptr;
     stmt._parent = nullptr;
     stmt.children.clear();
 }
 
-Statement::~Statement() {
+ASTNode::~ASTNode() {
     for(auto ptr : children)
         delete ptr;
 
     delete type;
 }
 
-Statement &Statement::operator=(Statement &&stmt) {
+ASTNode &ASTNode::operator=(ASTNode &&stmt) {
     type = stmt.type;
     _parent = stmt._parent;
-    children = std::move(stmt.children);
+    children = move(stmt.children);
     stmt.type = nullptr;
     stmt._parent = nullptr;
     stmt.children.clear();
@@ -100,12 +107,12 @@ Statement &Statement::operator=(Statement &&stmt) {
     return *this;
 }
 
-std::string Statement::apply() const {
+Value ASTNode::apply() const {
     return type->value(this);
 }
 
 AST::AST(AST &&ast) :
-    statements(std::move(ast.statements)) {
+    statements(move(ast.statements)) {
     ast.statements.clear();
 }
 
@@ -114,20 +121,22 @@ AST::~AST() {
 }
 
 AST &AST::operator=(AST &&ast) {
-    statements = std::move(ast.statements);
+    statements = move(ast.statements);
     ast.statements.clear();
     return *this;
 }
 
 void AST::apply() const {
     for(auto s : statements) {
-        std::string v = s->apply();
-        if(!v.empty()) throw std::logic_error("You don't say what to do with " + v);
+        auto v = s->apply();
+        if(!types::toString(v).empty()) {
+            throw logic_error("You don't say what to do with " + types::toString(v));
+        }
     }
 }
 
-Statement *AST::createStatement(const std::string &name) {
-    Statement *s = new Statement(new Statement::Procedure(name));
+ASTNode *AST::createNode(const string &name) {
+    ASTNode *s = new ASTNode(new ASTNode::Procedure(name));
     statements.push_back(s);
 
     return s;

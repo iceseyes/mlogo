@@ -24,6 +24,8 @@ using BuiltinProcedure = types::BasicProcedure;
 using Stack = memory::Stack;
 using Turtle = turtle::Turtle;
 
+using types::toString;
+
 /*
  * Constructors
  */
@@ -31,8 +33,8 @@ using Turtle = turtle::Turtle;
 struct Word : BuiltinProcedure {
     Word() : BuiltinProcedure(2, true) {}
     void operator()() const override {
-        std::string arg0 = fetchArg(0);
-        std::string arg1 = fetchArg(1);
+        std::string arg0 = toString(fetchArg(0));
+        std::string arg1 = toString(fetchArg(1));
 
         setReturnValue(arg0 + arg1);
     }
@@ -41,8 +43,8 @@ struct Word : BuiltinProcedure {
 struct List : BuiltinProcedure {
     List() : BuiltinProcedure(2, true) {}
     void operator()() const override {
-        std::string arg0 = fetchArg(0);
-        std::string arg1 = fetchArg(1);
+        std::string arg0 = toString(fetchArg(0));
+        std::string arg1 = toString(fetchArg(1));
 
         setReturnValue(arg0 + " " + arg1);
     }
@@ -51,8 +53,8 @@ struct List : BuiltinProcedure {
 struct Sentence : BuiltinProcedure {
     Sentence() : BuiltinProcedure(2, true) {}
     void operator()() const override {
-        std::string arg0 = fetchArg(0);
-        std::string arg1 = fetchArg(1);
+        std::string arg0 = toString(fetchArg(0));
+        std::string arg1 = toString(fetchArg(1));
 
         setReturnValue(arg0 + " " + arg1);
     }
@@ -61,8 +63,8 @@ struct Sentence : BuiltinProcedure {
 struct Fput : BuiltinProcedure {
     Fput() : BuiltinProcedure(2, true) {}
     void operator()() const override {
-        std::string arg0 = fetchArg(0);
-        std::string arg1 = fetchArg(1);
+        std::string arg0 = toString(fetchArg(0));
+        std::string arg1 = toString(fetchArg(1));
 
         setReturnValue(arg0 + arg1);
     }
@@ -71,8 +73,8 @@ struct Fput : BuiltinProcedure {
 struct Lput : BuiltinProcedure {
     Lput() : BuiltinProcedure(2, true) {}
     void operator()() const override {
-        std::string arg0 = fetchArg(0);
-        std::string arg1 = fetchArg(1);
+        std::string arg0 = toString(fetchArg(0));
+        std::string arg1 = toString(fetchArg(1));
 
         setReturnValue(arg1 + arg0);
     }
@@ -85,7 +87,7 @@ struct Lput : BuiltinProcedure {
 struct First : BuiltinProcedure {
     First() : BuiltinProcedure(1, true) {}
     void operator()() const override {
-        std::string arg0 = fetchArg(0);
+        std::string arg0 = toString(fetchArg(0));
 
         setReturnValue(arg0.substr(0, 1));
     }
@@ -94,7 +96,7 @@ struct First : BuiltinProcedure {
 struct Last : BuiltinProcedure {
     Last() : BuiltinProcedure(1, true) {}
     void operator()() const override {
-        std::string arg0 = fetchArg(0);
+        std::string arg0 = toString(fetchArg(0));
 
         setReturnValue(arg0.substr(arg0.size()-1, 1));
     }
@@ -103,7 +105,7 @@ struct Last : BuiltinProcedure {
 struct ButFirst : BuiltinProcedure {
     ButFirst() : BuiltinProcedure(1, true) {}
     void operator()() const override {
-        std::string arg0 = fetchArg(0);
+        std::string arg0 = toString(fetchArg(0));
 
         setReturnValue(arg0.substr(1));
     }
@@ -112,7 +114,7 @@ struct ButFirst : BuiltinProcedure {
 struct ButLast : BuiltinProcedure {
     ButLast() : BuiltinProcedure(1, true) {}
     void operator()() const override {
-        std::string arg0 = fetchArg(0);
+        std::string arg0 = toString(fetchArg(0));
 
         setReturnValue(arg0.substr(0, arg0.size()-1));
     }
@@ -121,8 +123,8 @@ struct ButLast : BuiltinProcedure {
 struct Item : BuiltinProcedure {
     Item() : BuiltinProcedure(2, true) {}
     void operator()() const override {
-        size_t arg0 = stoi(fetchArg(0));
-        std::string arg1 = fetchArg(1);
+        size_t arg0 = stoi(toString(fetchArg(0)));
+        std::string arg1 = toString(fetchArg(1));
 
         setReturnValue(arg1.substr(arg0, 1));
     }
@@ -135,8 +137,8 @@ struct Item : BuiltinProcedure {
 struct Make : BuiltinProcedure {
     Make() : BuiltinProcedure(2) {}
     void operator()() const override {
-        string varName = fetchArg(0);
-        string value = fetchArg(1);
+        string varName = toString(fetchArg(0));
+        string value = toString(fetchArg(1));
         Stack::instance().globalFrame().setVariable(varName, value);
     }
 };
@@ -144,7 +146,7 @@ struct Make : BuiltinProcedure {
 struct Thing : BuiltinProcedure {
     Thing() : BuiltinProcedure(1, true) {}
     void operator()() const override {
-        string varName = fetchArg(0);
+        string varName = toString(fetchArg(0));
         setReturnValue(Stack::instance().getVariable(varName));
     }
 };
@@ -152,7 +154,7 @@ struct Thing : BuiltinProcedure {
 struct Print : BuiltinProcedure {
 	Print() : BuiltinProcedure(1) {}
 	void operator()() const override {
-		string arg = fetchArg(0);
+		string arg = toString(fetchArg(0));
 		cout << arg << endl;
 	}
 };
@@ -161,8 +163,8 @@ struct Sum : BuiltinProcedure {
 	Sum() : BuiltinProcedure(2, true) {}
 	void operator()() const override {
 		stringstream ss;
-		double arg0 = stod(fetchArg(0));
-		double arg1 = stod(fetchArg(1));
+		double arg0 = stod(toString(fetchArg(0)));
+		double arg1 = stod(toString(fetchArg(1)));
 
 		double result = arg0 + arg1;
 		long rlong = static_cast<long>(result);
@@ -180,8 +182,8 @@ struct Repeat : BuiltinProcedure {
     Repeat() : BuiltinProcedure(2) {}
     void operator()() const override {
         stringstream ss;
-        int arg0 = stoi(fetchArg(0));
-        std::string arg1 = fetchArg(1);
+        int arg0 = stoi(toString(fetchArg(0)));
+        std::string arg1 = toString(fetchArg(1));
 
         for(int i=0; i<arg0; ++i) {
             auto stmt = parser::parse(arg1);
@@ -198,7 +200,7 @@ struct Repeat : BuiltinProcedure {
 struct Forward : BuiltinProcedure {
 	Forward() : BuiltinProcedure(1) {}
 	void operator()() const override {
-		int arg = std::stoi(fetchArg(0));
+		int arg = std::stoi(toString(fetchArg(0)));
 		Turtle::instance().forward(arg);
 	}
 };
@@ -206,7 +208,7 @@ struct Forward : BuiltinProcedure {
 struct Right : BuiltinProcedure {
 	Right() : BuiltinProcedure(1) {}
 	void operator()() const override {
-		double arg = std::stod(fetchArg(0));
+		double arg = std::stod(toString(fetchArg(0)));
 		Turtle::instance().right(arg);
 	}
 };
@@ -214,7 +216,7 @@ struct Right : BuiltinProcedure {
 struct Backward : BuiltinProcedure {
 	Backward() : BuiltinProcedure(1) {}
 	void operator()() const override {
-		int arg = std::stoi(fetchArg(0));
+		int arg = std::stoi(toString(fetchArg(0)));
 		Turtle::instance().forward(-1 * arg);
 	}
 };
@@ -222,7 +224,7 @@ struct Backward : BuiltinProcedure {
 struct Left : BuiltinProcedure {
 	Left() : BuiltinProcedure(1) {}
 	void operator()() const override {
-		double arg = std::stod(fetchArg(0));
+		double arg = std::stod(toString(fetchArg (0)));
 		Turtle::instance().right(-1 * arg);
 	}
 };

@@ -25,7 +25,7 @@ namespace eval {
 namespace impl {
 
 struct EvalStmtBuilderVisitor : boost::static_visitor<void> {
-	EvalStmtBuilderVisitor(Statement *node) :
+	EvalStmtBuilderVisitor(ASTNode *node) :
 		node(node) {}
 
 	EvalStmtBuilderVisitor(AST *node) :
@@ -35,33 +35,33 @@ struct EvalStmtBuilderVisitor : boost::static_visitor<void> {
 	void operator()(Value &&v) const {
 		setParent();
 
-		new mlogo::eval::Statement (
-			new mlogo::eval::Statement::Const(v.name), node);
+		new ASTNode (
+			new ASTNode::Const(v.name), node);
 	}
 
 	void operator()(mlogo::parser::Number &v) const {
 		setParent();
 
-		new mlogo::eval::Statement (
-			new mlogo::eval::Statement::Const(v.value), node);
+		new ASTNode (
+			new ASTNode::Const(v.value), node);
 
 	}
 
 	void operator()(mlogo::parser::ProcName &v) const {
 		setParent(true);
 
-		if(!node) node = ast->createStatement(v.name);
+		if(!node) node = ast->createNode(v.name);
 		else {
-            node = new mlogo::eval::Statement (
-                new mlogo::eval::Statement::Procedure(v.name), node);
+            node = new ASTNode (
+                new ASTNode::Procedure(v.name), node);
 		}
 	}
 
 	void operator()(mlogo::parser::Variable &v) const {
         setParent();
 
-        new mlogo::eval::Statement (
-            new mlogo::eval::Statement::Variable(v.name), node);
+        new ASTNode (
+            new ASTNode::Variable(v.name), node);
     }
 
     void operator()(mlogo::parser::List &v) const {
@@ -70,8 +70,8 @@ struct EvalStmtBuilderVisitor : boost::static_visitor<void> {
 		std::stringstream ss;
         ss << v;
 
-		new mlogo::eval::Statement (
-			new mlogo::eval::Statement::Const(ss.str()), node);
+		new ASTNode (
+			new ASTNode::Const(ss.str()), node);
     }
 
 private:
@@ -84,7 +84,7 @@ private:
 		}
 	}
 
-	mutable Statement *node { nullptr };
+	mutable ASTNode *node { nullptr };
 	mutable AST *ast { nullptr };
 };
 
