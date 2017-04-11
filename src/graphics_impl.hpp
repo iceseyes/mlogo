@@ -12,6 +12,7 @@
 #include "graphics.hpp"
 
 #include <cmath>
+#include <cstdint>
 #include <string>
 #include <sstream>
 #include <stdexcept>
@@ -27,6 +28,12 @@ namespace graphics {
 namespace impl {
 
 static constexpr double EPSILON  { 10e-5 };
+static constexpr uint32_t WIN_FLAGS {
+    SDL_WINDOW_SHOWN
+#ifdef SDL_WINDOW_ALWAYS_ON_TOP
+        |SDL_WINDOW_ALWAYS_ON_TOP
+#endif
+};
 
 inline double zeroif(double val) {
     if(fabs(val)<EPSILON)
@@ -103,7 +110,7 @@ public:
             title.c_str(),
             SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
             width, height,
-            SDL_WINDOW_SHOWN|SDL_WINDOW_ALWAYS_ON_TOP);
+            WIN_FLAGS);
 
         if(!window) {
             stringstream ss;
