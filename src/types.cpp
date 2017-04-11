@@ -55,28 +55,22 @@ struct ValueSum : boost::static_visitor<Value> {
         return s1 + s2;
     }
 
-    template<typename T>
-    Value operator()(const std::vector<T> &v1, const std::vector<T> &v2) const {
-        Value v = v1;
-        std::copy(v2.begin(), v2.end(), std::back_inserter(v));
+    Value operator()(ListValue &v1, const ListValue &v2) const {
+        std::copy(v2.begin(), v2.end(), std::back_inserter(v1));
 
-        return v;
+        return v1;
     }
 
-    template<typename T>
-    Value operator()(const std::vector<T> &v1, const std::string &s2) const {
-        std::vector<T> v = v1;
-        v.push_back(s2);
+    Value operator()(ListValue &v1, const std::string &s2) const {
+        v1.push_back(s2);
 
-        return v;
+        return v1;
     }
 
-    template<typename T>
-    Value operator()(const std::string &s2, const std::vector<T> &v1) const {
-        std::vector<T> v = v1;
-        v.push_back(s2);
+    Value operator()(const std::string &s2, ListValue &v1) const {
+        v1.push_back(s2);
 
-        return v;
+        return v1;
     }
 };
 
