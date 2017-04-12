@@ -28,13 +28,22 @@ using ListValue = std::vector<Value>;
 
 std::string toString(const Value &v);
 
+
 class ValueBox {
 public:
-	ValueBox();
+    ValueBox();
+    ValueBox(const char v[]);
+    ValueBox(const std::string &v);
+    ValueBox(const ListValue &v);
     ValueBox(const Value &v);
+
+    ValueBox &operator=(const ValueBox &v);
 
     bool isWord() const;
     bool isList() const { return !isWord(); }
+
+    bool operator==(const ValueBox &v1) const;
+    bool operator!=(const ValueBox &v1) const { return !(*this == v1); }
 
 private:
     Value _value;

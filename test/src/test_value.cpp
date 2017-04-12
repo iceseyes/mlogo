@@ -33,6 +33,65 @@ TEST(Value, creationAndStreaming) {
     FAIL() << "Incomplete Test";
 }
 
+TEST(Value, equality) {
+    Value word;
+    Value word2;
+    ASSERT_EQ(word2, word);
+
+    word="test";
+    ASSERT_NE(word2, word);
+
+    word2="test";
+    ASSERT_EQ(word2, word);
+    ASSERT_TRUE(word2==word);
+    ASSERT_EQ(Value("test"), word);
+
+    Value list;
+    Value list2;
+    ASSERT_NE(word2, list);
+    ASSERT_EQ(list2, list);
+
+    list = ListValue({word, word2});
+    ASSERT_NE(list2, list);
+
+    list2 = ListValue({word, word2});
+    ASSERT_EQ(list2, list);
+}
+
+TEST(ValueBox, equality) {
+    Value word;
+    Value word2;
+    ASSERT_EQ(ValueBox(word2), ValueBox(word));
+
+    word="test";
+    ASSERT_NE(ValueBox(word2), ValueBox(word));
+
+    word2="test";
+    ASSERT_EQ(ValueBox(word2), ValueBox(word));
+    ASSERT_TRUE(ValueBox(word2)==ValueBox(word));
+    ASSERT_EQ(ValueBox(Value("test")), ValueBox(word2));
+
+    Value list;
+    Value list2;
+    ASSERT_NE(ValueBox(word2), ValueBox(list));
+    ASSERT_EQ(ValueBox(list2), ValueBox(list));
+
+    list = ListValue({word, word2});
+    ASSERT_NE(ValueBox(list2), ValueBox(list));
+
+    list2 = ListValue({word, word2});
+    ASSERT_EQ(ValueBox(list2), ValueBox(list));
+}
+
+TEST(ValueBox, valueBoxFromString) {
+    ValueBox unknown;
+
+    unknown = "test";
+    ASSERT_EQ("test", unknown);
+
+    FAIL() << "Incomplete Test";
+}
+
 TEST(ValueBox, valueBoxCheckType) {
 	ValueBox unknown;
 

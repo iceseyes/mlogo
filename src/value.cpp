@@ -12,8 +12,22 @@ namespace types {
 
 ValueBox::ValueBox() {}
 
-ValueBox::ValueBox(const Value &v)
-	: _value(v) {}
+ValueBox::ValueBox(const char v[]) :
+    _value(std::string(v)) {}
+
+ValueBox::ValueBox(const std::string &v) :
+        _value(v) {}
+
+ValueBox::ValueBox(const ListValue &v) :
+        _value(v) {}
+
+ValueBox::ValueBox(const Value &v) :
+        _value(v) {}
+
+ValueBox &ValueBox::operator=(const ValueBox &v) {
+    _value = v._value;
+    return *this;
+}
 
 bool ValueBox::isWord() const {
 	try {
@@ -23,6 +37,10 @@ bool ValueBox::isWord() const {
 	}
 
 	return true;
+}
+
+bool ValueBox::operator==(const ValueBox &v1) const {
+    return _value == v1._value;
 }
 
 } /* ns: types */
