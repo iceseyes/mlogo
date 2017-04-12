@@ -30,16 +30,20 @@ std::string toString(const Value &v);
 
 class ValueBox {
 public:
+	ValueBox();
     ValueBox(const Value &v);
 
     bool isWord() const;
+    bool isList() const { return !isWord(); }
 
 private:
     Value _value;
 };
+
 } /* ns: types */
 
 } /* ns: mlogo */
+
 
 namespace std {
     template<typename S>
