@@ -42,6 +42,8 @@ public:
     bool isWord() const;
     bool isList() const { return !isWord(); }
 
+    std::string toString() const;
+
 private:
     Value _value;
 
@@ -59,7 +61,14 @@ bool operator!=(const ValueBox &v1, const ValueBox &v2);
 namespace std {
     template<typename S>
     S &operator<<(S &s, const mlogo::types::ListValue &v) {
-        for(auto &i : v) s << i;
+        bool first { true };
+        for(auto &i : v) {
+            if(!first) s << " ";
+            s << i;
+
+            first = false;
+        }
+
         return s;
     }
 } /* ns: std */

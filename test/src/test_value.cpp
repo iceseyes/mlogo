@@ -7,6 +7,8 @@
 
 #include <gtest/gtest.h>
 
+#include <sstream>
+
 #include <boost/variant.hpp>
 
 #include "value.hpp"
@@ -30,7 +32,11 @@ TEST(Value, creationAndStreaming) {
 
     ASSERT_EQ("world", boost::get<WordValue>(boost::get<ListValue>(list)[1]));
 
-    FAIL() << "Incomplete Test";
+    std::stringstream ss;
+
+    ss << w1 << w2 << w3 << list;
+
+    ASSERT_EQ("helloworldtesthello world test", ss.str());
 }
 
 TEST(Value, equality) {
@@ -89,7 +95,15 @@ TEST(ValueBox, valueBoxFromString) {
     unknown = "test";
     ASSERT_EQ("test", unknown);
 
-    FAIL() << "Incomplete Test";
+    ValueBox strValue { "test123" };
+    ASSERT_EQ("test123", strValue);
+
+    std::string abc { "abc" };
+    ValueBox abc_value { abc };
+    unknown = abc;
+
+    ASSERT_EQ("abc", unknown);
+    ASSERT_EQ("abc", abc_value);
 }
 
 TEST(ValueBox, valueBoxCheckType) {
@@ -104,7 +118,17 @@ TEST(ValueBox, valueBoxCheckType) {
 	ASSERT_TRUE(wordBox.isWord());
 	ASSERT_FALSE(wordBox.isList());
 
-	FAIL() << "Incomplete Test";
+	word = "word";
+	ListValue v {word, "test", "hi", "logo"};
+	ValueBox vbox { v };
+
+    ASSERT_EQ("word test hi logo", vbox.toString());
+    ASSERT_EQ(v, vbox);
+
+    ListValue v1 {v, word};
+    vbox = v1;
+
+    ASSERT_EQ(v1, vbox);
 }
 
 

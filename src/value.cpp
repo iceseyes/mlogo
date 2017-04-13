@@ -4,6 +4,8 @@
 
 #include "value.hpp"
 
+#include <sstream>
+
 using bad_get = boost::bad_get;
 
 namespace mlogo {
@@ -37,6 +39,13 @@ bool ValueBox::isWord() const {
 	}
 
 	return true;
+}
+
+std::string ValueBox::toString() const {
+    std::stringstream ss;
+
+    ss << _value;
+    return ss.str();
 }
 
 bool operator==(const ValueBox &v1, const ValueBox &v2) {
