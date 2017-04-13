@@ -288,6 +288,7 @@ struct ClearScreen : BuiltinProcedure {
 void initBuiltInProcedures() {
     /* Constructors */
     Stack::instance().globalFrame().setProcedure<Word>("word");
+    Stack::instance().globalFrame().setProcedure<Sentence>("sentence");
     Stack::instance().globalFrame().setProcedure<List>("list");
     Stack::instance().globalFrame().setProcedure<Fput>("Fput");
     Stack::instance().globalFrame().setProcedure<Lput>("Lput");
