@@ -20,6 +20,10 @@ using namespace std;
 
 namespace mlogo { namespace builtin {
 
+using Value = types::Value;
+using ListValue = types::ListValue;
+using ValueBox = types::ValueBox;
+
 using BuiltinProcedure = types::BasicProcedure;
 using Stack = memory::Stack;
 using Turtle = turtle::Turtle;
@@ -33,8 +37,8 @@ using types::toString;
 struct Word : BuiltinProcedure {
     Word() : BuiltinProcedure(2, true) {}
     void operator()() const override {
-        std::string arg0 = toString(fetchArg(0));
-        std::string arg1 = toString(fetchArg(1));
+        auto arg0 = fetchArg(0).word();
+        auto arg1 = fetchArg(1).word();
 
         setReturnValue(arg0 + arg1);
     }
@@ -43,40 +47,66 @@ struct Word : BuiltinProcedure {
 struct List : BuiltinProcedure {
     List() : BuiltinProcedure(2, true) {}
     void operator()() const override {
-        std::string arg0 = toString(fetchArg(0));
-        std::string arg1 = toString(fetchArg(1));
+        auto arg0 = fetchArg(0);
+        auto arg1 = fetchArg(1);
 
-        setReturnValue(arg0 + " " + arg1);
+        ValueBox out = ListValue();
+        out
+            .push_back(arg0)
+            .push_back(arg1);
+
+        setReturnValue(out);
     }
 };
 
 struct Sentence : BuiltinProcedure {
     Sentence() : BuiltinProcedure(2, true) {}
     void operator()() const override {
-        std::string arg0 = toString(fetchArg(0));
-        std::string arg1 = toString(fetchArg(1));
+        auto arg0 = fetchArg(0);
+        auto arg1 = fetchArg(1);
 
-        setReturnValue(arg0 + " " + arg1);
+        ValueBox out = ListValue();
+        out
+            .push_all_back(arg0)
+            .push_all_back(arg1);
+
+        setReturnValue(out);
     }
 };
 
 struct Fput : BuiltinProcedure {
     Fput() : BuiltinProcedure(2, true) {}
     void operator()() const override {
-        std::string arg0 = toString(fetchArg(0));
-        std::string arg1 = toString(fetchArg(1));
+        auto arg0 = fetchArg(0);
+        auto arg1 = fetchArg(1);
 
-        setReturnValue(arg0 + arg1);
+        ValueBox out;
+        if(arg1.isList()) {
+            out = Value(arg1.value());
+            out.push_front(arg0);
+        } else {
+            out = arg0.word() + arg1.word();
+        }
+
+        setReturnValue(out);
     }
 };
 
 struct Lput : BuiltinProcedure {
     Lput() : BuiltinProcedure(2, true) {}
     void operator()() const override {
-        std::string arg0 = toString(fetchArg(0));
-        std::string arg1 = toString(fetchArg(1));
+        auto arg0 = fetchArg(0);
+        auto arg1 = fetchArg(1);
 
-        setReturnValue(arg1 + arg0);
+        ValueBox out;
+        if(arg1.isList()) {
+            out = Value(arg1.value());
+            out.push_back(arg0);
+        } else {
+            out = arg1.word() + arg0.word();
+        }
+
+        setReturnValue(out);
     }
 };
 
@@ -87,46 +117,46 @@ struct Lput : BuiltinProcedure {
 struct First : BuiltinProcedure {
     First() : BuiltinProcedure(1, true) {}
     void operator()() const override {
-        std::string arg0 = toString(fetchArg(0));
+        auto arg0 = fetchArg(0);
 
-        setReturnValue(arg0.substr(0, 1));
+        setReturnValue(arg0.front());
     }
 };
 
 struct Last : BuiltinProcedure {
     Last() : BuiltinProcedure(1, true) {}
     void operator()() const override {
-        std::string arg0 = toString(fetchArg(0));
+        auto arg0 = fetchArg(0);
 
-        setReturnValue(arg0.substr(arg0.size()-1, 1));
+        setReturnValue(arg0.back());
     }
 };
 
 struct ButFirst : BuiltinProcedure {
     ButFirst() : BuiltinProcedure(1, true) {}
     void operator()() const override {
-        std::string arg0 = toString(fetchArg(0));
+        auto arg0 = fetchArg(0);
 
-        setReturnValue(arg0.substr(1));
+        setReturnValue(arg0.butFirst());
     }
 };
 
 struct ButLast : BuiltinProcedure {
     ButLast() : BuiltinProcedure(1, true) {}
     void operator()() const override {
-        std::string arg0 = toString(fetchArg(0));
+        auto arg0 = fetchArg(0);
 
-        setReturnValue(arg0.substr(0, arg0.size()-1));
+        setReturnValue(arg0.butLast());
     }
 };
 
 struct Item : BuiltinProcedure {
     Item() : BuiltinProcedure(2, true) {}
     void operator()() const override {
-        size_t arg0 = stoi(toString(fetchArg(0)));
-        std::string arg1 = toString(fetchArg(1));
+        auto arg0 = fetchArg(0).asUnsigned();
+        auto arg1 = fetchArg(1);
 
-        setReturnValue(arg1.substr(arg0, 1));
+        setReturnValue(arg1.at(arg0));
     }
 };
 
@@ -137,8 +167,8 @@ struct Item : BuiltinProcedure {
 struct Make : BuiltinProcedure {
     Make() : BuiltinProcedure(2) {}
     void operator()() const override {
-        string varName = toString(fetchArg(0));
-        string value = toString(fetchArg(1));
+        auto varName = fetchArg(0).word();
+        auto value = fetchArg(1);
         Stack::instance().globalFrame().setVariable(varName, value);
     }
 };
@@ -146,7 +176,7 @@ struct Make : BuiltinProcedure {
 struct Thing : BuiltinProcedure {
     Thing() : BuiltinProcedure(1, true) {}
     void operator()() const override {
-        string varName = toString(fetchArg(0));
+        auto varName = fetchArg(0).word();
         setReturnValue(Stack::instance().getVariable(varName));
     }
 };
@@ -154,7 +184,7 @@ struct Thing : BuiltinProcedure {
 struct Print : BuiltinProcedure {
 	Print() : BuiltinProcedure(1) {}
 	void operator()() const override {
-		string arg = toString(fetchArg(0));
+		string arg = fetchArg(0).toString();
 		cout << arg << endl;
 	}
 };
@@ -163,8 +193,8 @@ struct Sum : BuiltinProcedure {
 	Sum() : BuiltinProcedure(2, true) {}
 	void operator()() const override {
 		stringstream ss;
-		double arg0 = stod(toString(fetchArg(0)));
-		double arg1 = stod(toString(fetchArg(1)));
+		double arg0 = fetchArg(0).asDouble();
+		double arg1 = fetchArg(1).asDouble();
 
 		double result = arg0 + arg1;
 		long rlong = static_cast<long>(result);
@@ -182,8 +212,8 @@ struct Repeat : BuiltinProcedure {
     Repeat() : BuiltinProcedure(2) {}
     void operator()() const override {
         stringstream ss;
-        int arg0 = stoi(toString(fetchArg(0)));
-        std::string arg1 = toString(fetchArg(1));
+        int arg0 = fetchArg(0).asUnsigned();
+        string arg1 = fetchArg(1).toString();
 
         for(int i=0; i<arg0; ++i) {
             auto stmt = parser::parse(arg1);
@@ -200,7 +230,7 @@ struct Repeat : BuiltinProcedure {
 struct Forward : BuiltinProcedure {
 	Forward() : BuiltinProcedure(1) {}
 	void operator()() const override {
-		int arg = std::stoi(toString(fetchArg(0)));
+		int arg = fetchArg(0).asUnsigned();
 		Turtle::instance().forward(arg);
 	}
 };
@@ -208,7 +238,7 @@ struct Forward : BuiltinProcedure {
 struct Right : BuiltinProcedure {
 	Right() : BuiltinProcedure(1) {}
 	void operator()() const override {
-		double arg = std::stod(toString(fetchArg(0)));
+		double arg = fetchArg(0).asDouble();
 		Turtle::instance().right(arg);
 	}
 };
@@ -216,7 +246,7 @@ struct Right : BuiltinProcedure {
 struct Backward : BuiltinProcedure {
 	Backward() : BuiltinProcedure(1) {}
 	void operator()() const override {
-		int arg = std::stoi(toString(fetchArg(0)));
+		int arg = fetchArg(0).asUnsigned();
 		Turtle::instance().forward(-1 * arg);
 	}
 };
@@ -224,7 +254,7 @@ struct Backward : BuiltinProcedure {
 struct Left : BuiltinProcedure {
 	Left() : BuiltinProcedure(1) {}
 	void operator()() const override {
-		double arg = std::stod(toString(fetchArg (0)));
+		double arg = fetchArg(0).asDouble();
 		Turtle::instance().right(-1 * arg);
 	}
 };
@@ -234,6 +264,13 @@ struct Home : BuiltinProcedure {
 	void operator()() const override {
 		Turtle::instance().home();
 	}
+};
+
+struct Clean : BuiltinProcedure {
+    Clean() : BuiltinProcedure(0) {}
+    void operator()() const override {
+        Turtle::instance().clear();
+    }
 };
 
 struct ClearScreen : BuiltinProcedure {
@@ -279,6 +316,7 @@ void initBuiltInProcedures() {
 	Stack::instance().globalFrame().setProcedure<Left>("left");
 	Stack::instance().globalFrame().setProcedure<Left>("lt");
 	Stack::instance().globalFrame().setProcedure<Home>("home");
+	Stack::instance().globalFrame().setProcedure<Clean>("clean");
 	Stack::instance().globalFrame().setProcedure<ClearScreen>("clearscreen");
 	Stack::instance().globalFrame().setProcedure<ClearScreen>("cs");
 }

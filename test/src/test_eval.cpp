@@ -35,8 +35,8 @@ struct SimpleSum : types::BasicProcedure {
     SimpleSum() : BasicProcedure(2, true) {}
     void operator()() const {
         stringstream ss;
-		double arg0 = stod(types::toString(fetchArg(0)));
-		double arg1 = stod(types::toString(fetchArg(1)));
+		double arg0 = fetchArg(0).asDouble();
+		double arg1 = fetchArg(1).asDouble();
 
 		double result = arg0 + arg1;
 		long rlong = static_cast<long>(result);
@@ -60,9 +60,7 @@ void clearValue() {
 }
 
 int readValue() {
-    return std::stoi(
-        types::toString(
-            Stack::instance().globalFrame().getVariable("__test__")));
+    return Stack::instance().globalFrame().getVariable("__test__").asInteger();
 }
 
 TEST(Eval, makeStatementFromParser) {

@@ -24,21 +24,21 @@ struct Statement;
 
 namespace eval {
 
-using Value = types::Value;
+using ValueBox = types::ValueBox;
 
 class ASTNode {
 public:
     struct Type {
         virtual ~Type() {};
 
-        virtual Value value(const ASTNode *) const = 0;
+        virtual ValueBox value(const ASTNode *) const = 0;
 
         virtual std::size_t nArgs() const { return 0; }
     };
 
     struct Procedure : Type {
         Procedure(const std::string &name);
-        Value value(const ASTNode *) const override;
+        ValueBox value(const ASTNode *) const override;
 
         const std::string procName;
         std::size_t nArgs() const override { return _nargs; }
@@ -49,7 +49,7 @@ public:
 
     struct Variable : Type {
         Variable(const std::string &name);
-        Value value(const ASTNode *) const override;
+        ValueBox value(const ASTNode *) const override;
 
         const std::string varName;
     };
@@ -58,7 +58,7 @@ public:
         Const(const std::string &value) :
             _value (value) {}
 
-        Value value(const ASTNode *) const override { return _value; }
+        ValueBox value(const ASTNode *) const override { return _value; }
 
         const std::string _value;
     };
@@ -69,8 +69,8 @@ public:
 
     ASTNode &operator=(ASTNode &&stmt);
 
-    Value apply() const;
-    Value operator()() const { return apply(); }
+    ValueBox apply() const;
+    ValueBox operator()() const { return apply(); }
 
     ASTNode *parent() { return _parent; }
     std::size_t nArgs() const { return type->nArgs(); }

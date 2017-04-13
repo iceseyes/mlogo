@@ -42,7 +42,33 @@ public:
     bool isWord() const;
     bool isList() const { return !isWord(); }
 
+    bool empty() const;
+
     std::string toString() const;
+
+    double asDouble() const;
+    int32_t asInteger() const;
+    uint32_t asUnsigned() const;
+
+    WordValue &word();
+    const WordValue &word() const;
+
+    ListValue &list();
+    const ListValue &list() const;
+
+    Value &value() { return _value; }
+    const Value &value() const { return _value; }
+
+    ValueBox &push_front(const ValueBox &v);
+    ValueBox &push_back(const ValueBox &v);
+    ValueBox &push_all_back(const ValueBox &v);
+
+    ValueBox front() const;
+    ValueBox back() const;
+
+    ValueBox butFirst() const;
+    ValueBox butLast() const;
+    ValueBox at(std::size_t index) const;
 
 private:
     Value _value;

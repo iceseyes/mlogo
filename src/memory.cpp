@@ -25,7 +25,7 @@ bool Frame::hasVariable(const std::string &name) const {
     return iter != variables.end();
 }
 
-Frame &Frame::setVariable(const std::string &name, const Value &value) {
+Frame &Frame::setVariable(const std::string &name, const ValueBox &value) {
     variables[name] = value;
     return *this;
 }
@@ -44,7 +44,7 @@ Frame &Frame::setProcedure(const std::string &name, ProcedurePtr ptr) {
     throw invalid_argument("Function Pointer Must be a not null.");
 }
 
-Frame &Frame::storeResult(const Value &result) {
+Frame &Frame::storeResult(const ValueBox &result) {
     hasResultSetted = true;
     _lastResult = result;
     return *this;
@@ -115,7 +115,7 @@ std::size_t Stack::getProcedureNArgs(const std::string &name) {
         throw std::logic_error("Procedure Undefined");
 }
 
-Value &Stack::getVariable(const std::string &name) {
+ValueBox &Stack::getVariable(const std::string &name) {
     auto iter = find_if(
             frames.rbegin(), frames.rend(),
             [this, &name](Frame &f) {return f.hasVariable(name);});
@@ -127,7 +127,7 @@ Value &Stack::getVariable(const std::string &name) {
     throw std::logic_error("Variable Undefined");
 }
 
-Value &Stack::getArgument(uint8_t index) {
+ValueBox &Stack::getArgument(uint8_t index) {
     return currentFrame().getVariable(argumentName(index));
 }
 
@@ -163,7 +163,7 @@ std::string Stack::argumentName(uint8_t index) const {
     return ss.str();
 }
 
-Stack &Stack::storeResult(const Value &result) {
+Stack &Stack::storeResult(const ValueBox &result) {
     currentFrame().storeResult(result);
     return *this;
 }

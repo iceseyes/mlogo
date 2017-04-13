@@ -131,4 +131,23 @@ TEST(ValueBox, valueBoxCheckType) {
     ASSERT_EQ(v1, vbox);
 }
 
+TEST(ValueBox, empty) {
+    ValueBox word;
+    ASSERT_TRUE(word.empty());
+
+    word = "test";
+    ASSERT_FALSE(word.empty());
+
+    word = " ";
+    ASSERT_FALSE(word.empty());
+
+    word = "";
+    ASSERT_TRUE(word.empty());
+
+    ValueBox list = ListValue();
+    ASSERT_TRUE(list.empty());
+
+    list = ListValue({word.word()});
+    ASSERT_FALSE(list.empty());
+}
 

@@ -24,32 +24,32 @@ std::string toString(const Value &v) {
 }
 
 
-ActualArguments &ActualArguments::push_back(const Value &value) {
+ActualArguments &ActualArguments::push_back(const ValueBox &value) {
     arguments.push_back(value);
     return *this;
 }
 
-ActualArguments &ActualArguments::push_back(Value &&value) {
+ActualArguments &ActualArguments::push_back(ValueBox &&value) {
     arguments.push_back(value);
     return *this;
 }
 
-const Value &ActualArguments::at(uint8_t index) const {
+const ValueBox &ActualArguments::at(uint8_t index) const {
     return arguments.at(index);
 }
 
-Value &ActualArguments::at(uint8_t index) {
+ValueBox &ActualArguments::at(uint8_t index) {
     return arguments.at(index);
 }
 
 BasicProcedure::BasicProcedure(uint8_t args, bool funct) :
         _nArgs { args }, _funct { funct } {}
 
-Value &BasicProcedure::fetchArg(uint8_t index) const {
+ValueBox &BasicProcedure::fetchArg(uint8_t index) const {
     return memory::Stack::instance().getArgument(index);
 }
 
-void BasicProcedure::setReturnValue(const Value &output) const {
+void BasicProcedure::setReturnValue(const ValueBox &output) const {
     if(!_funct) {
         throw std::logic_error("Pure procedure can not return a value");
     }

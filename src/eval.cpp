@@ -53,7 +53,7 @@ AST make_ast(const mlogo::parser::Statement &stmt) {
 ASTNode::Procedure::Procedure(const string &name) :
     procName(name), _nargs(Stack::instance().getProcedureNArgs(name)) {}
 
-Value ASTNode::Procedure::value(const ASTNode *current) const {
+ValueBox ASTNode::Procedure::value(const ASTNode *current) const {
     memory::ActualArguments args;
     for(auto child : current->children) {
         args.push_back((*child)());
@@ -69,7 +69,7 @@ ASTNode::Variable::Variable(const string &name) :
     varName(name) {}
 
 
-Value ASTNode::Variable::value(const ASTNode *) const {
+ValueBox ASTNode::Variable::value(const ASTNode *) const {
     return Stack::instance().getVariable(varName);
 }
 
@@ -106,7 +106,7 @@ ASTNode &ASTNode::operator=(ASTNode &&stmt) {
     return *this;
 }
 
-Value ASTNode::apply() const {
+ValueBox ASTNode::apply() const {
     return type->value(this);
 }
 
@@ -128,8 +128,8 @@ AST &AST::operator=(AST &&ast) {
 void AST::apply() const {
     for(auto s : statements) {
         auto v = s->apply();
-        if(!types::toString(v).empty()) {
-            throw logic_error("You don't say what to do with " + types::toString(v));
+        if(!v.empty()) {
+            throw logic_error("You don't say what to do with " + v.toString());
         }
     }
 }

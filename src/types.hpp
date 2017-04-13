@@ -21,14 +21,14 @@ class ActualArguments {
 public:
 	ActualArguments() {}
 
-	ActualArguments &push_back(const Value &value);
-	ActualArguments &push_back(Value &&value);
+	ActualArguments &push_back(const ValueBox &value);
+	ActualArguments &push_back(ValueBox &&value);
 
-	const Value &at(uint8_t index) const;
-	Value &at(uint8_t index);
+	const ValueBox &at(uint8_t index) const;
+	ValueBox &at(uint8_t index);
 
 private:
-	std::vector<Value> arguments;
+	std::vector<ValueBox> arguments;
 };
 
 class BasicProcedure {
@@ -41,8 +41,8 @@ public:
 	bool isFunction() const { return _funct; }
 
 protected:
-	Value &fetchArg(uint8_t index) const;
-	void setReturnValue(const Value &output) const;
+	ValueBox &fetchArg(uint8_t index) const;
+	void setReturnValue(const ValueBox &output) const;
 
 private:
 	uint8_t _nArgs;
