@@ -42,12 +42,14 @@ public:
     bool isWord() const;
     bool isList() const { return !isWord(); }
 
-    bool operator==(const ValueBox &v1) const;
-    bool operator!=(const ValueBox &v1) const { return !(*this == v1); }
-
 private:
     Value _value;
+
+    friend bool operator==(const ValueBox &v1, const ValueBox &v2);
 };
+
+bool operator==(const ValueBox &v1, const ValueBox &v2);
+bool operator!=(const ValueBox &v1, const ValueBox &v2);
 
 } /* ns: types */
 

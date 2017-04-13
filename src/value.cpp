@@ -39,8 +39,12 @@ bool ValueBox::isWord() const {
 	return true;
 }
 
-bool ValueBox::operator==(const ValueBox &v1) const {
-    return _value == v1._value;
+bool operator==(const ValueBox &v1, const ValueBox &v2) {
+    return v1._value == v2._value;
+}
+
+bool operator!=(const ValueBox &v1, const ValueBox &v2) {
+    return !(v1 == v2);
 }
 
 } /* ns: types */
