@@ -184,8 +184,13 @@ struct Thing : BuiltinProcedure {
 struct Print : BuiltinProcedure {
 	Print() : BuiltinProcedure(1) {}
 	void operator()() const override {
-		string arg = fetchArg(0).toString();
-		cout << arg << endl;
+		auto arg = fetchArg(0);
+		auto str = arg.toString();
+
+		if(arg.isList())					   // if arg is a ListValue
+			str = str.substr(1, str.size()-2); // remove first and last square bracket
+
+		cout << str << endl;
 	}
 };
 

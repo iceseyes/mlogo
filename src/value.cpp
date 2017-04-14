@@ -4,6 +4,7 @@
 
 #include "value.hpp"
 
+#include <string>
 #include <sstream>
 #include <algorithm>
 
@@ -149,7 +150,7 @@ std::string ValueBox::toString() const {
 }
 
 double ValueBox::asDouble() const {
-    return stod(word());
+    return std::stod(word());
 }
 
 int32_t ValueBox::asInteger() const {

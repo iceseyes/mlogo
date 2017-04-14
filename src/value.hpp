@@ -88,12 +88,17 @@ namespace std {
     template<typename S>
     S &operator<<(S &s, const mlogo::types::ListValue &v) {
         bool first { true };
+
+        s << "[";
+
         for(auto &i : v) {
             if(!first) s << " ";
             s << i;
 
             first = false;
         }
+
+        s << "]";
 
         return s;
     }

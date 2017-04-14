@@ -36,7 +36,7 @@ TEST(Value, creationAndStreaming) {
 
     ss << w1 << w2 << w3 << list;
 
-    ASSERT_EQ("helloworldtesthello world test", ss.str());
+    ASSERT_EQ("helloworldtest[hello world test]", ss.str());
 }
 
 TEST(Value, equality) {
@@ -122,7 +122,7 @@ TEST(ValueBox, valueBoxCheckType) {
 	ListValue v {word, "test", "hi", "logo"};
 	ValueBox vbox { v };
 
-    ASSERT_EQ("word test hi logo", vbox.toString());
+    ASSERT_EQ("[word test hi logo]", vbox.toString());
     ASSERT_EQ(v, vbox);
 
     ListValue v1 {v, word};
