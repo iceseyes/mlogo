@@ -13,6 +13,7 @@
 #include <vector>
 #include <string>
 #include <utility>
+#include <memory>
 
 #include "types.hpp"
 
@@ -21,7 +22,7 @@ namespace mlogo {
 namespace memory {
 
 using ValueBox = types::ValueBox;
-using ProcedurePtr = types::BasicProcedure *;
+using ProcedurePtr = std::shared_ptr<types::BasicProcedure>;
 using ActualArguments = types::ActualArguments;
 
 class Frame {
@@ -38,7 +39,7 @@ public:
 	const ProcedurePtr getProcedure(const std::string &name) const;
 	Frame &setProcedure(const std::string &name, ProcedurePtr ptr);
 	template<typename Proc, typename... Args> Frame &setProcedure(const std::string &name, Args&&... args) {
-		return setProcedure(name, new Proc(std::forward<Args>(args)...));
+		return setProcedure(name, std::make_shared<Proc>(std::forward<Args>(args)...));
 	}
 
 	Frame &storeResult(const ValueBox &result);
@@ -73,10 +74,10 @@ public:
 	Stack &setVariable(const std::string &name, const ValueBox &v, bool global=true);
 	Stack &setProcedure(const std::string &name, ProcedurePtr v, bool global=true);
 	template<typename Proc, typename... Args> Stack &setProcedure(const std::string &name, Args&&... args) {
-        return setProcedure(name, new Proc(std::forward<Args>(args)...));
+        return setProcedure(name, std::make_shared<Proc>(std::forward<Args>(args)...));
     }
 	template<typename Proc, typename... Args> Stack &setLocalProcedure(const std::string &name, Args&&... args) {
-        return setProcedure(name, new Proc(std::forward<Args>(args)...), false);
+        return setProcedure(name, std::make_shared<Proc>(std::forward<Args>(args)...), false);
     }
 
 	Frame &globalFrame() { return frames.front(); }

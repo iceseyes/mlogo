@@ -254,7 +254,7 @@ TEST(Memory, ignoreCase) {
     ASSERT_EQ("123", mem::Stack::instance().getVariable("UPPERCaSE"));
     ASSERT_EQ("123", mem::Stack::instance().getVariable("UPPERcase"));
 
-    auto ptr = new Sum;
+    auto ptr = std::make_shared<Sum>();
     mem::Stack::instance().setProcedure("UPPERcaseSum", ptr);
     ASSERT_EQ(ptr, mem::Stack::instance().getProcedure("uppercaseSUM"));
     ASSERT_EQ(ptr, mem::Stack::instance().getProcedure("uppERcaseSUM"));
