@@ -6,6 +6,7 @@ include (CheckFunctionExists)
 # Compiling Options
 option(WITH_TESTS "Enable build for mLogo Automatic Tests" ON)
 option(USE_BOOST_STATIC  "Static link for boost librerees" OFF)
+option(WITH_WINDOW_ALWAYS_ON_TOP "Requires that graphics window is always on top" ON)
 
 # Basic Configuration
 set(MLOGO_PROGRAM mlogo)
@@ -31,6 +32,10 @@ endif(USE_BOOST_STATIC)
 find_package(Threads)
 find_package(Boost REQUIRED COMPONENTS thread log_setup log filesystem program_options system)
 find_package(SDL2 REQUIRED)
+
+if(WITH_WINDOW_ALWAYS_ON_TOP)
+    add_definitions(-DWITH_WINDOW_ALWAYS_ON_TOP)
+endif()
 
 set(MLOGO_DEPS
     ${Boost_LIBRARIES} rt ${CMAKE_THREAD_LIBS_INIT} ${SDL2_LIBRARY})

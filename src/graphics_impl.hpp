@@ -30,7 +30,7 @@ namespace impl {
 static constexpr double EPSILON  { 10e-5 };
 static constexpr uint32_t WIN_FLAGS {
     SDL_WINDOW_SHOWN
-#ifdef SDL_WINDOW_ALWAYS_ON_TOP
+#ifdef WITH_WINDOW_ALWAYS_ON_TOP
         |SDL_WINDOW_ALWAYS_ON_TOP
 #endif
 };
