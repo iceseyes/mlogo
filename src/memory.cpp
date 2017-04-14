@@ -13,35 +13,63 @@
 #include <algorithm>
 #include <stdexcept>
 
+#include <boost/algorithm/string.hpp>
+
 using namespace std;
+
+using boost::to_lower_copy;
 
 namespace mlogo {
 namespace memory {
 
 const char Stack::__ARGUMENT_PREFIX[] { "_p" };
 
+namespace {
+
+std::string formatName(const std::string &name) {
+    return to_lower_copy(name);
+}
+
+}
+
 bool Frame::hasVariable(const std::string &name) const {
-    auto iter = variables.find(name);
+    auto iter = variables.find(formatName(name));
     return iter != variables.end();
 }
 
 Frame &Frame::setVariable(const std::string &name, const ValueBox &value) {
-    variables[name] = value;
+    variables[formatName(name)] = value;
     return *this;
 }
 
+ValueBox &Frame::getVariable(const std::string &name) {
+    return variables.at(formatName(name));
+}
+
+const ValueBox &Frame::getVariable(const std::string &name) const {
+    return variables.at(formatName(name));
+}
+
 bool Frame::hasProcedure(const std::string &name) const {
-    auto iter = procedures.find(name);
+    auto iter = procedures.find(formatName(name));
     return iter != procedures.end();
 }
 
 Frame &Frame::setProcedure(const std::string &name, ProcedurePtr ptr) {
     if(ptr) {
-        procedures[name] = ptr;
+        procedures[formatName(name)] = ptr;
         return *this;
     }
 
     throw invalid_argument("Function Pointer Must be a not null.");
+}
+
+ProcedurePtr Frame::getProcedure(const std::string &name) {
+    return procedures.at(formatName(name));
+}
+
+const ProcedurePtr Frame::getProcedure(const std::string &name) const {
+    return procedures.at(formatName(name));
 }
 
 Frame &Frame::storeResult(const ValueBox &result) {
@@ -70,7 +98,7 @@ Stack::Stack() :
 void Stack::callProcedure(const std::string &name, ActualArguments args, const std::string &returnIn) {
     auto iter = find_if(
             frames.rbegin(), frames.rend(),
-            [this, &name](Frame &f) {return f.hasProcedure(name);});
+            [this, &name](Frame &f) { return f.hasProcedure(name); });
 
     if(iter != frames.rend()) {
         auto &func = *iter->getProcedure(name);
@@ -95,7 +123,7 @@ void Stack::callProcedure(const std::string &name, ActualArguments args, const s
 ProcedurePtr Stack::getProcedure(const std::string &name) {
     auto iter = find_if(
         frames.rbegin(), frames.rend(),
-        [this, &name](Frame &f) {return f.hasProcedure(name);});
+        [this, &name](Frame &f) { return f.hasProcedure(name); });
 
     if(iter != frames.rend()) {
         return iter->getProcedure(name);
@@ -106,7 +134,7 @@ ProcedurePtr Stack::getProcedure(const std::string &name) {
 std::size_t Stack::getProcedureNArgs(const std::string &name) {
     auto iter = find_if(
         frames.rbegin(), frames.rend(),
-        [this, &name](Frame &f) {return f.hasProcedure(name);});
+        [this, &name](Frame &f) { return f.hasProcedure(name); });
 
     if(iter != frames.rend()) {
         auto &func = *iter->getProcedure(name);
@@ -118,7 +146,7 @@ std::size_t Stack::getProcedureNArgs(const std::string &name) {
 ValueBox &Stack::getVariable(const std::string &name) {
     auto iter = find_if(
             frames.rbegin(), frames.rend(),
-            [this, &name](Frame &f) {return f.hasVariable(name);});
+            [this, &name](Frame &f) { return f.hasVariable(name); });
 
     if(iter != frames.rend()) {
         return iter->getVariable(name);
@@ -129,6 +157,26 @@ ValueBox &Stack::getVariable(const std::string &name) {
 
 ValueBox &Stack::getArgument(uint8_t index) {
     return currentFrame().getVariable(argumentName(index));
+}
+
+Stack &Stack::setVariable(const std::string &name, const ValueBox &v, bool global) {
+    if(global) {
+        globalFrame().setVariable(name, v);
+    } else {
+        currentFrame().setVariable(name, v);
+    }
+
+    return *this;
+}
+
+Stack &Stack::setProcedure(const std::string &name, ProcedurePtr v, bool global) {
+    if(global) {
+        globalFrame().setProcedure(name, v);
+    } else {
+        currentFrame().setProcedure(name, v);
+    }
+
+    return *this;
 }
 
 Stack &Stack::openFrame() {

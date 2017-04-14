@@ -125,23 +125,23 @@ TEST(Memory, globalFrameProcedureNoArgs) {
     };
 
     ASSERT_EQ(1u, mem::Stack::instance().nFrames());
-    mem::Stack::instance().globalFrame().setProcedure<Nop>("nop");
+    mem::Stack::instance().setProcedure<Nop>("nop");
     ASSERT_TRUE(mem::Stack::instance().globalFrame().hasProcedure("nop"));
     ASSERT_NO_THROW(mem::Stack::instance().callProcedure("nop", {}));
     ASSERT_EQ(1u, mem::Stack::instance().nFrames());
 
-    mem::Stack::instance().globalFrame().setVariable("globalLocalVar2", "empty");
+    mem::Stack::instance().setVariable("globalLocalVar2", "empty");
     struct updateGlobal : mlogo::types::BasicProcedure {
         updateGlobal() : mlogo::types::BasicProcedure(0) {}
         void operator()() const override {
             ASSERT_EQ(2u, mem::Stack::instance().nFrames());
-            mem::Stack::instance().globalFrame().setVariable("globalNewVar1", "123");
-            mem::Stack::instance().globalFrame().setVariable("globalLocalVar2", "321");
+            mem::Stack::instance().setVariable("globalNewVar1", "123");
+            mem::Stack::instance().setVariable("globalLocalVar2", "321");
         }
     };
 
     ASSERT_EQ(1u, mem::Stack::instance().nFrames());
-    mem::Stack::instance().globalFrame().setProcedure<updateGlobal>("update_global");
+    mem::Stack::instance().setProcedure<updateGlobal>("update_global");
     ASSERT_TRUE(mem::Stack::instance().globalFrame().hasProcedure("update_global"));
 
     ASSERT_EQ(mem::ValueBox("empty"), mem::Stack::instance().getVariable("globalLocalVar2"));
@@ -157,13 +157,13 @@ TEST(Memory, ProcedureWithArgs) {
         SimplePrint1() : mlogo::types::BasicProcedure(1) {}
         void operator()() const override {
             auto arg0 = fetchArg(0);
-            mem::Stack::instance().globalFrame()
+            mem::Stack::instance()
                 .setVariable("__simple_print_result__", arg0);
         }
     };
 
-    mem::Stack::instance().currentFrame()
-        .setProcedure<SimplePrint1>("simple_print_1");
+    mem::Stack::instance()
+        .setLocalProcedure<SimplePrint1>("simple_print_1");
 
     ASSERT_THROW(mem::Stack::instance().getVariable("__simple_print_result__"), std::logic_error);
 
@@ -185,13 +185,13 @@ TEST(Memory, ProcedureWithArgs) {
             auto arg0 = fetchArg(0).toString();
             auto arg1 = fetchArg(1).toString();
 
-            mem::Stack::instance().globalFrame()
+            mem::Stack::instance()
                     .setVariable("__simple_print_result__", arg0 + " " + arg1);
         }
     };
 
-    mem::Stack::instance().currentFrame()
-            .setProcedure<SimplePrint2>("simple_print_2");
+    mem::Stack::instance()
+            .setLocalProcedure<SimplePrint2>("simple_print_2");
 
     mem::ActualArguments args3;
     args3.push_back("alpha");
@@ -225,16 +225,41 @@ TEST(Memory, ProcedureWithArgsAndReturnValue) {
 
             mem::Stack::instance().callProcedure("sum", args, "res");
             auto arg0 = mem::Stack::instance().getVariable("res");
-            mem::Stack::instance().globalFrame()
+            mem::Stack::instance()
                 .setVariable("__simple_print_result__", arg0);
         }
     };
 
-    mem::Stack::instance().currentFrame()
-        .setProcedure<Sum>("sum")
-        .setProcedure<SimplePrint3>("simple_print_3");
+    mem::Stack::instance()
+        .setLocalProcedure<Sum>("sum")
+        .setLocalProcedure<SimplePrint3>("simple_print_3");
 
     mem::ActualArguments args;
     mem::Stack::instance().callProcedure("simple_print_3", args);
     ASSERT_EQ(mem::ValueBox("5"), mem::Stack::instance().getVariable("__simple_print_result__"));
 }
+
+TEST(Memory, ignoreCase) {
+    struct Sum : mlogo::types::BasicProcedure {
+        Sum() : mlogo::types::BasicProcedure(0, true) {}
+        void operator()() const override {
+            mem::Stack::instance().storeResult("SUM");
+        }
+    };
+
+    mem::Stack::instance().setVariable("UPPERcase", "123");
+    ASSERT_EQ("123", mem::Stack::instance().getVariable("uppercase"));
+    ASSERT_EQ("123", mem::Stack::instance().getVariable("uppERcase"));
+    ASSERT_EQ("123", mem::Stack::instance().getVariable("UPPERCASE"));
+    ASSERT_EQ("123", mem::Stack::instance().getVariable("UPPERCaSE"));
+    ASSERT_EQ("123", mem::Stack::instance().getVariable("UPPERcase"));
+
+    auto ptr = new Sum;
+    mem::Stack::instance().setProcedure("UPPERcaseSum", ptr);
+    ASSERT_EQ(ptr, mem::Stack::instance().getProcedure("uppercaseSUM"));
+    ASSERT_EQ(ptr, mem::Stack::instance().getProcedure("uppERcaseSUM"));
+    ASSERT_EQ(ptr, mem::Stack::instance().getProcedure("UPPERCASEsUM"));
+    ASSERT_EQ(ptr, mem::Stack::instance().getProcedure("UPPERCaSESUm"));
+    ASSERT_EQ(ptr, mem::Stack::instance().getProcedure("UPPERcaseSuM"));
+}
+

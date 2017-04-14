@@ -29,13 +29,13 @@ public:
 	Frame() {}
 
 	bool hasVariable(const std::string &name) const;
-	ValueBox &getVariable(const std::string &name) { return variables.at(name); }
-	const ValueBox &getVariable(const std::string &name) const { return variables.at(name); }
+	ValueBox &getVariable(const std::string &name);
+	const ValueBox &getVariable(const std::string &name) const;
 	Frame &setVariable(const std::string &name, const ValueBox &value);
 
 	bool hasProcedure(const std::string &name) const;
-	ProcedurePtr getProcedure(const std::string &name) { return procedures.at(name); }
-	const ProcedurePtr getProcedure(const std::string &name) const { return procedures.at(name); }
+	ProcedurePtr getProcedure(const std::string &name);
+	const ProcedurePtr getProcedure(const std::string &name) const;
 	Frame &setProcedure(const std::string &name, ProcedurePtr ptr);
 	template<typename Proc, typename... Args> Frame &setProcedure(const std::string &name, Args&&... args) {
 		return setProcedure(name, new Proc(std::forward<Args>(args)...));
@@ -69,6 +69,15 @@ public:
 	std::size_t getProcedureNArgs(const std::string &name);
 	ValueBox &getVariable(const std::string &name);
 	ValueBox &getArgument(uint8_t index);
+
+	Stack &setVariable(const std::string &name, const ValueBox &v, bool global=true);
+	Stack &setProcedure(const std::string &name, ProcedurePtr v, bool global=true);
+	template<typename Proc, typename... Args> Stack &setProcedure(const std::string &name, Args&&... args) {
+        return setProcedure(name, new Proc(std::forward<Args>(args)...));
+    }
+	template<typename Proc, typename... Args> Stack &setLocalProcedure(const std::string &name, Args&&... args) {
+        return setProcedure(name, new Proc(std::forward<Args>(args)...), false);
+    }
 
 	Frame &globalFrame() { return frames.front(); }
 	const Frame &globalFrame() const { return frames.front(); }
