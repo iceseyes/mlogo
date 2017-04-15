@@ -34,6 +34,9 @@ public:
     Turtle &currentXPosition(int x);
     Turtle &currentYPosition(int y);
 
+    double heading() const;
+    Turtle &heading(double h);
+
 private:
     Turtle();
     ~Turtle();

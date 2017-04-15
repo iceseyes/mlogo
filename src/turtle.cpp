@@ -59,16 +59,54 @@ struct Turtle::_pImpl {
     }
 
     void newPath() {
-        newPath(std::make_pair(GC::SCREEN_WIDTH/2, GC::SCREEN_HEIGHT/2));
+        newPath(std::make_pair(0, 0));
     }
 
-    void newPath(const Turtle::Position &origin) {
+    void newPath(const Turtle::Position &o) {
+        auto origin = toWindowSystem(o);
         paths.push_back(GC::instance().createPath(origin.first, origin.second));
     }
 
-    Turtle::Position lastPos() const {
+    Turtle::Position lastPos(bool tsp=true) const { // (T)urtle (S)ystem  (P)osition
         auto lastPath = paths.back();
+        if(tsp) return toTurtleSystem(lastPath->last());
+
         return lastPath->last();
+    }
+
+    void moveTurtleTo(const Turtle::Position &o) {
+        auto current = lastPos();
+        turtle->move(o.first - current.first, -1*o.second + current.second);
+    }
+
+    void moveTo(const Turtle::Position &o) {
+        moveTurtleTo(o);
+        newPath(o);
+    }
+
+    void walkBy(int offsetX, int offsetY) {
+        auto current = lastPos();
+        auto dest = std::make_pair(current.first + offsetX, current.second - offsetY);
+        auto wDest = toWindowSystem(dest);
+        moveTurtleTo(dest);
+        paths.back()->addPoint(wDest.first, wDest.second);
+    }
+
+    void setAngle(double a) {
+        double rotateBy = a - angle;
+        int x,y;
+        std::tie(x,y) = lastPos(false);
+
+        angle = a;
+        turtle->rotate(-rotateBy, x, y);
+    }
+
+    Turtle::Position toTurtleSystem(const Turtle::Position &p) const {
+        return std::make_pair(p.first - GC::SCREEN_WIDTH/2, -1 * p.second + GC::SCREEN_HEIGHT/2);
+    }
+
+    Turtle::Position toWindowSystem(const Turtle::Position &p) const {
+        return std::make_pair(p.first + GC::SCREEN_WIDTH/2, -1 * p.second + GC::SCREEN_HEIGHT/2);
     }
 
     Path *turtle { nullptr };
@@ -101,28 +139,18 @@ Turtle &Turtle::clear() {
 }
 
 Turtle &Turtle::forward(int steps) {
-    int x, y;
-    auto current = impl->paths.back();
-    std::tie(x, y) = current->last();
     double alpha = graphics::deg2rad(impl->angle);
-
     int sx = sin(alpha) * steps;
     int sy = cos(alpha) * steps;
-    x += sx;
-    y += sy;
 
-    impl->turtle->move(sx, sy);
-    current->addPoint(x, y);
-
+    impl->walkBy(sx, sy);
     render();
+
     return *this;
 }
 
 Turtle &Turtle::right(double angle) {
-    int x,y;
-    std::tie(x,y) = impl->paths.back()->last();
-    impl->angle -= angle;
-    impl->turtle->rotate(angle, x, y);
+    impl->setAngle(impl->angle - angle);
     render();
     return *this;
 }
@@ -132,26 +160,32 @@ Turtle::Position Turtle::currentPosition() const {
 }
 
 Turtle &Turtle::currentPosition(const Position &pos) {
-    impl->newPath(pos);
+    impl->moveTo(pos);
+    render();
     return *this;
 }
 
 Turtle &Turtle::currentXPosition(int x) {
     auto pos = currentPosition();
     pos.first = x;
-    impl->newPath(pos);
-
-    return *this;
+    return currentPosition(pos);
 }
 
 Turtle &Turtle::currentYPosition(int y) {
     auto pos = currentPosition();
     pos.second = y;
-    impl->newPath(pos);
-
-    return *this;
+    return currentPosition(pos);
 }
 
+double Turtle::heading() const {
+    return impl->angle;
+}
+
+Turtle &Turtle::heading(double h) {
+    impl->setAngle(180 - h);
+    render();
+    return *this;
+}
 
 void Turtle::render() {
     GC::instance().window()->clear();

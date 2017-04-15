@@ -288,45 +288,96 @@ struct ClearScreen : BuiltinProcedure {
 	}
 };
 
+struct SetPos : BuiltinProcedure {
+    SetPos() : BuiltinProcedure(1) {}
+    void operator()() const override {
+        auto pos = fetchArg(0).list();
+        if(pos.size()!=2) throw std::logic_error("Expected X,Y Coordinates");
+        int x = ValueBox(pos[0]).asInteger();
+        int y = ValueBox(pos[1]).asInteger();
+        Turtle::instance().currentPosition(
+            std::make_pair(x, y));
+    }
+};
+
+struct SetXY : BuiltinProcedure {
+    SetXY() : BuiltinProcedure(2) {}
+    void operator()() const override {
+        int x = fetchArg(0).asInteger();
+        int y = fetchArg(1).asInteger();
+        Turtle::instance().currentPosition(std::make_pair(x, y));
+    }
+};
+
+struct SetX : BuiltinProcedure {
+    SetX() : BuiltinProcedure(1) {}
+    void operator()() const override {
+        int x = fetchArg(0).asInteger();
+        Turtle::instance().currentXPosition(x);
+    }
+};
+
+struct SetY : BuiltinProcedure {
+    SetY() : BuiltinProcedure(1) {}
+    void operator()() const override {
+        int y = fetchArg(0).asInteger();
+        Turtle::instance().currentYPosition(y);
+    }
+};
+
+struct SetHeading : BuiltinProcedure {
+    SetHeading() : BuiltinProcedure(1) {}
+    void operator()() const override {
+        int alpha = fetchArg(0).asDouble();
+        Turtle::instance().heading(alpha);
+    }
+};
+
 /**
  * Register procedures in memory
  */
 
 void initBuiltInProcedures() {
     /* Constructors */
-    Stack::instance().globalFrame().setProcedure<Word>("word");
-    Stack::instance().globalFrame().setProcedure<Sentence>("sentence");
-    Stack::instance().globalFrame().setProcedure<List>("list");
-    Stack::instance().globalFrame().setProcedure<Fput>("Fput");
-    Stack::instance().globalFrame().setProcedure<Lput>("Lput");
+    Stack::instance().setProcedure<Word>("word");
+    Stack::instance().setProcedure<Sentence>("sentence");
+    Stack::instance().setProcedure<List>("list");
+    Stack::instance().setProcedure<Fput>("Fput");
+    Stack::instance().setProcedure<Lput>("Lput");
 
     /* Data Selector*/
-    Stack::instance().globalFrame().setProcedure<First>("first");
-    Stack::instance().globalFrame().setProcedure<Last>("last");
-    Stack::instance().globalFrame().setProcedure<ButFirst>("butfirst");
-    Stack::instance().globalFrame().setProcedure<ButLast>("butlast");
-    Stack::instance().globalFrame().setProcedure<Item>("item");
+    Stack::instance().setProcedure<First>("first");
+    Stack::instance().setProcedure<Last>("last");
+    Stack::instance().setProcedure<ButFirst>("butfirst");
+    Stack::instance().setProcedure<ButLast>("butlast");
+    Stack::instance().setProcedure<Item>("item");
 
     /* */
-    Stack::instance().globalFrame().setProcedure<Make>("make");
-    Stack::instance().globalFrame().setProcedure<Thing>("thing");
-    Stack::instance().globalFrame().setProcedure<Print>("print");
-    Stack::instance().globalFrame().setProcedure<Sum>("sum");
-	Stack::instance().globalFrame().setProcedure<Repeat>("repeat");
+    Stack::instance().setProcedure<Make>("make");
+    Stack::instance().setProcedure<Thing>("thing");
+    Stack::instance().setProcedure<Print>("print");
+    Stack::instance().setProcedure<Sum>("sum");
+	Stack::instance().setProcedure<Repeat>("repeat");
 
 	// Turtle Graphics
-	Stack::instance().globalFrame().setProcedure<Forward>("forward");
-	Stack::instance().globalFrame().setProcedure<Forward>("fd");
-	Stack::instance().globalFrame().setProcedure<Backward>("backward");
-	Stack::instance().globalFrame().setProcedure<Backward>("bk");
-	Stack::instance().globalFrame().setProcedure<Right>("right");
-	Stack::instance().globalFrame().setProcedure<Right>("rt");
-	Stack::instance().globalFrame().setProcedure<Left>("left");
-	Stack::instance().globalFrame().setProcedure<Left>("lt");
-	Stack::instance().globalFrame().setProcedure<Home>("home");
-	Stack::instance().globalFrame().setProcedure<Clean>("clean");
-	Stack::instance().globalFrame().setProcedure<ClearScreen>("clearscreen");
-	Stack::instance().globalFrame().setProcedure<ClearScreen>("cs");
+	Stack::instance().setProcedure<Forward>("forward");
+	Stack::instance().setProcedure<Forward>("fd");
+	Stack::instance().setProcedure<Backward>("backward");
+	Stack::instance().setProcedure<Backward>("bk");
+	Stack::instance().setProcedure<Right>("right");
+	Stack::instance().setProcedure<Right>("rt");
+	Stack::instance().setProcedure<Left>("left");
+	Stack::instance().setProcedure<Left>("lt");
+	Stack::instance().setProcedure<Home>("home");
+	Stack::instance().setProcedure<Clean>("clean");
+	Stack::instance().setProcedure<ClearScreen>("clearscreen");
+	Stack::instance().setProcedure<ClearScreen>("cs");
+	Stack::instance().setProcedure<SetPos>("setpos");
+	Stack::instance().setProcedure<SetXY>("setxy");
+	Stack::instance().setProcedure<SetX>("setx");
+	Stack::instance().setProcedure<SetY>("sety");
+	Stack::instance().setProcedure<SetHeading>("setheading");
+	Stack::instance().setProcedure<SetHeading>("seth");
 }
 
 }}

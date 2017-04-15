@@ -26,11 +26,10 @@ if(USE_BOOST_STATIC)
   set(Boost_USE_STATIC_RUNTIME     ON)
 else(USE_BOOST_STATIC)
   message(STATUS "Linking Boost dynamically")
-  add_definitions(-DBOOST_LOG_DYN_LINK)
 endif(USE_BOOST_STATIC)
 
 find_package(Threads)
-find_package(Boost REQUIRED COMPONENTS thread log_setup log filesystem program_options system)
+find_package(Boost REQUIRED)
 find_package(SDL2 REQUIRED)
 
 if(WITH_WINDOW_ALWAYS_ON_TOP)

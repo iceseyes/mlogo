@@ -22,7 +22,8 @@ namespace graphics {
 
 static const double rad_coef { 0.0174533 };
 
-Context::Context() {
+Context::Context() :
+    _window(nullptr) {
     if(SDL_Init(SDL_INIT_VIDEO) < 0) {
         stringstream ss;
         ss << "SDL could not initialize! SDL_Error: " << SDL_GetError();
