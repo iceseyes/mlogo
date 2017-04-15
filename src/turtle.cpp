@@ -75,8 +75,10 @@ struct Turtle::_pImpl {
     }
 
     void moveTurtleTo(const Turtle::Position &o) {
-        auto current = lastPos();
-        turtle->move(o.first - current.first, -1*o.second + current.second);
+        if(!paths.empty()) {
+            auto current = lastPos();
+            turtle->move(o.first - current.first, -1*o.second + current.second);
+        }
     }
 
     void moveTo(const Turtle::Position &o) {
