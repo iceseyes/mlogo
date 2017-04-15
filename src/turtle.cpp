@@ -59,7 +59,16 @@ struct Turtle::_pImpl {
     }
 
     void newPath() {
-        paths.push_back(GC::instance().createPath(GC::SCREEN_WIDTH/2, GC::SCREEN_HEIGHT/2));
+        newPath(std::make_pair(GC::SCREEN_WIDTH/2, GC::SCREEN_HEIGHT/2));
+    }
+
+    void newPath(const Turtle::Position &origin) {
+        paths.push_back(GC::instance().createPath(origin.first, origin.second));
+    }
+
+    Turtle::Position lastPos() const {
+        auto lastPath = paths.back();
+        return lastPath->last();
     }
 
     Path *turtle { nullptr };
@@ -79,14 +88,14 @@ Turtle::~Turtle() {
 Turtle &Turtle::home() {
     impl->angle = _pImpl::START_ANGLE;
     impl->createTurle();
-    if(!impl->paths.back()->empty()) impl->newPath();
+    impl->newPath();
     render();
 
     return *this;
 }
 
 Turtle &Turtle::clear() {
-    impl->initPaths();
+    impl->clearPaths();
     render();
     return *this;
 }
@@ -117,6 +126,32 @@ Turtle &Turtle::right(double angle) {
     render();
     return *this;
 }
+
+Turtle::Position Turtle::currentPosition() const {
+    return impl->lastPos();
+}
+
+Turtle &Turtle::currentPosition(const Position &pos) {
+    impl->newPath(pos);
+    return *this;
+}
+
+Turtle &Turtle::currentXPosition(int x) {
+    auto pos = currentPosition();
+    pos.first = x;
+    impl->newPath(pos);
+
+    return *this;
+}
+
+Turtle &Turtle::currentYPosition(int y) {
+    auto pos = currentPosition();
+    pos.second = y;
+    impl->newPath(pos);
+
+    return *this;
+}
+
 
 void Turtle::render() {
     GC::instance().window()->clear();

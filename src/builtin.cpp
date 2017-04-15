@@ -274,7 +274,9 @@ struct Home : BuiltinProcedure {
 struct Clean : BuiltinProcedure {
     Clean() : BuiltinProcedure(0) {}
     void operator()() const override {
+        auto p = Turtle::instance().currentPosition();
         Turtle::instance().clear();
+        Turtle::instance().currentPosition(p);
     }
 };
 
