@@ -37,6 +37,9 @@ public:
     double heading() const;
     Turtle &heading(double h);
 
+    std::pair<double, double> scrunch();
+    Turtle &scrunch(double xScrunch, double yScrunch);
+
 private:
     Turtle();
     ~Turtle();

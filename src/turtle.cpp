@@ -88,7 +88,9 @@ struct Turtle::_pImpl {
 
     void walkBy(int offsetX, int offsetY) {
         auto current = lastPos();
-        auto dest = std::make_pair(current.first + offsetX, current.second - offsetY);
+        auto dest = std::make_pair(
+                current.first + offsetX*xScrunch,
+                current.second - offsetY*yScrunch);
         auto wDest = toWindowSystem(dest);
         moveTurtleTo(dest);
         paths.back()->addPoint(wDest.first, wDest.second);
@@ -114,6 +116,8 @@ struct Turtle::_pImpl {
     Path *turtle { nullptr };
     vector<Path *> paths;
     double angle;
+    double xScrunch { 1 };
+    double yScrunch { 1 };
 };
 
 Turtle::Turtle() :
@@ -186,6 +190,16 @@ double Turtle::heading() const {
 Turtle &Turtle::heading(double h) {
     impl->setAngle(180 - h);
     render();
+    return *this;
+}
+
+std::pair<double, double> Turtle::scrunch() {
+    return std::make_pair(impl->xScrunch, impl->yScrunch);
+}
+
+Turtle &Turtle::scrunch(double xScrunch, double yScrunch) {
+    impl->xScrunch = xScrunch;
+    impl->yScrunch = yScrunch;
     return *this;
 }
 

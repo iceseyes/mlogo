@@ -333,6 +333,82 @@ struct SetHeading : BuiltinProcedure {
     }
 };
 
+struct Position : BuiltinProcedure {
+    Position() : BuiltinProcedure(0, true) {}
+    void operator()() const override {
+        ListValue out;
+        auto pos = Turtle::instance().currentPosition();
+        stringstream ss, ss1;
+        ss << pos.first;
+        out.push_back(ss.str());
+
+        ss1 << pos.second;
+        out.push_back(ss1.str());
+
+        setReturnValue(out);
+    }
+};
+
+struct GetX : BuiltinProcedure {
+    GetX() : BuiltinProcedure(0, true) {}
+    void operator()() const override {
+        auto pos = Turtle::instance().currentPosition();
+        stringstream ss;
+        ss << pos.first;
+        setReturnValue(ss.str());
+    }
+};
+
+struct GetY : BuiltinProcedure {
+    GetY() : BuiltinProcedure(0, true) {}
+    void operator()() const override {
+        auto pos = Turtle::instance().currentPosition();
+        stringstream ss;
+        ss << pos.second;
+        setReturnValue(ss.str());
+    }
+};
+
+struct Heading : BuiltinProcedure {
+    Heading() : BuiltinProcedure(0, true) {}
+    void operator()() const override {
+        double h { -1 * Turtle::instance().heading() };
+        stringstream ss;
+
+        h += 180;
+        while(h<0) h += 360;
+        while(h>359) h -= 360;
+        ss << h;
+        setReturnValue(ss.str());
+    }
+};
+
+struct Scrunch : BuiltinProcedure {
+    Scrunch() : BuiltinProcedure(0, true) {}
+    void operator()() const override {
+        auto scrunch = Turtle::instance().scrunch();
+        ListValue out;
+        stringstream ss, ss1;
+        ss << scrunch.first;
+        out.push_back(ss.str());
+
+        ss1 << scrunch.second;
+        out.push_back(ss1.str());
+
+        setReturnValue(out);
+    }
+};
+
+struct SetScrunch : BuiltinProcedure {
+    SetScrunch() : BuiltinProcedure(2) {}
+    void operator()() const override {
+        int alpha = fetchArg(0).asDouble();
+        int beta = fetchArg(1).asDouble();
+
+        Turtle::instance().scrunch(alpha, beta);
+    }
+};
+
 /**
  * Register procedures in memory
  */
@@ -378,6 +454,12 @@ void initBuiltInProcedures() {
 	Stack::instance().setProcedure<SetY>("sety");
 	Stack::instance().setProcedure<SetHeading>("setheading");
 	Stack::instance().setProcedure<SetHeading>("seth");
+	Stack::instance().setProcedure<Position>("pos");
+	Stack::instance().setProcedure<GetX>("xcor");
+	Stack::instance().setProcedure<GetY>("ycor");
+	Stack::instance().setProcedure<Heading>("heading");
+	Stack::instance().setProcedure<Scrunch>("scrunch");
+	Stack::instance().setProcedure<SetScrunch>("setscrunch");
 }
 
 }}
