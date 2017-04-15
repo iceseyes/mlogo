@@ -40,6 +40,8 @@ public:
     std::pair<double, double> scrunch();
     Turtle &scrunch(double xScrunch, double yScrunch);
 
+    Turtle &showTurtle();
+    Turtle &hideTurtle();
 private:
     Turtle();
     ~Turtle();

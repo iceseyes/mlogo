@@ -409,6 +409,20 @@ struct SetScrunch : BuiltinProcedure {
     }
 };
 
+struct ShowTurtle : BuiltinProcedure {
+    ShowTurtle() : BuiltinProcedure(0) {}
+    void operator()() const override {
+        Turtle::instance().showTurtle();
+    }
+};
+
+struct HideTurtle : BuiltinProcedure {
+    HideTurtle() : BuiltinProcedure(0) {}
+    void operator()() const override {
+        Turtle::instance().hideTurtle();
+    }
+};
+
 /**
  * Register procedures in memory
  */
@@ -460,6 +474,10 @@ void initBuiltInProcedures() {
 	Stack::instance().setProcedure<Heading>("heading");
 	Stack::instance().setProcedure<Scrunch>("scrunch");
 	Stack::instance().setProcedure<SetScrunch>("setscrunch");
+	Stack::instance().setProcedure<ShowTurtle>("showturtle");
+	Stack::instance().setProcedure<ShowTurtle>("st");
+	Stack::instance().setProcedure<HideTurtle>("hideturtle");
+	Stack::instance().setProcedure<HideTurtle>("ht");
 }
 
 }}

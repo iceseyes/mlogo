@@ -118,6 +118,7 @@ struct Turtle::_pImpl {
     double angle;
     double xScrunch { 1 };
     double yScrunch { 1 };
+    bool showTurtle { true };
 };
 
 Turtle::Turtle() :
@@ -203,9 +204,21 @@ Turtle &Turtle::scrunch(double xScrunch, double yScrunch) {
     return *this;
 }
 
+Turtle &Turtle::showTurtle() {
+    impl->showTurtle = true;
+    render();
+    return *this;
+}
+
+Turtle &Turtle::hideTurtle() {
+    impl->showTurtle = false;
+    render();
+    return *this;
+};
+
 void Turtle::render() {
     GC::instance().window()->clear();
-    GC::instance().window()->draw(impl->turtle);
+    if(impl->showTurtle) GC::instance().window()->draw(impl->turtle);
     for(auto p : impl->paths) GC::instance().window()->draw(p);
     GC::instance().window()->paint();
 }
