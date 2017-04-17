@@ -15,6 +15,10 @@ namespace mlogo {
 
 namespace turtle {
 
+enum class Mode {
+    WRAP, WINDOW, FENCE
+};
+
 class Turtle {
 public:
     using Position = std::pair<int, int>;

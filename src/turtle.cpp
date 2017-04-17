@@ -10,6 +10,7 @@
 
 #include <cmath>
 #include <vector>
+#include <iostream>
 
 #include "graphics.hpp"
 
@@ -89,10 +90,19 @@ struct Turtle::_pImpl {
     void walkBy(int offsetX, int offsetY) {
         auto current = lastPos();
         auto dest = std::make_pair(
-                current.first + offsetX*xScrunch,
-                current.second - offsetY*yScrunch);
-        auto wDest = toWindowSystem(dest);
-        moveTurtleTo(dest);
+            current.first + offsetX*xScrunch,
+            current.second - offsetY*yScrunch);
+
+        switch(mode) {
+        case Mode::WINDOW: walkTo(dest); break;
+        case Mode::WRAP: wrapPathTo(current, dest); break;
+        case Mode::FENCE: fencePathTo(current, dest); break;
+        }
+    }
+
+    void walkTo(const Turtle::Position &pos) {
+        auto wDest = toWindowSystem(pos);
+        moveTurtleTo(pos);
         paths.back()->addPoint(wDest.first, wDest.second);
     }
 
@@ -113,12 +123,26 @@ struct Turtle::_pImpl {
         return std::make_pair(p.first + GC::SCREEN_WIDTH/2, -1 * p.second + GC::SCREEN_HEIGHT/2);
     }
 
+    void wrapPathTo(const Turtle::Position &start, const Turtle::Position &dest) {
+        auto leftTop = toTurtleSystem(std::make_pair(0, 0));
+        auto rightBottom = toTurtleSystem(std::make_pair((int)GC::SCREEN_WIDTH, (int)GC::SCREEN_HEIGHT));
+
+        /* TODO Handling path wrapping */
+        walkTo(dest);
+    }
+
+    void fencePathTo(const Turtle::Position &start, const Turtle::Position &dest) {
+        /* TODO Handling path wrapping */
+        walkTo(dest);
+    }
+
     Path *turtle { nullptr };
     vector<Path *> paths;
     double angle;
     double xScrunch { 1 };
     double yScrunch { 1 };
     bool showTurtle { true };
+    Mode mode { Mode::WRAP };
 };
 
 Turtle::Turtle() :
