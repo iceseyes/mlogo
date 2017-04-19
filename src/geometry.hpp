@@ -6,15 +6,16 @@
 #define __GEOMETRY_HPP_
 
 #include <cmath>
+#include <iostream>
 
 namespace mlogo {
 
 namespace geometry {
 
-constexpr double RADIANS4DEGREES { M_PI / 180 };
-
 class Angle {
 public:
+    constexpr static double MAX_ERROR = 1e-5;
+
 	struct Rad {
 		explicit Rad(double value) : _value(value) {}
 		double value() const { return _value; }
@@ -40,12 +41,39 @@ public:
 	Rad radians() const;
 
 	bool equals(const Angle &angle) const;
+
+	Angle &operator+=(const Angle &another);
+	Angle &operator-=(const Angle &another);
+	Angle &operator*=(double k);
+	Angle &operator/=(double k);
+
+	Angle &inv();
+
+	double sin() const;
+	double cos() const;
+	double tan() const;
+
 private:
 	double _value;
 };
 
 bool operator==(const Angle &a, const Angle &b);
 bool operator!=(const Angle &a, const Angle &b);
+
+Angle operator+(const Angle &a, const Angle &b);
+Angle operator-(const Angle &a, const Angle &b);
+Angle operator*(const Angle &a, double k);
+Angle operator*(double k, const Angle &a);
+Angle operator/(const Angle &a, double k);
+Angle operator/(double k, const Angle &a);
+
+double sin(const Angle &angle);
+double cos(const Angle &angle);
+double tan(const Angle &angle);
+
+std::ostream &operator<<(std::ostream &s, const Angle::Rad &value);
+std::ostream &operator<<(std::ostream &s, const Angle::Degrees &value);
+std::ostream &operator<<(std::ostream &s, const Angle &value);
 
 } /* ns: geometry */
 
