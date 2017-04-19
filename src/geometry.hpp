@@ -11,7 +11,7 @@ namespace mlogo {
 
 namespace geometry {
 
-constexpr double RADIANS4DEGREES { M_PI / 360 };
+constexpr double RADIANS4DEGREES { M_PI / 180 };
 
 class Angle {
 public:
