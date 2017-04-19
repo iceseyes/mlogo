@@ -47,7 +47,7 @@ set(SRCS
 set(LIBLOGO_SRCS
   src/parser.cpp src/memory.cpp
   src/types.cpp src/value.cpp src/eval.cpp
-  src/graphics.cpp src/turtle.cpp
+  src/geometry.cpp src/graphics.cpp src/turtle.cpp
   src/builtin.cpp)
 
 add_library(${MLOGO_LIBRARY} ${LIBLOGO_SRCS})

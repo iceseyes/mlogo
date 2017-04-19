@@ -11,6 +11,7 @@ set(TEST_SRC
   src/test_memory.cpp           # test for memory
   src/test_eval.cpp             # test for eval
   src/test_value.cpp            # test for value
+  src/test_geometry.cpp         # test for geometry
 )
 
 
