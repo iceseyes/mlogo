@@ -99,6 +99,92 @@ double Angle::tan() const {
     return v;
 }
 
+Reference::Reference(double kx, int ox, double ky, int oy) :
+	kx(kx), ky(ky), ox(ox), oy(oy) {}
+
+Point Reference::toGPS(const Point &p) const {
+	return Point(p.x/kx + ox, p.y/ky + oy);
+}
+
+Point Reference::fromGPS(const Point &p) const {
+	return Point(kx*p.x - ox, ky*p.y - oy, *this);
+}
+
+bool Reference::operator==(const Reference &ref) const {
+	return ((ref.ox == ox)&&(ref.oy == oy)&&(ref.kx == kx)&&(ref.ky == ky));
+}
+
+bool Reference::operator!=(const Reference &ref) const {
+	return !(*this == ref);
+}
+
+bool Reference::global() const {
+	return (*this == Reference());
+}
+
+Point::Point(int x, int y, const Reference &system) :
+	x(x), y(y), system(system) {}
+
+bool Point::same(const Point &p) const {
+	return this->toGPS() == p.toGPS();
+}
+
+bool Point::operator==(const Point &p) const {
+	return (p.x == x) && (p.y == y) && (p.system == system);
+}
+
+bool Point::operator!=(const Point &p) const {
+	return !(*this == p);
+}
+
+bool Point::operator<(const Point &p) const {
+	return (system == p.system) && ((x < p.x) || ((x == p.x) && (y < p.y)));
+}
+
+bool Point::operator<=(const Point &p) const {
+	return (*this < p) || (*this == p);
+}
+
+bool Point::operator>(const Point &p) const {
+	return !(*this <= p);
+}
+
+bool Point::operator>=(const Point &p) const {
+	return !(*this < p);
+}
+
+Point &Point::operator+=(const Point &p) {
+	x += p.x;
+	y += p.y;
+
+	return *this;
+}
+
+Point &Point::operator-=(const Point &p) {
+	x -= p.x;
+	y -= p.y;
+
+	return *this;
+}
+
+Point &Point::operator*=(double k) {
+	x *= k;
+	y *= k;
+
+	return *this;
+}
+
+Point &Point::operator/=(double k) {
+	x /= k;
+	y /= k;
+
+	return *this;
+}
+
+Point Point::toGPS() const {
+	return system.toGPS(*this);
+}
+
 bool operator==(const Angle &a, const Angle &b) {
 	return a.equals(b);
 }
@@ -135,6 +221,31 @@ Angle operator/(const Angle &a, double k) {
 Angle operator/(double k, const Angle &a) {
     Angle b = a;
     return (b.inv() * k);
+}
+
+Point operator+(const Point &a, const Point &b) {
+	Point c { a };
+	return c += b;
+}
+
+Point operator-(const Point &a, const Point &b) {
+	Point c { a };
+	return c -= b;
+}
+
+Point operator*(const Point &a, double k) {
+	Point b { a };
+	return b *= k;
+}
+
+Point operator*(double k, const Point &a) {
+	Point b { a };
+	return b *= k;
+}
+
+Point operator/(const Point &a, double k) {
+	Point b { a };
+	return b /= k;
 }
 
 double sin(const Angle &angle) {
