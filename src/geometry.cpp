@@ -107,7 +107,7 @@ Point Reference::toGPS(const Point &p) const {
 }
 
 Point Reference::fromGPS(const Point &p) const {
-	return Point(kx*p.x - ox, ky*p.y - oy, *this);
+	return Point(kx*(p.x - ox), ky*(p.y - oy), *this);
 }
 
 bool Reference::operator==(const Reference &ref) const {

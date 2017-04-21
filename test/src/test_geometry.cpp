@@ -9,6 +9,8 @@
 
 
 using Angle = mlogo::geometry::Angle;
+using Reference = mlogo::geometry::Reference;
+using Point = mlogo::geometry::Point;
 
 constexpr double MAX_RAD_ERROR { 0.001 };
 constexpr double MAX_DEG_ERROR { 0.1 };
@@ -194,4 +196,105 @@ TEST(Angle, basicTrigonometry) {
 
     anAngle = Angle::Degrees(45);
     ASSERT_NEAR(1, tan(anAngle), 0.001);
+}
+
+TEST(Reference, globalReference) {
+    Reference global;
+
+    ASSERT_TRUE(global.global());
+    ASSERT_EQ(Reference({1, 0, 1, 0}), global);
+    ASSERT_NE(Reference({1, 0, -1, 0}), global);
+}
+
+TEST(Reference, turtleLikeReference) {
+    Reference turtle { 1, 320, -1, 240 };
+
+    ASSERT_FALSE(turtle.global());
+    ASSERT_NE(Reference({1, 0, 1, 0}), turtle);
+    ASSERT_EQ(Reference({1, 320, -1, 240}), turtle);
+    ASSERT_NE(Reference({1, 0, -1, 0}), turtle);
+
+    Point p = turtle.toGPS({0, 0});
+    ASSERT_EQ(320, p.x);
+    ASSERT_EQ(240, p.y);
+    ASSERT_TRUE(p.system.global());
+
+    p = turtle.toGPS({10, 10});
+    ASSERT_EQ(330, p.x);
+    ASSERT_EQ(230, p.y);
+    ASSERT_TRUE(p.system.global());
+
+    p = turtle.toGPS({-10, -10});
+    ASSERT_EQ(310, p.x);
+    ASSERT_EQ(250, p.y);
+    ASSERT_TRUE(p.system.global());
+
+    p = turtle.fromGPS({ 320, 240 });
+    ASSERT_EQ(0, p.x);
+    ASSERT_EQ(0, p.y);
+    ASSERT_FALSE(p.system.global());
+    ASSERT_EQ(turtle, p.system);
+
+    p = turtle.fromGPS({ 310, 250 });
+    ASSERT_EQ(-10, p.x);
+    ASSERT_EQ(-10, p.y);
+    ASSERT_FALSE(p.system.global());
+    ASSERT_EQ(turtle, p.system);
+
+    p = turtle.fromGPS({ 330, 230 });
+    ASSERT_EQ(10, p.x);
+    ASSERT_EQ(10, p.y);
+    ASSERT_FALSE(p.system.global());
+    ASSERT_EQ(turtle, p.system);
+
+    p = turtle.fromGPS({ 330, 250 });
+    ASSERT_EQ(10, p.x);
+    ASSERT_EQ(-10, p.y);
+    ASSERT_FALSE(p.system.global());
+    ASSERT_EQ(turtle, p.system);
+}
+
+TEST(Reference, halfReference) {
+    Reference ref { 0.5, -50, -0.5, 100 };
+
+    ASSERT_FALSE(ref.global());
+
+    Point p = ref.toGPS({0, 0});
+    ASSERT_EQ(-50, p.x);
+    ASSERT_EQ(100, p.y);
+    ASSERT_TRUE(p.system.global());
+
+    p = ref.toGPS({10, 10});
+    ASSERT_EQ(-30, p.x);
+    ASSERT_EQ(80, p.y);
+    ASSERT_TRUE(p.system.global());
+
+    p = ref.toGPS({-10, -10});
+    ASSERT_EQ(-70, p.x);
+    ASSERT_EQ(120, p.y);
+    ASSERT_TRUE(p.system.global());
+
+    p = ref.fromGPS({ -50, 100 });
+    ASSERT_EQ(0, p.x);
+    ASSERT_EQ(0, p.y);
+    ASSERT_FALSE(p.system.global());
+    ASSERT_EQ(ref, p.system);
+
+    p = ref.fromGPS({ -70, 120 });
+    ASSERT_EQ(-10, p.x);
+    ASSERT_EQ(-10, p.y);
+    ASSERT_FALSE(p.system.global());
+    ASSERT_EQ(ref, p.system);
+
+    p = ref.fromGPS({-30, 80 });
+    ASSERT_EQ(10, p.x);
+    ASSERT_EQ(10, p.y);
+    ASSERT_FALSE(p.system.global());
+    ASSERT_EQ(ref, p.system);
+
+    p = ref.fromGPS({ -30, 120 });
+    ASSERT_EQ(10, p.x);
+    ASSERT_EQ(-10, p.y);
+    ASSERT_FALSE(p.system.global());
+    ASSERT_EQ(ref, p.system);
 }
