@@ -202,17 +202,17 @@ TEST(Reference, globalReference) {
     Reference global;
 
     ASSERT_TRUE(global.global());
-    ASSERT_EQ(Reference({1, 0, 1, 0}), global);
-    ASSERT_NE(Reference({1, 0, -1, 0}), global);
+    ASSERT_EQ(Reference(1, 0, 1, 0), global);
+    ASSERT_NE(Reference(1, 0, -1, 0), global);
 }
 
 TEST(Reference, turtleLikeReference) {
     Reference turtle { 1, 320, -1, 240 };
 
     ASSERT_FALSE(turtle.global());
-    ASSERT_NE(Reference({1, 0, 1, 0}), turtle);
-    ASSERT_EQ(Reference({1, 320, -1, 240}), turtle);
-    ASSERT_NE(Reference({1, 0, -1, 0}), turtle);
+    ASSERT_NE(Reference(1, 0, 1, 0), turtle);
+    ASSERT_EQ(Reference(1, 320, -1, 240), turtle);
+    ASSERT_NE(Reference(1, 0, -1, 0), turtle);
 
     Point p = turtle.toGPS({0, 0});
     ASSERT_EQ(320, p.x);
@@ -297,4 +297,58 @@ TEST(Reference, halfReference) {
     ASSERT_EQ(-10, p.y);
     ASSERT_FALSE(p.system.global());
     ASSERT_EQ(ref, p.system);
+}
+
+TEST(Point, globalPoints) {
+    Point p { 100, 200 };
+
+    ASSERT_EQ(100, p.x);
+    ASSERT_EQ(200, p.y);
+    ASSERT_TRUE(p.system.global());
+
+    p = { 320, 240 };
+    ASSERT_EQ(320, p.x);
+    ASSERT_EQ(240, p.y);
+    ASSERT_TRUE(p.system.global());
+
+    ASSERT_EQ(Point({320, 240}), p);
+    ASSERT_TRUE(p.same({320, 240}));
+}
+
+TEST(Point, globalOrderedPoints) {
+    Point p1 { 100, 200 };
+    Point p2 { 320, 240 };
+    Point p3 { 320, -200 };
+    Point p4 { -100, 0 };
+
+    ASSERT_TRUE(p1 < p2);
+    ASSERT_TRUE(p1 <= p2);
+    ASSERT_TRUE(p3 <= p2);
+    ASSERT_TRUE(p2 > p3);
+    ASSERT_TRUE(p4 < p1);
+    ASSERT_TRUE(p4 <= Point({-100, 0}));
+    ASSERT_TRUE(Point({-100, 0}) >= p4);
+}
+
+TEST(Point, globalOperations) {
+    Point p1 { 100, 200 };
+    Point t = p1 - Point({-50, 100});
+
+    ASSERT_EQ(Point({150, 100}), t);
+
+    t += { 50, 50 };
+
+    ASSERT_EQ(Point({200, 150}), t);
+
+    t = t * 2;
+
+    ASSERT_EQ(Point({400, 300}), t);
+
+    t /= 2;
+
+    ASSERT_EQ(Point({200, 150}), t);
+
+    t = 2 * t;
+
+    ASSERT_EQ(Point({400, 300}), t);
 }

@@ -61,7 +61,7 @@ private:
 
 class Reference {
 public:
-	Reference(double kx=1, int ox=0, double ky=1, int oy=0);
+	explicit Reference(double kx=1, int ox=0, double ky=1, int oy=0);
 
 	Point toGPS(const Point &p) const;
 	Point fromGPS(const Point &p) const;
