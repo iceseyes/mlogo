@@ -352,3 +352,50 @@ TEST(Point, globalOperations) {
 
     ASSERT_EQ(Point({400, 300}), t);
 }
+
+TEST(Point, localPosition) {
+    Reference system { 1, 320, -1, 240 };
+    Point p1 { 0, 0, system };
+
+    ASSERT_EQ(0, p1.x);
+    ASSERT_EQ(0, p1.y);
+
+    ASSERT_TRUE(Point({320, 240}).same(p1));
+    ASSERT_TRUE(p1.same(Point({320, 240})));
+
+    ASSERT_NE(Point({320, 240}), p1);
+
+    Point globalP1 { p1.toGPS() };
+    ASSERT_EQ(Point({320, 240}), globalP1);
+
+    Point p2 { p1 + Point {100, -25} };
+    ASSERT_EQ(100, p2.x);
+    ASSERT_EQ(-25, p2.y);
+
+    ASSERT_TRUE(p1 < p2);
+    ASSERT_TRUE(p1 <= p2);
+    ASSERT_TRUE(p2 > p1);
+    ASSERT_TRUE(p2 >= p1);
+
+    // p1, p2 using different reference system
+    // so are incomparable with globalP1
+    ASSERT_FALSE(p1 > globalP1);
+    ASSERT_FALSE(p1 >= globalP1);
+    ASSERT_FALSE(p2 > globalP1);
+    ASSERT_FALSE(p2 >= globalP1);
+
+    ASSERT_FALSE(p1 < globalP1);
+    ASSERT_FALSE(p1 <= globalP1);
+    ASSERT_FALSE(p2 < globalP1);
+    ASSERT_FALSE(p2 <= globalP1);
+
+    p2 /= 2;
+    ASSERT_EQ(50, p2.x);
+    ASSERT_EQ(-12, p2.y); // TRUNC-ed!
+    ASSERT_EQ(system, p2.system);
+
+    p2 *= 2;
+    ASSERT_EQ(100, p2.x);
+    ASSERT_EQ(-24, p2.y);
+    ASSERT_EQ(system, p2.system);
+}

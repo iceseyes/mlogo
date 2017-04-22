@@ -146,11 +146,11 @@ bool Point::operator<=(const Point &p) const {
 }
 
 bool Point::operator>(const Point &p) const {
-	return !(*this <= p);
+	return (system == p.system) && !(*this <= p);
 }
 
 bool Point::operator>=(const Point &p) const {
-	return !(*this < p);
+	return (system == p.system) && !(*this < p);
 }
 
 Point &Point::operator+=(const Point &p) {
