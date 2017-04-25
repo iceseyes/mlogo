@@ -23,6 +23,12 @@ namespace {
     double deg2rad(double d) {
         return radNormalize(d*RADIANS4DEGREES);
     }
+
+    int myround(double v) {
+        int sgn = v/std::fabs(v);
+
+        return sgn * std::round(std::fabs(v));
+    }
 }
 
 Angle::Angle(const Rad &angle) :
@@ -185,6 +191,90 @@ Point Point::toGPS() const {
 	return system.toGPS(*this);
 }
 
+Path::Path(const Reference &system, int x, int y) :
+        system(system), center(0,0,system) {
+    push_back(x, y);
+}
+
+Path::Path(const Point &p) :
+        system(p.system), center(0,0,system) {
+    push_back(p);
+}
+
+Path &Path::push_back(int x, int y) {
+    points.emplace_back(x, y, system);
+    return *this;
+}
+
+Path &Path::push_back(const Point &p) {
+    points.push_back(p);
+    return *this;
+}
+
+Path &Path::push_back(Point &&p) {
+    points.push_back(p);
+    return *this;
+}
+
+Path &Path::push_from_last(int offsetX, int offsetY) {
+    Point p = last() + Point { offsetX, offsetY };
+    push_back(std::move(p));
+    return *this;
+}
+
+Path &Path::translate(const Point &p) {
+    for(auto &item : points) item += p;
+    center += p;
+    return *this;
+}
+
+Path &Path::translate(int offsetX, int offsetY) {
+    Point p { offsetX, offsetY };
+    return translate(p);
+}
+
+Path &Path::rotate(const Angle &a) {
+    double sin_a = sin(a);
+    double cos_a = cos(a);
+
+    for(auto &p : points) {
+        Point p1 { p };
+        // move path to the origin
+        p1 -= center;
+
+        // rotate path
+        p1.x = myround(p.x * cos_a - p.y * sin_a);
+        p1.y = myround(p.x * sin_a + p.y * cos_a);
+
+        // move in original position
+        p1 += center;
+
+        p = p1;
+    }
+
+    return *this;
+}
+
+Point Path::last() const {
+    return points.back();
+}
+
+Path::iterator Path::begin() noexcept { return points.begin(); }
+
+Path::const_iterator Path::begin() const noexcept  { return points.begin(); }
+
+Path::iterator Path::end() noexcept { return points.end(); }
+
+Path::const_iterator Path::end() const noexcept { return points.end(); }
+
+std::size_t Path::size() const {
+    return points.size();
+}
+
+bool Path::empty() const {
+    return size()<2;    // at least 2 points are needed by a path
+}
+
 bool operator==(const Angle &a, const Angle &b) {
 	return a.equals(b);
 }
@@ -272,6 +362,11 @@ std::ostream &operator<<(std::ostream &s, const Angle::Degrees &value) {
 
 std::ostream &operator<<(std::ostream &s, const Angle &value) {
     s << value.radians();
+    return s;
+}
+
+std::ostream &operator<<(std::ostream &s, const Point &value) {
+    s << "(" << value.x << "," << value.y << ")";
     return s;
 }
 

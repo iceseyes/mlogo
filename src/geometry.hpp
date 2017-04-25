@@ -7,6 +7,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <vector>
 
 namespace mlogo {
 
@@ -102,6 +103,42 @@ struct Point {
 	Reference system;
 };
 
+class Path {
+    using Points = std::vector<Point>;
+
+public:
+    using iterator = Points::iterator;
+    using const_iterator = Points::const_iterator;
+
+    Path(const Reference &system, int x, int y);
+    explicit Path(const Point &p);
+
+    Path &push_back(int x, int y);
+    Path &push_back(const Point &p);
+    Path &push_back(Point &&p);
+    Path &push_from_last(int offsetX, int offsetY);
+
+    Path &translate(const Point &p);
+    Path &translate(int offsetX, int offsetY);
+
+    Path &rotate(const Angle &a);
+
+    Point last() const;
+
+    iterator begin() noexcept;
+    const_iterator begin() const noexcept;
+    iterator end() noexcept;
+    const_iterator end() const noexcept;
+
+    std::size_t size() const;
+    bool empty() const;
+
+private:
+    Points points;
+    Reference system;
+    Point center;
+};
+
 bool operator==(const Angle &a, const Angle &b);
 bool operator!=(const Angle &a, const Angle &b);
 
@@ -125,6 +162,7 @@ double tan(const Angle &angle);
 std::ostream &operator<<(std::ostream &s, const Angle::Rad &value);
 std::ostream &operator<<(std::ostream &s, const Angle::Degrees &value);
 std::ostream &operator<<(std::ostream &s, const Angle &value);
+std::ostream &operator<<(std::ostream &s, const Point &value);
 
 } /* ns: geometry */
 

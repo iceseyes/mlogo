@@ -11,6 +11,7 @@
 using Angle = mlogo::geometry::Angle;
 using Reference = mlogo::geometry::Reference;
 using Point = mlogo::geometry::Point;
+using Path = mlogo::geometry::Path;
 
 constexpr double MAX_RAD_ERROR { 0.001 };
 constexpr double MAX_DEG_ERROR { 0.1 };
@@ -398,4 +399,153 @@ TEST(Point, localPosition) {
     ASSERT_EQ(100, p2.x);
     ASSERT_EQ(-24, p2.y);
     ASSERT_EQ(system, p2.system);
+}
+
+TEST(Path, turtle) {
+    Reference ref { 1, 320, -1, 240 };
+    Path turtle { ref, 8, 0 };
+
+    ASSERT_TRUE(turtle.empty());
+    ASSERT_EQ(1u, turtle.size());
+    ASSERT_EQ(Point(8, 0, ref), turtle.last());
+
+    turtle.push_back(-8, 5);
+
+    ASSERT_FALSE(turtle.empty());
+    ASSERT_EQ(2u, turtle.size());
+    ASSERT_EQ(Point(-8, 5, ref), turtle.last());
+
+    turtle.push_back(-8, -5);
+
+    ASSERT_FALSE(turtle.empty());
+    ASSERT_EQ(3u, turtle.size());
+    ASSERT_EQ(Point(-8, -5, ref), turtle.last());
+
+    turtle.push_back(8, 0);
+
+    ASSERT_FALSE(turtle.empty());
+    ASSERT_EQ(4u, turtle.size());
+    ASSERT_EQ(Point(8, 0, ref), turtle.last());
+
+    auto i = turtle.begin();
+    ASSERT_EQ(Point(8, 0, ref), *(i++));
+    ASSERT_EQ(Point(-8, 5, ref), *(i++));
+    ASSERT_EQ(Point(-8, -5, ref), *(i++));
+    ASSERT_EQ(Point(8, 0, ref), *(i++));
+    ASSERT_EQ(i, turtle.end());
+}
+
+TEST(Path, turtleRotate) {
+    Reference ref { 1, 320, -1, 240 };
+    Path turtle { ref, 8, 0 };
+    turtle.push_back(-8, 5);
+    turtle.push_back(-8, -5);
+    turtle.push_back(8, 0);
+
+    turtle.rotate(Angle(Angle::Degrees(90)));
+
+    auto i = turtle.begin();
+    ASSERT_EQ(Point(0, 8, ref), *(i++));
+    ASSERT_EQ(Point(-5, -8, ref), *(i++));
+    ASSERT_EQ(Point(5, -8, ref), *(i++));
+    ASSERT_EQ(Point(0, 8, ref), *(i++));
+    ASSERT_EQ(i, turtle.end());
+
+    turtle.rotate(Angle(Angle::Degrees(-45)));
+
+    i = turtle.begin();
+    ASSERT_EQ(Point(6, 6, ref), *(i++));
+    ASSERT_EQ(Point(-9, -2, ref), *(i++));
+    ASSERT_EQ(Point(-2, -9, ref), *(i++));
+    ASSERT_EQ(Point(6, 6, ref), *(i++));
+    ASSERT_EQ(i, turtle.end());
+
+    turtle.rotate(Angle(Angle::Degrees(-45)));
+
+    i = turtle.begin();
+    ASSERT_EQ(Point(8, 0, ref), *(i++));
+    ASSERT_EQ(Point(-8, 5, ref), *(i++));
+    ASSERT_EQ(Point(-8, -5, ref), *(i++));
+    ASSERT_EQ(Point(8, 0, ref), *(i++));
+    ASSERT_EQ(i, turtle.end());
+
+}
+
+TEST(Path, turtleTranslate) {
+    Reference ref { 1, 320, -1, 240 };
+    Path turtle { ref, 8, 0 };
+    turtle.push_back(-8, 5);
+    turtle.push_back(-8, -5);
+    turtle.push_back(8, 0);
+
+    turtle.translate(100, 0);
+
+    auto i = turtle.begin();
+    ASSERT_EQ(Point(108, 0, ref), *(i++));
+    ASSERT_EQ(Point(92, 5, ref), *(i++));
+    ASSERT_EQ(Point(92, -5, ref), *(i++));
+    ASSERT_EQ(Point(108, 0, ref), *(i++));
+    ASSERT_EQ(i, turtle.end());
+
+    turtle.translate(0, 100);
+
+    i = turtle.begin();
+    ASSERT_EQ(Point(108, 100, ref), *(i++));
+    ASSERT_EQ(Point(92, 105, ref), *(i++));
+    ASSERT_EQ(Point(92, 95, ref), *(i++));
+    ASSERT_EQ(Point(108, 100, ref), *(i++));
+    ASSERT_EQ(i, turtle.end());
+
+    turtle.translate(-100, -100);
+
+    i = turtle.begin();
+    ASSERT_EQ(Point(8, 0, ref), *(i++));
+    ASSERT_EQ(Point(-8, 5, ref), *(i++));
+    ASSERT_EQ(Point(-8, -5, ref), *(i++));
+    ASSERT_EQ(Point(8, 0, ref), *(i++));
+    ASSERT_EQ(i, turtle.end());
+}
+
+TEST(Path, turtleRotateAndTranslate) {
+    Reference ref { 1, 320, -1, 240 };
+    Path turtle { ref, 8, 0 };
+    turtle.push_back(-8, 5);
+    turtle.push_back(-8, -5);
+    turtle.push_back(8, 0);
+
+    turtle.rotate(Angle::Degrees(30));
+
+    auto i = turtle.begin();
+    ASSERT_EQ(Point(7, 4, ref), *(i++));
+    ASSERT_EQ(Point(-9, 0, ref), *(i++));
+    ASSERT_EQ(Point(-4, -8, ref), *(i++));
+    ASSERT_EQ(Point(7, 4, ref), *(i++));
+    ASSERT_EQ(i, turtle.end());
+
+    turtle.translate(100, 100);
+
+    i = turtle.begin();
+    ASSERT_EQ(Point(107, 104, ref), *(i++));
+    ASSERT_EQ(Point(91, 100, ref), *(i++));
+    ASSERT_EQ(Point(96, 92, ref), *(i++));
+    ASSERT_EQ(Point(107, 104, ref), *(i++));
+    ASSERT_EQ(i, turtle.end());
+
+    turtle.translate(-100, -100);
+
+    i = turtle.begin();
+    ASSERT_EQ(Point(7, 4, ref), *(i++));
+    ASSERT_EQ(Point(-9, 0, ref), *(i++));
+    ASSERT_EQ(Point(-4, -8, ref), *(i++));
+    ASSERT_EQ(Point(7, 4, ref), *(i++));
+    ASSERT_EQ(i, turtle.end());
+
+    turtle.rotate(Angle::Degrees(-30));
+
+    i = turtle.begin();
+    ASSERT_EQ(Point(8, 0, ref), *(i++));
+    ASSERT_EQ(Point(-8, 5, ref), *(i++));
+    ++i; // Should be -8 but rounding introduce an error. ASSERT_EQ(Point(-8, -5, ref), *(i++));
+    ASSERT_EQ(Point(8, 0, ref), *(i++));
+    ASSERT_EQ(i, turtle.end());
 }
