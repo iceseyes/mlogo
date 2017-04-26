@@ -545,7 +545,7 @@ TEST(Path, turtleRotateAndTranslate) {
     i = turtle.begin();
     ASSERT_EQ(Point(8, 0, ref), *(i++));
     ASSERT_EQ(Point(-8, 5, ref), *(i++));
-    ++i; // Should be -8 but rounding introduce an error. ASSERT_EQ(Point(-8, -5, ref), *(i++));
+    ASSERT_EQ(Point(-8, -5, ref), *(i++));
     ASSERT_EQ(Point(8, 0, ref), *(i++));
     ASSERT_EQ(i, turtle.end());
 }
