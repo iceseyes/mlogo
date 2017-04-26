@@ -191,13 +191,24 @@ Point Point::toGPS() const {
 	return system.toGPS(*this);
 }
 
+Point Point::rotate(const Angle &a) const {
+    double sin_a = sin(a);
+    double cos_a = cos(a);
+
+    Point p { *this };
+    p.x = myround(x * cos_a - y * sin_a);
+    p.y = myround(x * sin_a + y * cos_a);
+
+    return p;
+}
+
 Path::Path(const Reference &system, int x, int y) :
-        system(system), center(0,0,system) {
+        system(system) {
     push_back(x, y);
 }
 
 Path::Path(const Point &p) :
-        system(p.system), center(0,0,system) {
+        system(p.system) {
     push_back(p);
 }
 
@@ -222,37 +233,25 @@ Path &Path::push_from_last(int offsetX, int offsetY) {
     return *this;
 }
 
-Path &Path::translate(const Point &p) {
-    for(auto &item : points) item += p;
-    center += p;
-    return *this;
+Path Path::translate(const Point &p) const {
+    Path path { *this };
+
+    for(auto &point : path) point += p;
+
+    return path;
 }
 
-Path &Path::translate(int offsetX, int offsetY) {
+Path Path::translate(int offsetX, int offsetY) const {
     Point p { offsetX, offsetY };
     return translate(p);
 }
 
-Path &Path::rotate(const Angle &a) {
-    double sin_a = sin(a);
-    double cos_a = cos(a);
+Path Path::rotate(const Angle &a) const {
+    Path p { *this };
 
-    for(auto &p : points) {
-        Point p1 { p };
-        // move path to the origin
-        p1 -= center;
+    for(auto &point : p) point = point.rotate(a);
 
-        // rotate path
-        p1.x = myround(p.x * cos_a - p.y * sin_a);
-        p1.y = myround(p.x * sin_a + p.y * cos_a);
-
-        // move in original position
-        p1 += center;
-
-        p = p1;
-    }
-
-    return *this;
+    return p;
 }
 
 Point Path::last() const {

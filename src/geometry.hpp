@@ -97,6 +97,7 @@ struct Point {
 	Point &operator/=(double k);
 
 	Point toGPS() const;
+	Point rotate(const Angle &a) const;
 
 	int x;
 	int y;
@@ -118,10 +119,10 @@ public:
     Path &push_back(Point &&p);
     Path &push_from_last(int offsetX, int offsetY);
 
-    Path &translate(const Point &p);
-    Path &translate(int offsetX, int offsetY);
+    Path translate(const Point &p) const;
+    Path translate(int offsetX, int offsetY) const;
 
-    Path &rotate(const Angle &a);
+    Path rotate(const Angle &a) const;
 
     Point last() const;
 
@@ -136,7 +137,6 @@ public:
 private:
     Points points;
     Reference system;
-    Point center;
 };
 
 bool operator==(const Angle &a, const Angle &b);
