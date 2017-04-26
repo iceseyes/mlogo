@@ -42,63 +42,15 @@ inline double zeroif(double val) {
     return val;
 }
 
-struct SDLPath : Path {
-    SDLPath(int ox, int oy) {
-        addPoint(ox, oy);
-    }
+SDL_Point toSDLPoint(const geometry::Point &p) {
+    SDL_Point out;
+    auto point = p.toGPS();
 
-    Path &addPoint(int x, int y) override {
-        SDL_Point p { x, y };
-        points.push_back(std::move(p));
-        return *this;
-    }
+    out.x = point.x;
+    out.y = point.y;
 
-    Path &move(int shift_x, int shift_y) override {
-        for(auto &p : points) {
-            p.x += shift_x;
-            p.y += shift_y;
-        }
-
-        return *this;
-    }
-
-    Path &rotate(double angle, int ox=0, int oy=0) override {
-        double rad = deg2rad(angle);
-        double sin_a = zeroif(sin(rad));
-        double cos_a = zeroif(cos(rad));
-
-        for(auto &p : points) {
-            // move path to the origin
-            int x=p.x-ox;
-            int y=p.y-oy;
-
-            // rotate path
-            double x1 = x * cos_a - y * sin_a;
-            double y1 = x * sin_a + y * cos_a;
-
-            // move in original position
-            p.x = static_cast<int>(round(x1)) + ox;
-            p.y = static_cast<int>(round(y1)) + oy;
-        }
-
-        return *this;
-    }
-
-    const void *data() const override {
-        return points.data();
-    };
-
-    size_t size() const override {
-        return points.size();
-    }
-
-    std::pair<int, int> last() override {
-        auto p = points.back();
-        return std::make_pair(p.x, p.y);
-    }
-
-    std::vector<SDL_Point> points;
-};
+    return out;
+}
 
 class SDLWindow : public Window {
 public:
@@ -151,11 +103,17 @@ public:
         return this;
     }
 
-    Window *draw(Path *path) {
-        SDL_RenderDrawLines(
-            renderer,
-            static_cast<const SDL_Point*>(path->data()),
-            path->size());
+    Window *draw(const geometry::Path &path) {
+        auto iter = path.begin();
+        auto a = toSDLPoint(*iter);
+        while(iter!=path.end()) {
+            auto b = toSDLPoint(*(++iter));
+            SDL_RenderDrawLine(
+                renderer,
+                a.x, a.y, b.x, b.y);
+
+            a = b;
+        }
         return this;
     }
 

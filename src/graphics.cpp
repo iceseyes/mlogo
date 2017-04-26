@@ -20,8 +20,6 @@ namespace mlogo {
 
 namespace graphics {
 
-static const double rad_coef { 0.0174533 };
-
 Context::Context() :
     _window(nullptr) {
     if(SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -43,17 +41,6 @@ Window *Context::window() {
         _window = new SDLWindow("mlogo", SCREEN_WIDTH, SCREEN_HEIGHT);
     }
     return _window;
-}
-
-Path *Context::createPath(int ox, int oy) const {
-    return new impl::SDLPath(ox, oy);
-}
-
-double deg2rad(double deg) {
-    int d = static_cast<int>(deg);
-    while(d<0) d+=360;
-    d %= 360;
-    return d*rad_coef;
 }
 
 } /* ns: graphics */
