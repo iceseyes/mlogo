@@ -105,9 +105,9 @@ public:
 
     Window *draw(const geometry::Path &path) {
         auto iter = path.begin();
-        auto a = toSDLPoint(*iter);
+        auto a = toSDLPoint(*(iter++));
         while(iter!=path.end()) {
-            auto b = toSDLPoint(*(++iter));
+            auto b = toSDLPoint(*(iter++));
             SDL_RenderDrawLine(
                 renderer,
                 a.x, a.y, b.x, b.y);

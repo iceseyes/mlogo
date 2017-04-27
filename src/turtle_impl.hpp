@@ -125,22 +125,28 @@ struct Turtle::_pImpl {
         walkTo(dest);
     }
 
-    Turtle::Position toPosition(const geometry::Point &p) const {
+    Turtle::Position toPosition(const Point &p) const {
         return make_pair(p.x, p.y);
     }
 
-    Turtle::Position toPosition(geometry::Point &&p) const {
+    Turtle::Position toPosition(Point &&p) const {
         return make_pair(p.x, p.y);
     }
 
-    geometry::Point toPoint(const Turtle::Position &p) const {
-        return geometry::Point(p.first, p.second, turtleSystem);
+    Point toPoint(const Turtle::Position &p) const {
+        return Point(p.first, p.second, turtleSystem);
     }
 
-    geometry::Reference turtleSystem;
+    Path getTurtle() const {
+        return turtle
+                .rotate(angle - Angle::Degrees(180))
+                .translate(paths.back().last());
+    }
+
+    Reference turtleSystem;
     Path turtle;
     vector<Path> paths;
-    geometry::Angle angle;
+    Angle angle;
     double xScrunch { 1 };
     double yScrunch { 1 };
     bool showTurtle { true };

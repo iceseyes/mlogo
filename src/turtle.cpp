@@ -88,8 +88,8 @@ Turtle &Turtle::heading(double h) {
     return *this;
 }
 
-std::pair<double, double> Turtle::scrunch() {
-    return std::make_pair(impl->xScrunch, impl->yScrunch);
+pair<double, double> Turtle::scrunch() {
+    return make_pair(impl->xScrunch, impl->yScrunch);
 }
 
 Turtle &Turtle::scrunch(double xScrunch, double yScrunch) {
@@ -112,7 +112,9 @@ Turtle &Turtle::hideTurtle() {
 
 void Turtle::render() {
     GC::instance().window()->clear();
-    if(impl->showTurtle) GC::instance().window()->draw(impl->turtle);
+    if(impl->showTurtle) {
+        GC::instance().window()->draw(impl->getTurtle());
+    }
     for(auto p : impl->paths) GC::instance().window()->draw(p);
     GC::instance().window()->paint();
 }
