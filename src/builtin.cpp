@@ -283,8 +283,8 @@ struct Clean : BuiltinProcedure {
 struct ClearScreen : BuiltinProcedure {
 	ClearScreen() : BuiltinProcedure(0) {}
 	void operator()() const override {
+        Turtle::instance().home();
 		Turtle::instance().clear();
-		Turtle::instance().home();
 	}
 };
 
@@ -329,7 +329,7 @@ struct SetHeading : BuiltinProcedure {
     SetHeading() : BuiltinProcedure(1) {}
     void operator()() const override {
         int alpha = fetchArg(0).asDouble();
-        Turtle::instance().heading(alpha);
+        Turtle::instance().heading(-1 * alpha);
     }
 };
 
@@ -375,7 +375,6 @@ struct Heading : BuiltinProcedure {
         double h { -1 * Turtle::instance().heading() };
         stringstream ss;
 
-        h += 180;
         while(h<0) h += 360;
         while(h>359) h -= 360;
         ss << h;

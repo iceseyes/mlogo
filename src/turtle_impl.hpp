@@ -71,7 +71,7 @@ struct Turtle::_pImpl {
     void moveTo(const Turtle::Position &o) {
         auto current = toPoint(o);
 
-        paths.back().push_back(current);
+        addPoint(current);
         turtlePosition = current;
     }
 
@@ -81,9 +81,16 @@ struct Turtle::_pImpl {
         Point d { 0, steps, turtleSystem};
         d = d.rotate(angle).scale(xScrunch, yScrunch);
         current = current + d;
-        paths.back().push_back(current);
 
+        addPoint(current);
         turtlePosition = current;
+    }
+
+    void addPoint(const Point &current) {
+        if(paths.empty())
+            paths.emplace_back(turtlePosition);
+
+        paths.back().push_back(current);
     }
 
     void setAngle(double a) {
@@ -109,7 +116,7 @@ struct Turtle::_pImpl {
     Path turtle() const {
         return _turtle
                 .rotate(angle)
-                .translate(paths.back().last());
+                .translate(turtlePosition);
     }
 
     Reference turtleSystem;
