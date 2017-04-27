@@ -19,12 +19,12 @@
 #include "geometry.hpp"
 
 using namespace std;
+using namespace mlogo::geometry;
 
 namespace mlogo {
 
 namespace turtle {
 
-using Path = geometry::Path;
 using GC = graphics::Context;
 
 struct Turtle::_pImpl {
@@ -34,7 +34,10 @@ struct Turtle::_pImpl {
     static constexpr int TURTLE_HEAD_X { GC::SCREEN_WIDTH / 2 };
     static constexpr int TURTLE_HEAD_Y { (GC::SCREEN_HEIGHT - TURTLE_HEIGHT) / 2};
 
-    _pImpl() : angle(START_ANGLE), turtleSystem(1, TURTLE_HEAD_X, -1, TURTLE_HEAD_Y) {
+    _pImpl() :
+        angle(Angle::Degrees(START_ANGLE)),
+        turtleSystem(1, TURTLE_HEAD_X, -1, TURTLE_HEAD_Y),
+        turtle(turtleSystem, 0, 0){
         createTurle();
         initPaths();
     }
@@ -44,7 +47,7 @@ struct Turtle::_pImpl {
     }
 
     void createTurle() {
-        turtle = Path(0, TURTLE_HEIGHT/2);
+        turtle = Path(turtleSystem, 0, TURTLE_HEIGHT/2);
         turtle.push_back(TURTLE_BASE/2, -TURTLE_HEIGHT/2);
         turtle.push_back(-TURTLE_BASE/2, -TURTLE_HEIGHT/2);
         turtle.push_back(0, TURTLE_HEIGHT/2);
@@ -56,20 +59,19 @@ struct Turtle::_pImpl {
     }
 
     void clearPaths() {
-        for(auto p : paths) delete p;
         paths.clear();
     }
 
     void newPath() {
-        newPath(std::make_pair(0, 0));
+        newPath(make_pair(0, 0));
     }
 
     void newPath(const Turtle::Position &o) {
-        paths.push_back(Path(o.first, o.second));
+        paths.push_back(Path(toPoint(o)));
     }
 
-    Turtle::Position lastPos() const { // (T)urtle (S)ystem  (P)osition
-        return paths.back().last();
+    Turtle::Position lastPos() const {
+        return toPosition(paths.back().last());
     }
 
     void moveTurtleTo(const Turtle::Position &o) {
@@ -98,22 +100,21 @@ struct Turtle::_pImpl {
     }
 
     void walkTo(const Turtle::Position &pos) {
-        auto wDest = toWindowSystem(pos);
         moveTurtleTo(pos);
-        paths.back().push_back(wDest.first, wDest.second);
+        paths.back().push_back(toPoint(pos));
     }
 
     void setAngle(double a) {
-        double rotateBy = a - angle;
-        int x,y;
-        std::tie(x,y) = lastPos(false);
+        setAngle(Angle::Degrees(a));
+    }
 
+    void setAngle(Angle a) {
         angle = a;
     }
 
     void wrapPathTo(const Turtle::Position &start, const Turtle::Position &dest) {
-        auto leftTop = toTurtleSystem(std::make_pair(0, 0));
-        auto rightBottom = toTurtleSystem(std::make_pair((int)GC::SCREEN_WIDTH, (int)GC::SCREEN_HEIGHT));
+        auto leftTop = make_pair(0, 0);
+        auto rightBottom = make_pair((int)GC::SCREEN_WIDTH, (int)GC::SCREEN_HEIGHT);
 
         /* TODO Handling path wrapping */
         walkTo(dest);
@@ -124,14 +125,26 @@ struct Turtle::_pImpl {
         walkTo(dest);
     }
 
+    Turtle::Position toPosition(const geometry::Point &p) const {
+        return make_pair(p.x, p.y);
+    }
+
+    Turtle::Position toPosition(geometry::Point &&p) const {
+        return make_pair(p.x, p.y);
+    }
+
+    geometry::Point toPoint(const Turtle::Position &p) const {
+        return geometry::Point(p.first, p.second, turtleSystem);
+    }
+
+    geometry::Reference turtleSystem;
     Path turtle;
     vector<Path> paths;
-    double angle;
+    geometry::Angle angle;
     double xScrunch { 1 };
     double yScrunch { 1 };
     bool showTurtle { true };
     Mode mode { Mode::WRAP };
-    geometry::Reference turtleSystem;
 };
 
 } /* ns: turtle */

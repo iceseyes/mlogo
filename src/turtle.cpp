@@ -26,7 +26,7 @@ Turtle::~Turtle() {
 }
 
 Turtle &Turtle::home() {
-    impl->angle = _pImpl::START_ANGLE;
+    impl->angle = Angle::Degrees(_pImpl::START_ANGLE);
     impl->createTurle();
     impl->newPath();
     render();
@@ -41,9 +41,8 @@ Turtle &Turtle::clear() {
 }
 
 Turtle &Turtle::forward(int steps) {
-    double alpha = graphics::deg2rad(impl->angle);
-    int sx = sin(alpha) * steps;
-    int sy = cos(alpha) * steps;
+    int sx = sin(impl->angle) * steps;
+    int sy = cos(impl->angle) * steps;
 
     impl->walkBy(sx, sy);
     render();
@@ -52,7 +51,7 @@ Turtle &Turtle::forward(int steps) {
 }
 
 Turtle &Turtle::right(double angle) {
-    impl->setAngle(impl->angle - angle);
+    impl->setAngle(impl->angle - Angle::Degrees(angle));
     render();
     return *this;
 }
@@ -80,7 +79,7 @@ Turtle &Turtle::currentYPosition(int y) {
 }
 
 double Turtle::heading() const {
-    return impl->angle;
+    return impl->angle.degrees().value();
 }
 
 Turtle &Turtle::heading(double h) {
