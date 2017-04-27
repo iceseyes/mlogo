@@ -187,6 +187,13 @@ Point &Point::operator/=(double k) {
 	return *this;
 }
 
+Point &Point::scale(double a, double b) {
+    x *= a;
+    y *= b;
+
+    return *this;
+}
+
 Point Point::toGPS() const {
 	return system.toGPS(*this);
 }

@@ -26,9 +26,8 @@ Turtle::~Turtle() {
 }
 
 Turtle &Turtle::home() {
-    impl->angle = Angle::Degrees(_pImpl::START_ANGLE);
-    impl->createTurle();
-    impl->newPath();
+    heading(0);
+    currentPosition(make_pair(0,0));
     render();
 
     return *this;
@@ -41,12 +40,8 @@ Turtle &Turtle::clear() {
 }
 
 Turtle &Turtle::forward(int steps) {
-    int sx = sin(impl->angle) * steps;
-    int sy = cos(impl->angle) * steps;
-
-    impl->walkBy(sx, sy);
+    impl->walk(steps);
     render();
-
     return *this;
 }
 
@@ -83,7 +78,7 @@ double Turtle::heading() const {
 }
 
 Turtle &Turtle::heading(double h) {
-    impl->setAngle(180 - h);
+    impl->setAngle(h);
     render();
     return *this;
 }
@@ -113,7 +108,7 @@ Turtle &Turtle::hideTurtle() {
 void Turtle::render() {
     GC::instance().window()->clear();
     if(impl->showTurtle) {
-        GC::instance().window()->draw(impl->getTurtle());
+        GC::instance().window()->draw(impl->turtle());
     }
     for(auto p : impl->paths) GC::instance().window()->draw(p);
     GC::instance().window()->paint();

@@ -27,30 +27,24 @@ namespace turtle {
 
 using GC = graphics::Context;
 
-struct Turtle::_pImpl {
-    static constexpr float START_ANGLE { 180.0 };
-    static constexpr int TURTLE_HEIGHT { 10 };
-    static constexpr int TURTLE_BASE   { 10 };
-    static constexpr int TURTLE_HEAD_X { GC::SCREEN_WIDTH / 2 };
-    static constexpr int TURTLE_HEAD_Y { (GC::SCREEN_HEIGHT - TURTLE_HEIGHT) / 2};
+static constexpr int TURTLE_HEIGHT { 10 };
+static constexpr int TURTLE_BASE   { 10 };
+static constexpr int TURTLE_HEAD_X { GC::SCREEN_WIDTH / 2 };
+static constexpr int TURTLE_HEAD_Y { (GC::SCREEN_HEIGHT - TURTLE_HEIGHT) / 2};
 
+Path createTurle(const Reference &turtleSystem);
+
+struct Turtle::_pImpl {
     _pImpl() :
-        angle(Angle::Degrees(START_ANGLE)),
         turtleSystem(1, TURTLE_HEAD_X, -1, TURTLE_HEAD_Y),
-        turtle(turtleSystem, 0, 0){
-        createTurle();
+        angle(Angle::Degrees(0)),
+        turtlePosition(0,0, turtleSystem),
+        _turtle(createTurle(turtleSystem)) {
         initPaths();
     }
 
     ~_pImpl() {
         clearPaths();
-    }
-
-    void createTurle() {
-        turtle = Path(turtleSystem, 0, TURTLE_HEIGHT/2);
-        turtle.push_back(TURTLE_BASE/2, -TURTLE_HEIGHT/2);
-        turtle.push_back(-TURTLE_BASE/2, -TURTLE_HEIGHT/2);
-        turtle.push_back(0, TURTLE_HEIGHT/2);
     }
 
     void initPaths() {
@@ -71,37 +65,25 @@ struct Turtle::_pImpl {
     }
 
     Turtle::Position lastPos() const {
-        return toPosition(paths.back().last());
-    }
-
-    void moveTurtleTo(const Turtle::Position &o) {
-        if(!paths.empty()) {
-            auto current = lastPos();
-            turtle.translate(o.first - current.first, -1*o.second + current.second);
-        }
+        return toPosition(turtlePosition);
     }
 
     void moveTo(const Turtle::Position &o) {
-        moveTurtleTo(o);
-        newPath(o);
+        auto current = toPoint(o);
+
+        paths.back().push_back(current);
+        turtlePosition = current;
     }
 
-    void walkBy(int offsetX, int offsetY) {
-        auto current = lastPos();
-        auto dest = std::make_pair(
-            current.first + offsetX*xScrunch,
-            current.second - offsetY*yScrunch);
+    void walk(int steps) {
+        auto current = turtlePosition;
 
-        switch(mode) {
-        case Mode::WINDOW: walkTo(dest); break;
-        case Mode::WRAP: wrapPathTo(current, dest); break;
-        case Mode::FENCE: fencePathTo(current, dest); break;
-        }
-    }
+        Point d { 0, steps, turtleSystem};
+        d = d.rotate(angle).scale(xScrunch, yScrunch);
+        current = current + d;
+        paths.back().push_back(current);
 
-    void walkTo(const Turtle::Position &pos) {
-        moveTurtleTo(pos);
-        paths.back().push_back(toPoint(pos));
+        turtlePosition = current;
     }
 
     void setAngle(double a) {
@@ -110,19 +92,6 @@ struct Turtle::_pImpl {
 
     void setAngle(Angle a) {
         angle = a;
-    }
-
-    void wrapPathTo(const Turtle::Position &start, const Turtle::Position &dest) {
-        auto leftTop = make_pair(0, 0);
-        auto rightBottom = make_pair((int)GC::SCREEN_WIDTH, (int)GC::SCREEN_HEIGHT);
-
-        /* TODO Handling path wrapping */
-        walkTo(dest);
-    }
-
-    void fencePathTo(const Turtle::Position &start, const Turtle::Position &dest) {
-        /* TODO Handling path wrapping */
-        walkTo(dest);
     }
 
     Turtle::Position toPosition(const Point &p) const {
@@ -137,21 +106,34 @@ struct Turtle::_pImpl {
         return Point(p.first, p.second, turtleSystem);
     }
 
-    Path getTurtle() const {
-        return turtle
-                .rotate(angle - Angle::Degrees(180))
+    Path turtle() const {
+        return _turtle
+                .rotate(angle)
                 .translate(paths.back().last());
     }
 
     Reference turtleSystem;
-    Path turtle;
-    vector<Path> paths;
+
     Angle angle;
+    Point turtlePosition;
+
+    vector<Path> paths;
     double xScrunch { 1 };
     double yScrunch { 1 };
     bool showTurtle { true };
     Mode mode { Mode::WRAP };
+    Path _turtle;
 };
+
+Path createTurle(const Reference &turtleSystem) {
+    Path _turtle { turtleSystem, 0, TURTLE_HEIGHT/2 };
+
+    _turtle.push_back( TURTLE_BASE/2, -TURTLE_HEIGHT/2);
+    _turtle.push_back(-TURTLE_BASE/2, -TURTLE_HEIGHT/2);
+    _turtle.push_back(0,  TURTLE_HEIGHT/2);
+
+    return _turtle;
+}
 
 } /* ns: turtle */
 

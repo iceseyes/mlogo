@@ -95,6 +95,7 @@ struct Point {
 	Point &operator-=(const Point &p);
 	Point &operator*=(double k);
 	Point &operator/=(double k);
+    Point &scale(double a, double b);
 
 	Point toGPS() const;
 	Point rotate(const Angle &a) const;
