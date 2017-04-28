@@ -103,7 +103,7 @@ Turtle &Turtle::hideTurtle() {
     impl->showTurtle = false;
     render();
     return *this;
-};
+}
 
 void Turtle::render() {
     GC::instance().window()->clear();

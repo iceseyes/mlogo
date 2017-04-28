@@ -72,7 +72,6 @@ struct Turtle::_pImpl {
         auto current = toPoint(o);
 
         addPoint(current);
-        turtlePosition = current;
     }
 
     void walk(int steps) {
@@ -83,14 +82,40 @@ struct Turtle::_pImpl {
         current = current + d;
 
         addPoint(current);
-        turtlePosition = current;
     }
 
     void addPoint(const Point &current) {
-        if(paths.empty())
+    	if(paths.empty())
             paths.emplace_back(turtlePosition);
 
         paths.back().push_back(current);
+
+        switch(mode) {
+        case Mode::WINDOW: turtlePosition = current; break;
+        case Mode::FENCE: break;
+        case Mode::WRAP: {
+				auto GPSPoint = current.toGPS();
+				auto GPSTurtle = turtlePosition.toGPS();
+				int offsetX {0}, offsetY {0};
+
+				if(GPSPoint.x>GC::SCREEN_WIDTH) offsetX -= GC::SCREEN_WIDTH;
+				else if(GPSPoint.x<0) offsetX += GC::SCREEN_WIDTH;
+
+				if(GPSPoint.y>GC::SCREEN_HEIGHT) offsetY -= GC::SCREEN_HEIGHT;
+				else if(GPSPoint.y<0) offsetY += GC::SCREEN_HEIGHT;
+
+				GPSTurtle.x += offsetX;
+				GPSTurtle.y += offsetY;
+				GPSPoint.x += offsetX;
+				GPSPoint.y += offsetY;
+
+				cout << "Turtle " << GPSTurtle << " - Dest: " << GPSPoint << endl;
+				turtlePosition = turtleSystem.fromGPS(GPSPoint);
+				paths.emplace_back(turtleSystem.fromGPS(GPSTurtle));
+				paths.back().push_back(turtlePosition);
+			}
+        	break;
+        }
     }
 
     void setAngle(double a) {
