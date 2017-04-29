@@ -93,28 +93,7 @@ struct Turtle::_pImpl {
         switch(mode) {
         case Mode::WINDOW: turtlePosition = current; break;
         case Mode::FENCE: break;
-        case Mode::WRAP: {
-				auto GPSPoint = current.toGPS();
-				auto GPSTurtle = turtlePosition.toGPS();
-				int offsetX {0}, offsetY {0};
-
-				if(GPSPoint.x>GC::SCREEN_WIDTH) offsetX -= GC::SCREEN_WIDTH;
-				else if(GPSPoint.x<0) offsetX += GC::SCREEN_WIDTH;
-
-				if(GPSPoint.y>GC::SCREEN_HEIGHT) offsetY -= GC::SCREEN_HEIGHT;
-				else if(GPSPoint.y<0) offsetY += GC::SCREEN_HEIGHT;
-
-				GPSTurtle.x += offsetX;
-				GPSTurtle.y += offsetY;
-				GPSPoint.x += offsetX;
-				GPSPoint.y += offsetY;
-
-				cout << "Turtle " << GPSTurtle << " - Dest: " << GPSPoint << endl;
-				turtlePosition = turtleSystem.fromGPS(GPSPoint);
-				paths.emplace_back(turtleSystem.fromGPS(GPSTurtle));
-				paths.back().push_back(turtlePosition);
-			}
-        	break;
+        case Mode::WRAP: wrapLine(current); break;
         }
     }
 
@@ -155,6 +134,29 @@ struct Turtle::_pImpl {
     bool showTurtle { true };
     Mode mode { Mode::WRAP };
     Path _turtle;
+
+private:
+    void wrapLine(const Point &current) {
+        auto GPSPoint = current.toGPS();
+        auto GPSTurtle = turtlePosition.toGPS();
+        int offsetX {0}, offsetY {0};
+
+        if(GPSPoint.x>GC::SCREEN_WIDTH) offsetX -= GC::SCREEN_WIDTH;
+        else if(GPSPoint.x<0) offsetX += GC::SCREEN_WIDTH;
+
+        if(GPSPoint.y>GC::SCREEN_HEIGHT) offsetY -= GC::SCREEN_HEIGHT;
+        else if(GPSPoint.y<0) offsetY += GC::SCREEN_HEIGHT;
+
+        GPSTurtle.x += offsetX;
+        GPSTurtle.y += offsetY;
+        GPSPoint.x += offsetX;
+        GPSPoint.y += offsetY;
+
+        cout << "Turtle " << GPSTurtle << " - Dest: " << GPSPoint << endl;
+        turtlePosition = turtleSystem.fromGPS(GPSPoint);
+        paths.emplace_back(turtleSystem.fromGPS(GPSTurtle));
+        paths.back().push_back(turtlePosition);
+    }
 };
 
 Path createTurle(const Reference &turtleSystem) {

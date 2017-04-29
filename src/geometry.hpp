@@ -17,8 +17,6 @@ struct Point;
 
 class Angle {
 public:
-    constexpr static double MAX_ERROR = 1e-5;
-
 	struct Rad {
 		explicit Rad(double value) : _value(value) {}
 		double value() const { return _value; }
@@ -140,6 +138,40 @@ private:
     Reference system;
 };
 
+class StraightLine {
+public:
+    static const double VERTICAL;
+
+    StraightLine(double m, double q, const Reference &system=Reference());
+    StraightLine(const Angle &a, double q, const Reference &system=Reference());
+    StraightLine(const Point &a, const Point &b);
+    StraightLine(double m, const Point &a);
+
+    Angle angle() const;
+    Point whenX(int x) const;
+    Point whenY(int y) const;
+    Point where(const StraightLine &line) const;
+    bool belongTo(const Point &p) const;
+
+    bool operator==(const StraightLine &line) const;
+    bool operator!=(const StraightLine &line) const {
+        return !(*this == line);
+    }
+
+    bool parallel(const StraightLine &line) const;
+    StraightLine parallel(double q) const;
+
+    bool isVertical() const;
+    bool isHorizontal() const;
+
+private:
+    double m;
+    double q;
+    Reference system;
+
+    friend std::ostream &operator<<(std::ostream &s, const StraightLine &value);
+};
+
 bool operator==(const Angle &a, const Angle &b);
 bool operator!=(const Angle &a, const Angle &b);
 
@@ -160,10 +192,13 @@ double sin(const Angle &angle);
 double cos(const Angle &angle);
 double tan(const Angle &angle);
 
+StraightLine parallel(const StraightLine &r, double q);
+
 std::ostream &operator<<(std::ostream &s, const Angle::Rad &value);
 std::ostream &operator<<(std::ostream &s, const Angle::Degrees &value);
 std::ostream &operator<<(std::ostream &s, const Angle &value);
 std::ostream &operator<<(std::ostream &s, const Point &value);
+std::ostream &operator<<(std::ostream &s, const StraightLine &value);
 
 } /* ns: geometry */
 

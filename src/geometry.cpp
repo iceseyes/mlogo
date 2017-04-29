@@ -5,11 +5,15 @@
 
 #include "geometry.hpp"
 
+using namespace std;
+
 namespace mlogo {
 
 namespace geometry {
 
 namespace {
+    constexpr double EPSILON { 1e-5 };
+    constexpr double M { 1e4 };
     constexpr double RADIANS4DEGREES { M_PI / 180 };
     constexpr double MAX_RAD { M_PI * 2 };
 
@@ -25,11 +29,21 @@ namespace {
     }
 
     int myround(double v) {
-        int sgn = v/std::fabs(v);
+        int sgn = v/fabs(v);
 
-        return sgn * std::round(std::fabs(v));
+        return sgn * round(fabs(v));
+    }
+
+    bool isZero(double d) {
+        return fabs(d) < EPSILON;
+    }
+
+    bool isInf(double d) {
+        return fabs(d) > M;
     }
 }
+
+const double StraightLine::VERTICAL { M * 2 };
 
 Angle::Angle(const Rad &angle) :
 		_value(radNormalize(angle.value())) {}
@@ -52,7 +66,7 @@ Angle::Rad Angle::radians() const {
 }
 
 bool Angle::equals(const Angle &angle) const {
-	return std::fabs(angle._value - _value) < MAX_ERROR;
+	return isZero(angle._value - _value);
 }
 
 Angle &Angle::operator+=(const Angle &another) {
@@ -83,7 +97,7 @@ Angle &Angle::inv() {
 double Angle::sin() const {
     double v = std::sin(_value);
 
-    if(fabs(v)<MAX_ERROR) v = 0.0;
+    if(isZero(v)) v = 0.0;
 
     return v;
 }
@@ -91,7 +105,7 @@ double Angle::sin() const {
 double Angle::cos() const {
     double v = std::cos(_value);
 
-    if(fabs(v)<MAX_ERROR) v = 0.0;
+    if(isZero(v)) v = 0.0;
 
     return v;
 }
@@ -99,8 +113,8 @@ double Angle::cos() const {
 double Angle::tan() const {
     double v = std::tan(_value);
 
-    if(fabs(v)>1e4) throw std::logic_error("Tangent for right angle is undefined.");
-    if(fabs(v)<MAX_ERROR) v = 0.0;
+    if(isInf(v)) throw logic_error("Tangent for right angle is undefined.");
+    if(isZero(v)) v = 0.0;
 
     return v;
 }
@@ -236,7 +250,7 @@ Path &Path::push_back(Point &&p) {
 
 Path &Path::push_from_last(int offsetX, int offsetY) {
     Point p = last() + Point { offsetX, offsetY };
-    push_back(std::move(p));
+    push_back(move(p));
     return *this;
 }
 
@@ -273,12 +287,77 @@ Path::iterator Path::end() noexcept { return points.end(); }
 
 Path::const_iterator Path::end() const noexcept { return points.end(); }
 
-std::size_t Path::size() const {
+size_t Path::size() const {
     return points.size();
 }
 
 bool Path::empty() const {
     return size()<2;    // at least 2 points are needed by a path
+}
+
+StraightLine::StraightLine(double m, double q, const Reference &system) :
+    m(m), q(q), system(system) {}
+
+StraightLine::StraightLine(const Angle &a, double q, const Reference &system) :
+    m(tan(a)), q(q) {}
+
+StraightLine::StraightLine(const Point &a, const Point &b) {
+    if(a.system != b.system) throw std::logic_error("Ambiguous Reference System.");
+
+    m = (b.y - a.y)/(b.x - a.x);
+    q = b.y - m*b.x;
+
+    system = a.system;
+}
+
+StraightLine::StraightLine(double m, const Point &a) :
+    m(m), q(a.y - m*a.x), system(a.system) {}
+
+Angle StraightLine::angle() const {
+    return Angle::Rad(atan(m));
+}
+
+Point StraightLine::whenX(int x) const {
+    return Point(x, m*x+q, system);
+}
+
+Point StraightLine::whenY(int y) const {
+    return Point((y-q)/m, y, system);
+}
+
+Point StraightLine::where(const StraightLine &line) const {
+    if(line.system != system) throw logic_error("Straight lines in different reference system");
+    if(parallel(line)) throw logic_error("Straight lines are parallels");
+
+    int x = (q - line.q)/(line.m - m);
+    return Point(x, m*x + q);
+}
+
+bool StraightLine::belongTo(const Point &p) const {
+    Point p1 = system.fromGPS(p.toGPS());
+    int y = m*p1.x + q;
+
+    return !(p1.y - y);
+}
+
+bool StraightLine::operator==(const StraightLine &line) const {
+    return (line.system == system) && isZero(line.m-m) && isZero(line.q-q);
+}
+
+bool StraightLine::parallel(const StraightLine &line) const {
+    return isZero(line.m-m);
+}
+
+StraightLine StraightLine::parallel(double q) const {
+    return StraightLine(m, q, system);
+}
+
+bool StraightLine::isVertical() const {
+    return isInf(m);
+}
+
+bool StraightLine::isHorizontal() const {
+    return isZero(m);
 }
 
 bool operator==(const Angle &a, const Angle &b) {
@@ -356,23 +435,32 @@ double tan(const Angle &angle) {
     return angle.tan();
 }
 
-std::ostream &operator<<(std::ostream &s, const Angle::Rad &value) {
+StraightLine parallel(const StraightLine &r, double q) {
+    return r.parallel(q);
+}
+
+ostream &operator<<(ostream &s, const Angle::Rad &value) {
     s << value.value() << " rad";
     return s;
 }
 
-std::ostream &operator<<(std::ostream &s, const Angle::Degrees &value) {
+ostream &operator<<(ostream &s, const Angle::Degrees &value) {
     s << value.value() << " degrees";
     return s;
 }
 
-std::ostream &operator<<(std::ostream &s, const Angle &value) {
+ostream &operator<<(ostream &s, const Angle &value) {
     s << value.radians();
     return s;
 }
 
-std::ostream &operator<<(std::ostream &s, const Point &value) {
+ostream &operator<<(ostream &s, const Point &value) {
     s << "(" << value.x << "," << value.y << ")";
+    return s;
+}
+
+std::ostream &operator<<(std::ostream &s, const StraightLine &value) {
+    s << "y = " << value.m << "x + " << value.q;
     return s;
 }
 

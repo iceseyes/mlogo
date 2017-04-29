@@ -12,6 +12,7 @@ using Angle = mlogo::geometry::Angle;
 using Reference = mlogo::geometry::Reference;
 using Point = mlogo::geometry::Point;
 using Path = mlogo::geometry::Path;
+using StraightLine = mlogo::geometry::StraightLine;
 
 constexpr double MAX_RAD_ERROR { 0.001 };
 constexpr double MAX_DEG_ERROR { 0.1 };
@@ -559,4 +560,51 @@ TEST(Path, turtleRotateAndTranslate) {
     ASSERT_EQ(Point(-8, -5, ref), *(i++));
     ASSERT_EQ(Point(8, 0, ref), *(i++));
     ASSERT_EQ(i, turtle.end());
+}
+
+TEST(StraightLine, basicLine) {
+    StraightLine line {1, 0};  // from m and q
+
+    ASSERT_EQ(Point(1, 1), line.whenX(1));
+    ASSERT_EQ(Point(1, 1), line.whenY(1));
+    ASSERT_EQ(Point(5, 5), line.whenX(5));
+    ASSERT_EQ(Point(5, 5), line.whenY(5));
+
+    StraightLine lineTurtle = {1, 0, Reference (1, 320, -1, 240)};  // from m and q in a different system
+
+    ASSERT_EQ(Point(1, 1), line.whenX(1));
+    ASSERT_EQ(Point(1, 1), line.whenY(1));
+    ASSERT_EQ(Point(5, 5), line.whenX(5));
+    ASSERT_EQ(Point(5, 5), line.whenY(5));
+
+    ASSERT_NE(line, lineTurtle);
+    ASSERT_NE(lineTurtle, line);
+
+    StraightLine line2 {1, 0};  // from m and q
+    ASSERT_EQ(line, line2);
+    ASSERT_EQ(line2, line);
+
+    line2 = StraightLine(Angle::Degrees(45), 0);
+    ASSERT_EQ(line, line2);
+    ASSERT_EQ(line2, line);
+
+    ASSERT_EQ(Point(1, 1), line.whenX(1));
+    ASSERT_EQ(Point(1, 1), line.whenY(1));
+    ASSERT_EQ(Point(5, 5), line.whenX(5));
+    ASSERT_EQ(Point(5, 5), line.whenY(5));
+
+    line2 = StraightLine(Point(3,4), Point(4, 5));
+    line = StraightLine(1, 1);
+    ASSERT_EQ(line, line2);
+    ASSERT_EQ(line2, line);
+    ASSERT_TRUE(line.belongTo({1,2}));
+    ASSERT_TRUE(line.belongTo({3,4}));
+    ASSERT_TRUE(line.belongTo({4,5}));
+
+    line = StraightLine(1, Point(4, 5));
+    ASSERT_EQ(line, line2);
+    ASSERT_EQ(line2, line);
+    ASSERT_TRUE(line.belongTo({1,2}));
+    ASSERT_TRUE(line.belongTo({3,4}));
+    ASSERT_TRUE(line.belongTo({4,5}));
 }
