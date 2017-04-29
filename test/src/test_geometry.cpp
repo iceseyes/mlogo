@@ -608,3 +608,113 @@ TEST(StraightLine, basicLine) {
     ASSERT_TRUE(line.belongTo({3,4}));
     ASSERT_TRUE(line.belongTo({4,5}));
 }
+
+TEST(StraightLine, horizontalLines) {
+    StraightLine horizontalLine {0, 0};  // from m and q
+
+    ASSERT_TRUE(horizontalLine.isHorizontal());
+    ASSERT_FALSE(horizontalLine.isVertical());
+
+    ASSERT_EQ(Point(0, 0), horizontalLine.whenX(0));
+    ASSERT_EQ(Point(1, 0), horizontalLine.whenX(1));
+    ASSERT_EQ(Point(10, 0), horizontalLine.whenX(10));
+    ASSERT_EQ(Point(-100, 0), horizontalLine.whenX(-100));
+
+    ASSERT_THROW(horizontalLine.whenY(0), std::logic_error);
+    ASSERT_THROW(horizontalLine.whenY(1), std::logic_error);
+    ASSERT_THROW(horizontalLine.whenY(10), std::logic_error);
+    ASSERT_THROW(horizontalLine.whenY(-100), std::logic_error);
+
+    ASSERT_TRUE(horizontalLine.belongTo(Point(0, 0)));
+    ASSERT_TRUE(horizontalLine.belongTo(Point(10, 0)));
+    ASSERT_TRUE(horizontalLine.belongTo(Point(100, 0)));
+    ASSERT_TRUE(horizontalLine.belongTo(Point(-10, 0)));
+
+    ASSERT_FALSE(horizontalLine.belongTo(Point(-10, -10)));
+    ASSERT_FALSE(horizontalLine.belongTo(Point(-10, 10)));
+    ASSERT_FALSE(horizontalLine.belongTo(Point(12, 10)));
+
+    ASSERT_EQ(Angle::Degrees(0), horizontalLine.angle());
+    ASSERT_EQ(Angle::Rad(0), horizontalLine.angle());
+    ASSERT_EQ(StraightLine(Angle::Degrees(0), 0), horizontalLine);
+    ASSERT_EQ(StraightLine(Point(0, 0), Point(100, 0)), horizontalLine);
+
+
+    ASSERT_TRUE(horizontalLine.parallel(StraightLine(0, 10)));
+    ASSERT_FALSE(horizontalLine.parallel(StraightLine(0.1, 10)));
+    ASSERT_FALSE(horizontalLine.parallel(StraightLine(0.1, 20)));
+
+    ASSERT_EQ(StraightLine(0, 10), horizontalLine.parallel(10));
+}
+
+TEST(StraightLine, verticalLines) {
+    StraightLine verticalLine {StraightLine::VERTICAL, 0};  // from m and q
+
+    ASSERT_FALSE(verticalLine.isHorizontal());
+    ASSERT_TRUE(verticalLine.isVertical());
+
+    ASSERT_EQ(Point(0, 0), verticalLine.whenY(0));
+    ASSERT_EQ(Point(0, 1), verticalLine.whenY(1));
+    ASSERT_EQ(Point(0, 10), verticalLine.whenY(10));
+    ASSERT_EQ(Point(0, -100), verticalLine.whenY(-100));
+
+    ASSERT_THROW(verticalLine.whenX(0), std::logic_error);
+    ASSERT_THROW(verticalLine.whenX(1), std::logic_error);
+    ASSERT_THROW(verticalLine.whenX(10), std::logic_error);
+    ASSERT_THROW(verticalLine.whenX(-100), std::logic_error);
+
+    ASSERT_TRUE(verticalLine.belongTo(Point(0, 0)));
+    ASSERT_TRUE(verticalLine.belongTo(Point(0, 10)));
+    ASSERT_TRUE(verticalLine.belongTo(Point(0, 100)));
+    ASSERT_TRUE(verticalLine.belongTo(Point(0, -10)));
+
+    ASSERT_FALSE(verticalLine.belongTo(Point(-10, -10)));
+    ASSERT_FALSE(verticalLine.belongTo(Point(-10, 10)));
+    ASSERT_FALSE(verticalLine.belongTo(Point(12, 10)));
+
+    ASSERT_EQ(Angle::Rad(M_PI/2), verticalLine.angle());
+    ASSERT_EQ(Angle::Degrees(90), verticalLine.angle());
+    ASSERT_EQ(StraightLine(Angle::Degrees(90), 0), verticalLine);
+    ASSERT_EQ(StraightLine(Point(0, 0), Point(0, 100)), verticalLine);
+
+    ASSERT_TRUE(verticalLine.parallel(StraightLine(StraightLine::VERTICAL, 10)));
+    ASSERT_FALSE(verticalLine.parallel(StraightLine(1000, 10)));
+    ASSERT_FALSE(verticalLine.parallel(StraightLine(1000, 20)));
+
+    ASSERT_EQ(StraightLine(StraightLine::VERTICAL, 10), verticalLine.parallel(10));
+}
+
+TEST(StraightLine, othersLines) {
+    StraightLine halfLine {0.5, 2};  // from m and q
+
+    ASSERT_EQ(Point(0, 2), halfLine.whenX(0));
+    ASSERT_EQ(Point(1, 3), halfLine.whenX(1));
+    ASSERT_EQ(Point(2, 3), halfLine.whenX(2));
+    ASSERT_EQ(Point(3, 4), halfLine.whenX(3));
+    ASSERT_EQ(Point(10, 7), halfLine.whenX(10));
+
+    ASSERT_EQ(Point(-4, 0), halfLine.whenY(0));
+    ASSERT_EQ(Point(-2, 1), halfLine.whenY(1));
+    ASSERT_EQ(Point(0, 2), halfLine.whenY(2));
+    ASSERT_EQ(Point(2, 3), halfLine.whenY(3));
+    ASSERT_EQ(Point(10, 7), halfLine.whenY(7));
+
+    ASSERT_NEAR(0.46, halfLine.angle().radians().value(), 0.01);
+
+    ASSERT_FALSE(halfLine.isHorizontal());
+    ASSERT_FALSE(halfLine.isVertical());
+
+    ASSERT_TRUE(halfLine.parallel(StraightLine(0.5,0)));
+
+    StraightLine thirtyLine { Angle::Degrees(30), 1 };
+    ASSERT_NEAR(30, thirtyLine.angle().degrees().value(), 0.001);
+
+    ASSERT_EQ(Point(0, 1), thirtyLine.whenX(0));
+    ASSERT_EQ(Point(2, 2), thirtyLine.whenX(2));
+    ASSERT_EQ(Point(10, 7), thirtyLine.whenX(10));
+
+    ASSERT_EQ(Point(0, 1), thirtyLine.whenY(1));
+    ASSERT_EQ(Point(2, 2), thirtyLine.whenY(2));
+    ASSERT_EQ(Point(10, 7), thirtyLine.whenY(7));
+}
+

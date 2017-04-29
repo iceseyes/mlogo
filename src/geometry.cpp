@@ -43,7 +43,7 @@ namespace {
     }
 }
 
-const double StraightLine::VERTICAL { M * 2 };
+const double StraightLine::VERTICAL { std::tan(M_PI/2) };
 
 Angle::Angle(const Rad &angle) :
 		_value(radNormalize(angle.value())) {}
@@ -298,14 +298,27 @@ bool Path::empty() const {
 StraightLine::StraightLine(double m, double q, const Reference &system) :
     m(m), q(q), system(system) {}
 
-StraightLine::StraightLine(const Angle &a, double q, const Reference &system) :
-    m(tan(a)), q(q) {}
+StraightLine::StraightLine(const Angle &a, double q, const Reference &system) {
+    if(a!=Angle::Degrees(90))
+        m = tan(a);
+    else
+        m = VERTICAL;
+
+    this->q = q;
+    this->system = system;
+}
 
 StraightLine::StraightLine(const Point &a, const Point &b) {
     if(a.system != b.system) throw std::logic_error("Ambiguous Reference System.");
 
-    m = (b.y - a.y)/(b.x - a.x);
-    q = b.y - m*b.x;
+    int dx = (b.x - a.x);
+    if(dx==0) {
+        m = VERTICAL;
+        q = b.x;
+    } else {
+        m = (b.y - a.y)/dx;
+        q = b.y - m*b.x;
+    }
 
     system = a.system;
 }
@@ -318,24 +331,29 @@ Angle StraightLine::angle() const {
 }
 
 Point StraightLine::whenX(int x) const {
-    return Point(x, m*x+q, system);
+    if(isInf(m)) throw logic_error("straight line is vertical and Y coordinate cannot be computed from X.");
+    return Point(x, myround(m*x+q), system);
 }
 
 Point StraightLine::whenY(int y) const {
-    return Point((y-q)/m, y, system);
+    if(!m) throw logic_error("straight line is horizontal and X coordinate cannot be computed from Y.");
+    return Point(myround((y-q)/m), y, system);
 }
 
 Point StraightLine::where(const StraightLine &line) const {
     if(line.system != system) throw logic_error("Straight lines in different reference system");
     if(parallel(line)) throw logic_error("Straight lines are parallels");
 
-    int x = (q - line.q)/(line.m - m);
-    return Point(x, m*x + q);
+    int x = myround((q - line.q)/(line.m - m));
+    return Point(x, myround(m*x + q));
 }
 
 bool StraightLine::belongTo(const Point &p) const {
     Point p1 = system.fromGPS(p.toGPS());
-    int y = m*p1.x + q;
+
+    if(isInf(m)) return q == p1.x;
+
+    int y = myround(m*p1.x + q);
 
     return !(p1.y - y);
 }
