@@ -344,8 +344,13 @@ Point StraightLine::where(const StraightLine &line) const {
     if(line.system != system) throw logic_error("Straight lines in different reference system");
     if(parallel(line)) throw logic_error("Straight lines are parallels");
 
-    int x = myround((q - line.q)/(line.m - m));
-    return Point(x, myround(m*x + q));
+    if(isVertical()) {
+        return line.whenX(q);
+    } else if(line.isVertical()) {
+        return whenX(line.q);
+    }
+
+    return whenX(myround((q - line.q)/(line.m - m)));
 }
 
 bool StraightLine::belongTo(const Point &p) const {
@@ -478,7 +483,9 @@ ostream &operator<<(ostream &s, const Point &value) {
 }
 
 std::ostream &operator<<(std::ostream &s, const StraightLine &value) {
-    s << "y = " << value.m << "x + " << value.q;
+    if(isInf(value.m)) s << "x = " << value.q;
+    else s << "y = " << value.m << "x + " << value.q;
+
     return s;
 }
 

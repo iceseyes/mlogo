@@ -716,5 +716,33 @@ TEST(StraightLine, othersLines) {
     ASSERT_EQ(Point(0, 1), thirtyLine.whenY(1));
     ASSERT_EQ(Point(2, 2), thirtyLine.whenY(2));
     ASSERT_EQ(Point(10, 7), thirtyLine.whenY(7));
+
+    ASSERT_FALSE(thirtyLine.isHorizontal());
+    ASSERT_FALSE(thirtyLine.isVertical());
 }
 
+TEST(StraightLine, whereLines) {
+    StraightLine halfLine {1, 0};
+    StraightLine verticalLine {StraightLine::VERTICAL, 0};
+    StraightLine horizontalLine {0, 0};
+
+    ASSERT_EQ(Point(0,0), horizontalLine.where(verticalLine));
+    ASSERT_EQ(Point(0,0), verticalLine.where(horizontalLine));
+
+    ASSERT_EQ(Point(0,5), verticalLine.where(horizontalLine.parallel(5)));
+    ASSERT_EQ(Point(0,-10), verticalLine.where(horizontalLine.parallel(-10)));
+
+    ASSERT_EQ(Point(0,5), horizontalLine.parallel(5).where(verticalLine));
+    ASSERT_EQ(Point(0,-10), horizontalLine.parallel(-10).where(verticalLine));
+
+    ASSERT_EQ(Point(10,5), horizontalLine.parallel(5).where(verticalLine.parallel(10)));
+    ASSERT_EQ(Point(-5,-10), horizontalLine.parallel(-10).where(verticalLine.parallel(-5)));
+
+    ASSERT_EQ(Point(10,5), verticalLine.parallel(10).where(horizontalLine.parallel(5)));
+    ASSERT_EQ(Point(-5,-10), verticalLine.parallel(-5).where(horizontalLine.parallel(-10)));
+
+    ASSERT_EQ(Point(0,0), horizontalLine.where(halfLine));
+    ASSERT_EQ(Point(0,0), verticalLine.where(halfLine));
+
+    ASSERT_EQ(Point(15,5), horizontalLine.parallel(5).where(halfLine.parallel(-10)));
+}
