@@ -324,8 +324,8 @@ StraightLine::StraightLine(const Point &a, const Point &b) {
         m = VERTICAL;
         q = b.x;
     } else {
-        m = (b.y - a.y)/dx;
-        q = b.y - m*b.x;
+        m = (1.0*b.y - a.y)/dx;
+        q = 1.0*b.y - m*b.x;
     }
 
     system = a.system;
@@ -339,12 +339,14 @@ Angle StraightLine::angle() const {
 }
 
 Point StraightLine::whenX(int x) const {
-    if(isInf(m)) throw logic_error("straight line is vertical and Y coordinate cannot be computed from X.");
+    if(isVertical()) throw logic_error("straight line is vertical and Y coordinate cannot be computed from X.");
     return Point(x, myround(m*x+q), system);
 }
 
 Point StraightLine::whenY(int y) const {
-    if(!m) throw logic_error("straight line is horizontal and X coordinate cannot be computed from Y.");
+    if(isHorizontal()) throw logic_error("straight line is horizontal and X coordinate cannot be computed from Y.");
+    if(isVertical()) return Point(myround(q), y, system);
+
     return Point(myround((y-q)/m), y, system);
 }
 
