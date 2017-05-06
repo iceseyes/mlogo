@@ -105,6 +105,15 @@ Turtle &Turtle::hideTurtle() {
     return *this;
 }
 
+Turtle &Turtle::mode(Mode m) {
+    impl->mode = m;
+    return *this;
+}
+
+Mode Turtle::mode() const {
+    return impl->mode;
+}
+
 void Turtle::render() {
     GC::instance().window()->clear();
     if(impl->showTurtle) {

@@ -46,6 +46,9 @@ public:
 
     Turtle &showTurtle();
     Turtle &hideTurtle();
+
+    Turtle &mode(Mode m);
+    Mode mode() const;
 private:
     Turtle();
     ~Turtle();

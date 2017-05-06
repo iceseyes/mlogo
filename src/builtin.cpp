@@ -422,6 +422,27 @@ struct HideTurtle : BuiltinProcedure {
     }
 };
 
+struct WindowMode : BuiltinProcedure {
+    WindowMode() : BuiltinProcedure(0) {}
+    void operator()() const override {
+        Turtle::instance().mode(turtle::Mode::WINDOW);
+    }
+};
+
+struct FenceMode : BuiltinProcedure {
+    FenceMode() : BuiltinProcedure(0) {}
+    void operator()() const override {
+        Turtle::instance().mode(turtle::Mode::FENCE);
+    }
+};
+
+struct WrapMode : BuiltinProcedure {
+    WrapMode() : BuiltinProcedure(0) {}
+    void operator()() const override {
+        Turtle::instance().mode(turtle::Mode::WRAP);
+    }
+};
+
 /**
  * Register procedures in memory
  */
@@ -477,6 +498,9 @@ void initBuiltInProcedures() {
 	Stack::instance().setProcedure<ShowTurtle>("st");
 	Stack::instance().setProcedure<HideTurtle>("hideturtle");
 	Stack::instance().setProcedure<HideTurtle>("ht");
+    Stack::instance().setProcedure<WindowMode>("window");
+    Stack::instance().setProcedure<FenceMode>("fence");
+    Stack::instance().setProcedure<WrapMode>("wrap");
 }
 
 }}

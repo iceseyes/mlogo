@@ -96,7 +96,7 @@ struct Turtle::_pImpl {
             paths.back().push_back(current);
             turtlePosition = current;
             break;
-        case Mode::FENCE: break;
+        case Mode::FENCE: fenceLine(current); break;
         case Mode::WRAP: wrapLine(current); break;
         }
     }
@@ -178,8 +178,23 @@ private:
         }
     }
 
+    void fenceLine(const Point &current) {
+        Point next = current;
+        StraightLine line (turtlePosition, current);
+        Point middle = outOfBounds(line, current);
+
+        if(middle.x||middle.y) {
+            next = middle;
+        }
+
+        if(paths.empty())
+            paths.emplace_back(turtlePosition);
+        paths.back().push_back(next);
+        turtlePosition = next;
+    }
+
     Point outOfBounds(const StraightLine &line, const Point &current) {
-        Point middle(0, 0, next.system);
+        Point middle(0, 0, current.system);
 
         if(current.x < topLeft.x) {
             auto crossline = line.whenX(topLeft.x);
