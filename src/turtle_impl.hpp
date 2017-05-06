@@ -143,10 +143,43 @@ struct Turtle::_pImpl {
 private:
     void wrapLine(const Point &current) {
         Point next = current;
-        Point middle(0, 0, next.system);
         StraightLine line (turtlePosition, current);
+        Point middle = outOfBounds(line, current);
 
-        cout << "Turtle " << turtlePosition << " - Dest: " << next << endl;
+        if(middle.x||middle.y) {
+            next = middle;
+        }
+
+        if(paths.empty())
+            paths.emplace_back(turtlePosition);
+        paths.back().push_back(next);
+        turtlePosition = next;
+
+        if(next!=current) {
+            Point next_cur { current };
+            if(turtlePosition.x==topLeft.x) {
+                turtlePosition.x = bottomRight.x;
+                next_cur.x += offsets.x;
+            } else if(turtlePosition.x==bottomRight.x) {
+                turtlePosition.x = topLeft.x;
+                next_cur.x -= offsets.x;
+            }
+
+            if(turtlePosition.y==topLeft.y) {
+                turtlePosition.y = bottomRight.y;
+                next_cur.y -= offsets.y;
+            } else if(turtlePosition.y==bottomRight.y) {
+                turtlePosition.y = topLeft.y;
+                next_cur.y += offsets.y;
+            }
+
+            paths.emplace_back(turtlePosition);
+            wrapLine(next_cur);
+        }
+    }
+
+    Point outOfBounds(const StraightLine &line, const Point &current) {
+        Point middle(0, 0, next.system);
 
         if(current.x < topLeft.x) {
             auto crossline = line.whenX(topLeft.x);
@@ -172,38 +205,7 @@ private:
             }
         }
 
-        if(middle.x||middle.y) {
-            next = middle;
-        }
-
-        if(paths.empty())
-            paths.emplace_back(turtlePosition);
-        paths.back().push_back(next);
-        turtlePosition = next;
-
-        cout << "Turtle " << turtlePosition << " - Dest: " << next <<  " Finish in " << current <<endl;
-
-        if(next!=current) {
-            Point next_cur { current };
-            if(turtlePosition.x==topLeft.x) {
-                turtlePosition.x = bottomRight.x;
-                next_cur.x += offsets.x;
-            } else if(turtlePosition.x==bottomRight.x) {
-                turtlePosition.x = topLeft.x;
-                next_cur.x -= offsets.x;
-            }
-
-            if(turtlePosition.y==topLeft.y) {
-                turtlePosition.y = bottomRight.y;
-                next_cur.y -= offsets.y;
-            } else if(turtlePosition.y==bottomRight.y) {
-                turtlePosition.y = topLeft.y;
-                next_cur.y += offsets.y;
-            }
-
-            paths.emplace_back(turtlePosition);
-            wrapLine(next_cur);
-        }
+        return middle;
     }
 };
 
