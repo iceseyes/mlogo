@@ -98,6 +98,8 @@ struct Point {
 	Point toGPS() const;
 	Point rotate(const Angle &a) const;
 
+	double distance(const Point &p);
+
 	int x;
 	int y;
 	Reference system;

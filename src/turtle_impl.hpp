@@ -29,17 +29,20 @@ using GC = graphics::Context;
 
 static constexpr int TURTLE_HEIGHT { 10 };
 static constexpr int TURTLE_BASE   { 10 };
-static constexpr int TURTLE_HEAD_X { GC::SCREEN_WIDTH / 2 };
-static constexpr int TURTLE_HEAD_Y { (GC::SCREEN_HEIGHT - TURTLE_HEIGHT) / 2};
+static constexpr int TURTLE_CENTER_X { GC::SCREEN_WIDTH / 2 };
+static constexpr int TURTLE_CENTER_Y { GC::SCREEN_HEIGHT / 2};
 
 Path createTurle(const Reference &turtleSystem);
 
 struct Turtle::_pImpl {
     _pImpl() :
-        turtleSystem(1, TURTLE_HEAD_X, -1, TURTLE_HEAD_Y),
+        turtleSystem(1, TURTLE_CENTER_X, -1, TURTLE_CENTER_Y),
         angle(Angle::Degrees(0)),
         turtlePosition(0,0, turtleSystem),
-        _turtle(createTurle(turtleSystem)) {
+        _turtle(createTurle(turtleSystem)),
+        topLeft(turtleSystem.fromGPS(Point(0, 0))),
+        bottomRight(turtleSystem.fromGPS(Point(GC::SCREEN_WIDTH, GC::SCREEN_HEIGHT))),
+        offsets(GC::SCREEN_WIDTH, GC::SCREEN_HEIGHT, turtleSystem) {
         initPaths();
     }
 
@@ -85,13 +88,14 @@ struct Turtle::_pImpl {
     }
 
     void addPoint(const Point &current) {
-    	if(paths.empty())
-            paths.emplace_back(turtlePosition);
-
-        paths.back().push_back(current);
-
         switch(mode) {
-        case Mode::WINDOW: turtlePosition = current; break;
+        case Mode::WINDOW:
+            if(paths.empty())
+                paths.emplace_back(turtlePosition);
+
+            paths.back().push_back(current);
+            turtlePosition = current;
+            break;
         case Mode::FENCE: break;
         case Mode::WRAP: wrapLine(current); break;
         }
@@ -134,28 +138,72 @@ struct Turtle::_pImpl {
     bool showTurtle { true };
     Mode mode { Mode::WRAP };
     Path _turtle;
+    Point topLeft, bottomRight, offsets;
 
 private:
     void wrapLine(const Point &current) {
-        auto GPSPoint = current.toGPS();
-        auto GPSTurtle = turtlePosition.toGPS();
-        int offsetX {0}, offsetY {0};
+        Point next = current;
+        Point middle(0, 0, next.system);
+        StraightLine line (turtlePosition, current);
 
-        if(GPSPoint.x>GC::SCREEN_WIDTH) offsetX -= GC::SCREEN_WIDTH;
-        else if(GPSPoint.x<0) offsetX += GC::SCREEN_WIDTH;
+        cout << "Turtle " << turtlePosition << " - Dest: " << next << endl;
 
-        if(GPSPoint.y>GC::SCREEN_HEIGHT) offsetY -= GC::SCREEN_HEIGHT;
-        else if(GPSPoint.y<0) offsetY += GC::SCREEN_HEIGHT;
+        if(current.x < topLeft.x) {
+            auto crossline = line.whenX(topLeft.x);
+            if((crossline.y <= topLeft.y)&&(crossline.y >= bottomRight.y)) {
+                middle = crossline;
+            }
+        } else if(current.x > bottomRight.x) {
+            auto crossline = line.whenX(bottomRight.x);
+            if((crossline.y <= topLeft.y)&&(crossline.y >= bottomRight.y)) {
+                middle = crossline;
+            }
+        }
 
-        GPSTurtle.x += offsetX;
-        GPSTurtle.y += offsetY;
-        GPSPoint.x += offsetX;
-        GPSPoint.y += offsetY;
+        if(current.y > topLeft.y) {
+            auto crossline = line.whenY(topLeft.y);
+            if((crossline.x >= topLeft.x)&&(crossline.x <= bottomRight.x)) {
+                middle = crossline;
+            }
+        } else if(current.y < bottomRight.y) {
+            auto crossline = line.whenY(bottomRight.y);
+            if((crossline.x >= topLeft.x)&&(crossline.x <= bottomRight.x)) {
+                middle = crossline;
+            }
+        }
 
-        cout << "Turtle " << GPSTurtle << " - Dest: " << GPSPoint << endl;
-        turtlePosition = turtleSystem.fromGPS(GPSPoint);
-        paths.emplace_back(turtleSystem.fromGPS(GPSTurtle));
-        paths.back().push_back(turtlePosition);
+        if(middle.x||middle.y) {
+            next = middle;
+        }
+
+        if(paths.empty())
+            paths.emplace_back(turtlePosition);
+        paths.back().push_back(next);
+        turtlePosition = next;
+
+        cout << "Turtle " << turtlePosition << " - Dest: " << next <<  " Finish in " << current <<endl;
+
+        if(next!=current) {
+            Point next_cur { current };
+            if(turtlePosition.x==topLeft.x) {
+                turtlePosition.x = bottomRight.x;
+                next_cur.x += offsets.x;
+            } else if(turtlePosition.x==bottomRight.x) {
+                turtlePosition.x = topLeft.x;
+                next_cur.x -= offsets.x;
+            }
+
+            if(turtlePosition.y==topLeft.y) {
+                turtlePosition.y = bottomRight.y;
+                next_cur.y -= offsets.y;
+            } else if(turtlePosition.y==bottomRight.y) {
+                turtlePosition.y = topLeft.y;
+                next_cur.y += offsets.y;
+            }
+
+            paths.emplace_back(turtlePosition);
+            wrapLine(next_cur);
+        }
     }
 };
 

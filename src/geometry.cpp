@@ -41,6 +41,10 @@ namespace {
     bool isInf(double d) {
         return fabs(d) > M;
     }
+
+    double square(double x) {
+        return x*x;
+    }
 }
 
 const double StraightLine::VERTICAL { std::tan(M_PI/2) };
@@ -221,6 +225,10 @@ Point Point::rotate(const Angle &a) const {
     p.y = myround(x * sin_a + y * cos_a);
 
     return p;
+}
+
+double Point::distance(const Point &p) {
+    return sqrt(square(x - p.x) + square(y - p.y));
 }
 
 Path::Path(const Reference &system, int x, int y) :
