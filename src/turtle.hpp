@@ -10,6 +10,7 @@
 #define __TURTLE_HPP__
 
 #include <tuple>
+#include <iostream>
 
 namespace mlogo {
 
@@ -17,6 +18,19 @@ namespace turtle {
 
 enum class Mode {
     WRAP, WINDOW, FENCE
+};
+
+struct Pen {
+    enum class State {
+        DOWN, UP
+    };
+
+    enum class Mode {
+        PAINT, ERASE, REVERSE
+    };
+
+    State state { State::DOWN };
+    Mode mode { Mode::PAINT };
 };
 
 class Turtle {
@@ -46,9 +60,17 @@ public:
 
     Turtle &showTurtle();
     Turtle &hideTurtle();
+    bool &visible() const;
+
+    Turtle &penUp();
+    Turtle &penDown();
 
     Turtle &mode(Mode m);
     Mode mode() const;
+
+    Pen &pen();
+    const Pen &pen() const;
+
 private:
     Turtle();
     ~Turtle();
@@ -64,6 +86,9 @@ private:
     struct _pImpl;
     _pImpl *impl;
 };
+
+
+std::ostream &operator<<(std::ostream &s, const Mode &value);
 
 } /* ns: turtle */
 

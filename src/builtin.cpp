@@ -443,6 +443,40 @@ struct WrapMode : BuiltinProcedure {
     }
 };
 
+struct TurtleMode : BuiltinProcedure {
+    TurtleMode() : BuiltinProcedure(0, true) {}
+    void operator()() const override {
+        stringstream ss;
+        ss << Turtle::instance().mode();
+
+        setReturnValue(ss.str());
+    }
+};
+
+struct Shownp : BuiltinProcedure {
+    Shownp() : BuiltinProcedure(0, true) {}
+    void operator()() const override {
+        stringstream ss;
+        ss << (Turtle::instance().visible()?"TRUE":"FALSE");
+
+        setReturnValue(ss.str());
+    }
+};
+
+struct PenUp : BuiltinProcedure {
+    PenUp() : BuiltinProcedure(0) {}
+    void operator()() const override {
+        Turtle::instance().penUp();
+    }
+};
+
+struct PenDown : BuiltinProcedure {
+    PenDown() : BuiltinProcedure(0) {}
+    void operator()() const override {
+        Turtle::instance().penDown();
+    }
+};
+
 /**
  * Register procedures in memory
  */
@@ -501,6 +535,13 @@ void initBuiltInProcedures() {
     Stack::instance().setProcedure<WindowMode>("window");
     Stack::instance().setProcedure<FenceMode>("fence");
     Stack::instance().setProcedure<WrapMode>("wrap");
+    Stack::instance().setProcedure<TurtleMode>("turtlemode");
+    Stack::instance().setProcedure<Shownp>("shownp");
+    Stack::instance().setProcedure<Shownp>("shown?");
+    Stack::instance().setProcedure<PenUp>("penup");
+    Stack::instance().setProcedure<PenUp>("pu");
+    Stack::instance().setProcedure<PenDown>("pendown");
+    Stack::instance().setProcedure<PenDown>("pd");
 }
 
 }}

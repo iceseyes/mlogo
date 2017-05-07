@@ -93,7 +93,7 @@ struct Turtle::_pImpl {
             if(paths.empty())
                 paths.emplace_back(turtlePosition);
 
-            paths.back().push_back(current);
+            addTocurrentPath(current);
             turtlePosition = current;
             break;
         case Mode::FENCE: fenceLine(current); break;
@@ -139,8 +139,16 @@ struct Turtle::_pImpl {
     Mode mode { Mode::WRAP };
     Path _turtle;
     Point topLeft, bottomRight, offsets;
+    Pen pen;
 
 private:
+    void addTocurrentPath(const Point &point) {
+        switch(pen.state) {
+        case Pen::State::DOWN: paths.back().push_back(point); break;
+        case Pen::State::UP: paths.emplace_back(point); break;
+        }
+    }
+
     void wrapLine(const Point &current) {
         Point next = current;
         StraightLine line (turtlePosition, current);
@@ -152,7 +160,7 @@ private:
 
         if(paths.empty())
             paths.emplace_back(turtlePosition);
-        paths.back().push_back(next);
+        addTocurrentPath(next);
         turtlePosition = next;
 
         if(next!=current) {
@@ -189,7 +197,7 @@ private:
 
         if(paths.empty())
             paths.emplace_back(turtlePosition);
-        paths.back().push_back(next);
+        addTocurrentPath(next);
         turtlePosition = next;
     }
 
