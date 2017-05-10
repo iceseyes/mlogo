@@ -55,6 +55,8 @@ public:
     double heading() const;
     Turtle &heading(double h);
 
+    double towards(int x, int y) const;
+
     std::pair<double, double> scrunch();
     Turtle &scrunch(double xScrunch, double yScrunch);
 

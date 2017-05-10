@@ -477,6 +477,21 @@ struct PenDown : BuiltinProcedure {
     }
 };
 
+struct Towards : BuiltinProcedure {
+    Towards() : BuiltinProcedure(1, true) {}
+    void operator()() const override {
+        stringstream ss;
+        auto pos = fetchArg(0).list();
+        if(pos.size()!=2) throw std::logic_error("Expected X,Y Coordinates");
+        int x = ValueBox(pos[0]).asInteger();
+        int y = ValueBox(pos[1]).asInteger();
+        double heading = Turtle::instance().towards(x, y);
+        ss << heading;
+
+        setReturnValue(ss.str());
+    }
+};
+
 /**
  * Register procedures in memory
  */
@@ -506,7 +521,7 @@ void initBuiltInProcedures() {
 	// Turtle Graphics
 	Stack::instance().setProcedure<Forward>("forward");
 	Stack::instance().setProcedure<Forward>("fd");
-	Stack::instance().setProcedure<Backward>("backward");
+	Stack::instance().setProcedure<Backward>("back");
 	Stack::instance().setProcedure<Backward>("bk");
 	Stack::instance().setProcedure<Right>("right");
 	Stack::instance().setProcedure<Right>("rt");
@@ -542,6 +557,7 @@ void initBuiltInProcedures() {
     Stack::instance().setProcedure<PenUp>("pu");
     Stack::instance().setProcedure<PenDown>("pendown");
     Stack::instance().setProcedure<PenDown>("pd");
+    Stack::instance().setProcedure<Towards>("towards");
 }
 
 }}
