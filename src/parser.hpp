@@ -98,6 +98,7 @@ Statement parse(const std::string &line);
 ::std::ostream &operator<<(::std::ostream &s, const Variable &n);
 ::std::ostream &operator<<(::std::ostream &s, const ProcName &n);
 ::std::ostream &operator<<(::std::ostream &s, const List &n);
+::std::ostream &operator<<(::std::ostream &s, const Statement &n);
 
 struct DisplayArgumentVisitor : boost::static_visitor<std::string> {
 	template<typename Value>

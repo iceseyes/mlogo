@@ -96,7 +96,7 @@ Turtle &Turtle::scrunch(double xScrunch, double yScrunch) {
 double Turtle::towards(int x, int y) const {
     StraightLine line { Point(x, y, impl->turtleSystem), impl->turtlePosition };
     Angle heading { line.angle() };
-    heading += impl->angle;
+    heading -= impl->angle;
 
     return heading.degrees().value();
 }

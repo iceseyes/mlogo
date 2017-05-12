@@ -66,12 +66,16 @@ struct EvalStmtBuilderVisitor : boost::static_visitor<void> {
 
     void operator()(mlogo::parser::List &v) const {
 		setParent();
+		types::ListValue list;
 
-		std::stringstream ss;
-        ss << v;
+		for(auto &w : v.items) {
+		    std::stringstream ss;
+		    ss << w;
+		    list.push_back(ss.str());
+		}
 
 		new ASTNode (
-			new ASTNode::Const(ss.str()), node);
+			new ASTNode::List(list), node);
     }
 
 private:

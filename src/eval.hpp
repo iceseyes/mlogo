@@ -63,6 +63,15 @@ public:
         const std::string _value;
     };
 
+    struct List : Type {
+        List(const types::ListValue &value) :
+            _value (value) {}
+
+        ValueBox value(const ASTNode *) const override { return _value; }
+
+        const types::ListValue _value;
+    };
+
     ASTNode(Type *t, ASTNode *parent = nullptr);
     ASTNode(ASTNode &&stmt);
     ~ASTNode();

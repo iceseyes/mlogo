@@ -94,6 +94,11 @@ TEST(Parser, parseList) {
 
 	tmp.push_back(Word(":v.123"));
 	ASSERT_EQ(tmp, f("[test 123 :v.123]"));
+
+	List tmp2;
+	tmp2.push_back(Word("100"));
+	tmp2.push_back(Word("100"));
+    ASSERT_EQ(tmp2, f("[100 100]"));
 }
 
 TEST(Parser, parseStatement) {
