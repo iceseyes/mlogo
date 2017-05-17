@@ -47,10 +47,19 @@ set(SRCS
 set(LIBLOGO_SRCS
   src/parser.cpp src/memory.cpp
   src/types.cpp src/value.cpp src/eval.cpp
-  src/geometry.cpp src/graphics.cpp src/turtle.cpp
-  src/builtin.cpp)
+  src/geometry.cpp src/graphics.cpp src/turtle.cpp)
 
-add_library(${MLOGO_LIBRARY} ${LIBLOGO_SRCS})
+set(LIBLOGO_BUILTIN_SRCS
+  src/builtin/arithmetic.cpp
+  src/builtin/comm.cpp
+  src/builtin/data.cpp
+  src/builtin/control.cpp
+  src/builtin/graphics.cpp
+  src/builtin/memory.cpp
+  src/builtin/main.cpp
+)
+  
+add_library(${MLOGO_LIBRARY} ${LIBLOGO_SRCS} ${LIBLOGO_BUILTIN_SRCS})
 
 add_executable(${MLOGO_PROGRAM} ${SRCS})
   

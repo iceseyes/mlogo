@@ -18,15 +18,11 @@
 using namespace std;
 using namespace boost;
 
-namespace mlogo { namespace builtin {
-
-void initBuiltInProcedures();
-
-}}
+extern "C" void initBuiltInProcedures();
 
 
 int main(int argc, char **argv) {
-	mlogo::builtin::initBuiltInProcedures();
+	initBuiltInProcedures();
 
 	string str;
 	cout << "Welcome to myLogo v0.0" << endl;
