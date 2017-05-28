@@ -194,6 +194,14 @@ ValueBox &ValueBox::push_all_back(const ValueBox &v) {
     return *this;
 }
 
+ValueBox &ValueBox::set(uint32_t index, const ValueBox &v) {
+    auto n = list();
+    n.at(index) = v._value;
+
+    _value = n;
+    return *this;
+}
+
 ValueBox ValueBox::front() const {
     return apply_visitor(FrontVisitor(), _value);
 }

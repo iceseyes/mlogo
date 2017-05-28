@@ -62,6 +62,7 @@ public:
     ValueBox &push_front(const ValueBox &v);
     ValueBox &push_back(const ValueBox &v);
     ValueBox &push_all_back(const ValueBox &v);
+    ValueBox &set(uint32_t index, const ValueBox &v);
 
     ValueBox front() const;
     ValueBox back() const;

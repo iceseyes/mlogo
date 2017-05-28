@@ -43,6 +43,7 @@ public:
 protected:
 	ValueBox &fetchArg(uint8_t index) const;
 	void setReturnValue(const ValueBox &output) const;
+	void setReturnValue(bool output) const;
 
 private:
 	uint8_t _nArgs;

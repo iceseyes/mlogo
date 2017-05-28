@@ -17,7 +17,38 @@ struct Make : BuiltinProcedure {
     void operator()() const override {
         auto varName = fetchArg(0).word();
         auto value = fetchArg(1);
+
+        // wrong should try to find varName and only when  it does not exist
+        // create it in global frame
         Stack::instance().globalFrame().setVariable(varName, value);
+    }
+};
+
+struct Name : BuiltinProcedure {
+    Name() : BuiltinProcedure(2) {}
+    void operator()() const override {
+        auto value = fetchArg(0);
+        auto varName = fetchArg(1).word();
+
+        // wrong should try to find varName and only when  it does not exist
+        // create it in global frame
+        Stack::instance().globalFrame().setVariable(varName, value);
+    }
+};
+
+struct Local : BuiltinProcedure {
+    Local() : BuiltinProcedure(1) {}
+    void operator()() const override {
+        auto varName = fetchArg(0).word();
+        Stack::instance().currentFrame().setVariable(varName, "");
+    }
+};
+
+struct Global : BuiltinProcedure {
+    Global() : BuiltinProcedure(1) {}
+    void operator()() const override {
+        auto varName = fetchArg(0).word();
+        Stack::instance().globalFrame().setVariable(varName, "");
     }
 };
 
@@ -39,6 +70,8 @@ void initMemoryBuiltInProcedures() {
     /* Memory Management */
     Stack::instance()
         .setProcedure<Make>("make")
+        .setProcedure<Name>("name")
+        .setProcedure<Local>("local")
         .setProcedure<Thing>("thing");
 }
 

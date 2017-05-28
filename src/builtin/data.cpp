@@ -142,6 +142,84 @@ struct Item : BuiltinProcedure {
     }
 };
 
+struct SetItem : BuiltinProcedure {
+    SetItem() : BuiltinProcedure(3, false) {}
+    void operator()() const override {
+        auto arg0 = fetchArg(0).asUnsigned();
+        auto arg1 = fetchArg(1);
+        auto arg2 = fetchArg(2);
+
+        arg1.set(arg0, arg2);
+    }
+};
+
+struct SetFirst : BuiltinProcedure {
+    SetFirst() : BuiltinProcedure(3, false) {}
+    void operator()() const override {
+        auto arg0 = fetchArg(1);
+        auto arg1 = fetchArg(2);
+
+        arg0.set(0, arg1);
+    }
+};
+
+struct WordP : BuiltinProcedure {
+    WordP() : BuiltinProcedure(1, true) {}
+    void operator()() const override {
+        auto arg0 = fetchArg(1);
+
+        setReturnValue(arg0.isWord());
+    }
+};
+
+struct ListP : BuiltinProcedure {
+    ListP() : BuiltinProcedure(1, true) {}
+    void operator()() const override {
+        auto arg0 = fetchArg(1);
+
+        setReturnValue(arg0.isList());
+    }
+};
+
+struct EmptyP : BuiltinProcedure {
+    EmptyP() : BuiltinProcedure(1, true) {}
+    void operator()() const override {
+        auto arg0 = fetchArg(1);
+
+        setReturnValue(arg0.empty());
+    }
+};
+
+struct EqualP : BuiltinProcedure {
+    EqualP() : BuiltinProcedure(2, true) {}
+    void operator()() const override {
+        auto arg0 = fetchArg(1);
+        auto arg1 = fetchArg(2);
+
+        setReturnValue(arg0 == arg1);
+    }
+};
+
+struct NotEqualP : BuiltinProcedure {
+    NotEqualP() : BuiltinProcedure(2, true) {}
+    void operator()() const override {
+        auto arg0 = fetchArg(1);
+        auto arg1 = fetchArg(2);
+
+        setReturnValue(arg0 != arg1);
+    }
+};
+
+struct BeforeP : BuiltinProcedure {
+    BeforeP() : BuiltinProcedure(2, true) {}
+    void operator()() const override {
+        auto arg0 = fetchArg(1);
+        auto arg1 = fetchArg(2);
+
+        setReturnValue(arg0 < arg1);
+    }
+};
+
 }
 
 void initDataBuiltInProcedures() {
@@ -157,7 +235,29 @@ void initDataBuiltInProcedures() {
         .setProcedure<Last>("last")
         .setProcedure<ButFirst>("butfirst")
         .setProcedure<ButLast>("butlast")
-        .setProcedure<Item>("item");
+        .setProcedure<Item>("item")
+
+    /* Data Mutators */
+        .setProcedure<SetItem>("setitem")
+        .setProcedure<SetItem>(".setitem")
+        .setProcedure<SetFirst>("setfirst")
+        .setProcedure<SetFirst>(".setfirst")
+
+    /* Predicates */
+        .setProcedure<WordP>("wordp")
+        .setProcedure<WordP>("word?")
+        .setProcedure<ListP>("listp")
+        .setProcedure<ListP>("list?")
+        .setProcedure<EmptyP>("emptyp")
+        .setProcedure<EmptyP>("empty?")
+        .setProcedure<EqualP>("equalp")
+        .setProcedure<EqualP>("equal?")
+        .setProcedure<EqualP>(".eq")
+        .setProcedure<NotEqualP>("notequalp")
+        .setProcedure<NotEqualP>("notequal?")
+        .setProcedure<BeforeP>("beforep")
+        .setProcedure<BeforeP>("before?");
+
 }
 
 }}
