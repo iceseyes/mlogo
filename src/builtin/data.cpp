@@ -220,6 +220,16 @@ struct BeforeP : BuiltinProcedure {
     }
 };
 
+struct MemberP : BuiltinProcedure {
+    MemberP() : BuiltinProcedure(2, true) {}
+    void operator()() const override {
+        auto arg0 = fetchArg(1);
+        auto arg1 = fetchArg(2);
+
+        setReturnValue(arg1.in(arg0));
+    }
+};
+
 }
 
 void initDataBuiltInProcedures() {
@@ -256,7 +266,9 @@ void initDataBuiltInProcedures() {
         .setProcedure<NotEqualP>("notequalp")
         .setProcedure<NotEqualP>("notequal?")
         .setProcedure<BeforeP>("beforep")
-        .setProcedure<BeforeP>("before?");
+        .setProcedure<BeforeP>("before?")
+        .setProcedure<MemberP>("memberp")
+        .setProcedure<MemberP>("member?");
 
 }
 

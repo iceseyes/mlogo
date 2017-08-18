@@ -71,6 +71,8 @@ public:
     ValueBox butLast() const;
     ValueBox at(std::size_t index) const;
 
+    bool in(const ValueBox &v) const;
+
 private:
     Value _value;
 
@@ -79,6 +81,8 @@ private:
 
 bool operator==(const ValueBox &v1, const ValueBox &v2);
 bool operator!=(const ValueBox &v1, const ValueBox &v2);
+bool operator<(const ValueBox &v1, const ValueBox &v2);
+bool in(const ValueBox &v1, const ValueBox &v2);
 
 } /* ns: types */
 

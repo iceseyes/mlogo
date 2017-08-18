@@ -107,6 +107,28 @@ struct ButLastVisitor : Visitor<Value> {
     }
 };
 
+struct Find : Visitor<bool> {
+    Find(const Value &v) :
+        target(v) {}
+
+    template<typename T>
+	bool operator()(const T &v) const {
+		return v == target;
+	}
+
+    bool operator()(const ListValue &v) const {
+        auto iter = std::find_if(
+                std::begin(v), std::end(v),
+                [this](const Value &item){
+                    return item == target;
+                });
+
+        return iter != std::end(v);
+    }
+
+    Value target;
+};
+
 }
 
 ValueBox::ValueBox() {}
@@ -222,12 +244,24 @@ ValueBox ValueBox::at(std::size_t index) const {
     return apply_visitor(AtVisitor(index), _value);
 }
 
+bool ValueBox::in(const ValueBox &v) const {
+    return apply_visitor(Find(_value), v._value);
+}
+
 bool operator==(const ValueBox &v1, const ValueBox &v2) {
     return v1._value == v2._value;
 }
 
 bool operator!=(const ValueBox &v1, const ValueBox &v2) {
     return !(v1 == v2);
+}
+
+bool operator<(const ValueBox &v1, const ValueBox &v2) {
+	return v1.isWord() && v2.isWord() && v1 < v2;
+}
+
+bool in(const ValueBox &v1, const ValueBox &v2) {
+    return v1.in(v2);
 }
 
 } /* ns: types */
