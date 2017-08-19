@@ -173,7 +173,8 @@ struct StatementParser: qi::grammar<Iterator, Statement(), ascii::space_type> {
 
 		using namespace qi::labels;
 
-		argument = word | proc_name | variable | number | list;
+		// TODO number and variable are expressions, so they can not be returned as arguments!
+		argument = word | proc_name | list | expression | number | variable;
 		start = proc_name[at_c<0>(_val) = _1] >>
 				*argument[push_back(at_c<1>(_val), _1)];
 	}
@@ -183,6 +184,7 @@ struct StatementParser: qi::grammar<Iterator, Statement(), ascii::space_type> {
 	VariableParser<Iterator> variable;
 	ProcNameParser<Iterator> proc_name;
 	ListParser<Iterator> list;
+	ExpressionParser<Iterator> expression;
 	qi::rule<Iterator, Argument(), ascii::space_type> argument;
 	qi::rule<Iterator, Statement(), ascii::space_type> start;
 };

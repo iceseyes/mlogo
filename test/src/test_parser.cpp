@@ -143,7 +143,7 @@ TEST(Parser, parseStatement) {
 	auto stmt = parse("fd 10");
 	ASSERT_EQ(ProcName("fd"), stmt.name);
 	ASSERT_EQ(1u, stmt.arguments.size());
-	ASSERT_EQ(Number("10"), boost::get<Number>(stmt.arguments[0]));
+	ASSERT_EQ(Expression("10"), boost::get<Expression>(stmt.arguments[0]));
 
 	stmt = parse("fd 10 rt 90 fd 10 rt 90 fd 10 rt 90 fd 10");
 	ASSERT_EQ(ProcName("fd"), stmt.name);
@@ -169,10 +169,34 @@ TEST(Parser, parseStatement) {
 	ASSERT_EQ(list, boost::get<List>(stmt.arguments[0]));
 }
 
-//TEST(Parser, parseExprStatement) {
-//    auto stmt = parse("fd 10/2");
-//    ASSERT_EQ(ProcName("fd"), stmt.name);
-//    ASSERT_EQ(1u, stmt.arguments.size());
-//
-//    FAIL() << "Incomplete test";
-//}
+TEST(Parser, parseExprStatement) {
+    auto stmt = parse("fd 10/2");
+    ASSERT_EQ(ProcName("fd"), stmt.name);
+    ASSERT_EQ(1u, stmt.arguments.size());
+    ASSERT_EQ(Expression("10/2"), boost::get<Expression>(stmt.arguments[0]));
+
+    stmt = parse("fd 10 / :var");
+    ASSERT_EQ(ProcName("fd"), stmt.name);
+    ASSERT_EQ(1u, stmt.arguments.size());
+    ASSERT_EQ(Expression("10/var"), boost::get<Expression>(stmt.arguments[0]));
+
+    stmt = parse("rt (2*:PI * (360/2*:PI)) / sqrt 5");
+    ASSERT_EQ(ProcName("rt"), stmt.name);
+    ASSERT_EQ(1u, stmt.arguments.size());
+    ASSERT_EQ(Expression("(2*PI*(360/2*PI))/sqrt 5"), boost::get<Expression>(stmt.arguments[0]));
+
+    stmt = parse("rt sqrt 5 * 2");
+    ASSERT_EQ(ProcName("rt"), stmt.name);
+    ASSERT_EQ(2u, stmt.arguments.size());
+    ASSERT_EQ(ProcName("sqrt"), boost::get<ProcName>(stmt.arguments[0]));
+    ASSERT_EQ(Expression("5*2"), boost::get<Expression>(stmt.arguments[1]));
+
+    stmt = parse("func sqrt 5 * 2 ln :var / 2 (-6)");
+    ASSERT_EQ(ProcName("func"), stmt.name);
+    ASSERT_EQ(5u, stmt.arguments.size());
+    ASSERT_EQ(ProcName("sqrt"), boost::get<ProcName>(stmt.arguments[0]));
+    ASSERT_EQ(Expression("5*2"), boost::get<Expression>(stmt.arguments[1]));
+    ASSERT_EQ(ProcName("ln"), boost::get<ProcName>(stmt.arguments[2]));
+    ASSERT_EQ(Expression("var/2"), boost::get<Expression>(stmt.arguments[3]));
+    ASSERT_EQ(Expression("(-6)"), boost::get<Expression>(stmt.arguments[4]));
+}
