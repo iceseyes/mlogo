@@ -154,11 +154,10 @@ struct ExpressionParser: qi::grammar<Iterator, Expression(), ascii::space_type> 
         using phoenix::val;
         using namespace qi::labels;
 
-        expression = char_("+*/-") [ref(_val) += _1] >>
-                start [ref(_val) += _1] >>
-                -(expression [ref(_val) += _1]);
-        start = number [ref(_val) += _1] >>
-                -(expression [ref(_val) += _1]);
+        expression = char_("+*/-") [ref(_val) += _1] >> start [ref(_val) += _1] >> -(expression [ref(_val) += _1]);
+        start = (number [ref(_val) += _1]
+                | char_('(') [ref(_val) += _1] >> start [ref(_val) += _1] >> char_(')') [ref(_val) += _1]
+                ) >> -(expression [ref(_val) += _1]);
     }
 
     NumberParser<Iterator> number;

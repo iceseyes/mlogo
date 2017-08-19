@@ -87,6 +87,11 @@ TEST(Parser, parseExpr) {
     ASSERT_EQ(Expression("5*6"), f("5 * 6"));
     ASSERT_EQ(Expression("5/6"), f("5 / 6"));
     ASSERT_EQ(Expression("5-6"), f("5 - 6"));
+    ASSERT_EQ(Expression("(1+2)"), f("(1+2)"));
+    ASSERT_EQ(Expression("(1+2)*3"), f("(1+2)*3"));
+    ASSERT_EQ(Expression("4-(1+2)*3"), f("4-(1+2)*3"));
+    ASSERT_EQ(Expression("4-(1+2)*4"), f("4-( 1+2 )*4"));
+    ASSERT_EQ(Expression("(1+2)*(3)"), f("(1+2)*(3)"));
     FAIL() << "Incomplete Test";
 }
 
