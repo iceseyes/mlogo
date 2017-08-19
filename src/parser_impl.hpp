@@ -154,9 +154,11 @@ struct ExpressionParser: qi::grammar<Iterator, Expression()> {
         using phoenix::val;
         using namespace qi::labels;
 
-        expression = number [ref(_val) += _1]
-                     | char_('+') [ref(_val) += _1] >> expression [ref(_val) += _1];
-        start = expression;
+        expression = char_('+') [ref(_val) += _1] >>
+                start [ref(_val) += _1] >>
+                -(expression [ref(_val) += _1]);
+        start = number [ref(_val) += _1] >>
+                -(expression [ref(_val) += _1]);
     }
 
     NumberParser<Iterator> number;

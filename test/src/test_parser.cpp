@@ -80,7 +80,7 @@ TEST(Parser, parseExpr) {
     auto f = [](const std::string &v) { return parse<ExpressionParser, Expression>(v); };
 
     ASSERT_EQ(Expression("2"), f("2"));
-    ASSERT_EQ(Expression("2+2"), f("2+2"));
+    ASSERT_EQ(Expression("1+2"), f("1+2"));
     FAIL() << "Incomplete Test";
 }
 
