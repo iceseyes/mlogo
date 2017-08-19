@@ -36,6 +36,11 @@ Statement parse(const std::string &line) {
 	return s;
 }
 
+::std::ostream &operator<<(::std::ostream &s, const Expression &n) {
+    s << n.name;
+    return s;
+}
+
 ::std::ostream &operator<<(::std::ostream &s, const ProcName &n) {
 	s << n.name;
 	return s;

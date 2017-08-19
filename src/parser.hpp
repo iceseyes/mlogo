@@ -53,6 +53,26 @@ struct Variable {
 	bool operator==(const Variable &b) const { return name==b.name; }
 };
 
+struct Expression {
+    std::string name;
+
+    Expression() {}
+
+    Expression(const std::string &name) :
+            name(name) {}
+
+    Expression(const Number &name) :
+            name(name.value) {}
+
+    Expression(char name) {
+        this->name += name;
+    }
+
+    bool operator!=(const Expression &b) const { return !(*this == b); }
+    bool operator==(const Expression &b) const { return name==b.name; }
+    Expression &operator+=(const Expression &b) { name += b.name; return *this; }
+};
+
 struct ProcName {
 	std::string name;
 
@@ -77,7 +97,7 @@ struct List {
 	void push_back(Word &&w) { items.push_back(w); }
 };
 
-using Argument = boost::variant<ProcName, Word, Number, Variable, List>;
+using Argument = boost::variant<ProcName, Word, Number, Variable, List, Expression>;
 
 struct Statement {
 	ProcName name;
@@ -96,6 +116,7 @@ Statement parse(const std::string &line);
 ::std::ostream &operator<<(::std::ostream &s, const Word &n);
 ::std::ostream &operator<<(::std::ostream &s, const Number &n);
 ::std::ostream &operator<<(::std::ostream &s, const Variable &n);
+::std::ostream &operator<<(::std::ostream &s, const Expression &n);
 ::std::ostream &operator<<(::std::ostream &s, const ProcName &n);
 ::std::ostream &operator<<(::std::ostream &s, const List &n);
 ::std::ostream &operator<<(::std::ostream &s, const Statement &n);

@@ -76,6 +76,14 @@ TEST(Parser, parseProcName) {
 	ASSERT_ANY_THROW(f("test test"));
 }
 
+TEST(Parser, parseExpr) {
+    auto f = [](const std::string &v) { return parse<ExpressionParser, Expression>(v); };
+
+    ASSERT_EQ(Expression("2"), f("2"));
+    ASSERT_EQ(Expression("2+2"), f("2+2"));
+    FAIL() << "Incomplete Test";
+}
+
 TEST(Parser, parseList) {
 	auto f = [](const std::string &v) { return parse<ListParser, List>(v); };
 	List tmp;
@@ -130,3 +138,11 @@ TEST(Parser, parseStatement) {
 	ASSERT_EQ(1u, stmt.arguments.size());
 	ASSERT_EQ(list, boost::get<List>(stmt.arguments[0]));
 }
+
+//TEST(Parser, parseExprStatement) {
+//    auto stmt = parse("fd 10/2");
+//    ASSERT_EQ(ProcName("fd"), stmt.name);
+//    ASSERT_EQ(1u, stmt.arguments.size());
+//
+//    FAIL() << "Incomplete test";
+//}
