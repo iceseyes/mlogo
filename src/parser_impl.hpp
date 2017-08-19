@@ -122,6 +122,33 @@ struct NumberParser: qi::grammar<Iterator, Number()> {
 };
 
 template<typename Iterator>
+struct ExpressionParser: qi::grammar<Iterator, Expression(), ascii::space_type> {
+    ExpressionParser() :
+        ExpressionParser::base_type(start, "Expression") {
+        using ascii::digit;
+        using ascii::char_;
+        using phoenix::val;
+        using namespace qi::labels;
+
+        // In UCBLogo if you have a variable like :a45+4, :45+4+4 is a valid expression.
+        // In mLogo this is not possible, or at least you should handle this case like a variable
+        // and manage the expression when you look up in the memory.
+        expression = char_("+*/-") [ref(_val) += _1] >> start [ref(_val) += _1] >>
+                -(expression [ref(_val) += _1]);
+        start = -char_('-') [ref(_val) += _1] >>
+                (number [ref(_val) += _1] | variable [ref(_val) += _1]
+                | char_('(') [ref(_val) += _1] >> start [ref(_val) += _1] >> char_(')') [ref(_val) += _1]
+                ) >>
+                -(expression [ref(_val) += _1]);
+    }
+
+    NumberParser<Iterator> number;
+    VariableParser<Iterator> variable;
+    qi::rule<Iterator, Expression(), ascii::space_type> expression;
+    qi::rule<Iterator, Expression(), ascii::space_type> start;
+};
+
+template<typename Iterator>
 struct StatementParser: qi::grammar<Iterator, Statement(), ascii::space_type> {
 	StatementParser() :
 			StatementParser::base_type(start, "statement") {
@@ -147,33 +174,6 @@ struct StatementParser: qi::grammar<Iterator, Statement(), ascii::space_type> {
 	ListParser<Iterator> list;
 	qi::rule<Iterator, Argument(), ascii::space_type> argument;
 	qi::rule<Iterator, Statement(), ascii::space_type> start;
-};
-
-template<typename Iterator>
-struct ExpressionParser: qi::grammar<Iterator, Expression(), ascii::space_type> {
-    ExpressionParser() :
-        ExpressionParser::base_type(start, "Expression") {
-        using ascii::digit;
-        using ascii::char_;
-        using phoenix::val;
-        using namespace qi::labels;
-
-        // In UCBLogo if you have a variable like :a45+4, :45+4+4 is a valid expression.
-        // In mLogo this is not possible, or at least you should handle this case like a variable
-        // and manage the expression when you look up in the memory.
-        expression = char_("+*/-") [ref(_val) += _1] >> start [ref(_val) += _1] >>
-                -(expression [ref(_val) += _1]);
-        start = -char_('-') [ref(_val) += _1] >>
-                (number [ref(_val) += _1] | variable [ref(_val) += _1]
-                | char_('(') [ref(_val) += _1] >> start [ref(_val) += _1] >> char_(')') [ref(_val) += _1]
-                ) >>
-                -(expression [ref(_val) += _1]);
-    }
-
-    NumberParser<Iterator> number;
-    VariableParser<Iterator> variable;
-    qi::rule<Iterator, Expression(), ascii::space_type> expression;
-    qi::rule<Iterator, Expression(), ascii::space_type> start;
 };
 
 template<template<class > class Parser, typename Result = std::string>
