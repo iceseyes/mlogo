@@ -17,6 +17,8 @@
 namespace mlogo {
 namespace parser {
 
+struct Statement;
+
 struct Word {
 	std::string name;
 
@@ -86,6 +88,8 @@ struct Expression {
 
     Expression(const Variable &name) :
         name(name.name) {}
+
+    Expression(const Statement &name);
 
     bool operator!=(const Expression &b) const { return !(*this == b); }
     bool operator==(const Expression &b) const { return name==b.name; }

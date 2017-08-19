@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <stdexcept>
 
 namespace mlogo {
@@ -16,6 +17,16 @@ namespace parser {
 
 using iterator_type = std::string::const_iterator;
 using Parser = StatementParser<iterator_type>;
+
+Expression::Expression(const Statement &name) {
+    std::stringstream ss;
+    ss << name.name;
+    for(auto &a : name.arguments) {
+        ss << " " << a;
+    }
+
+    this->name = ss.str();
+}
 
 Statement parse(const std::string &line) {
 	return parse<StatementParser, Statement>(line);

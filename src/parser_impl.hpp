@@ -128,7 +128,13 @@ struct ExpressionParser: qi::grammar<Iterator, Expression(), ascii::space_type> 
         using ascii::digit;
         using ascii::char_;
         using phoenix::val;
+        using phoenix::at_c;
+        using phoenix::push_back;
         using namespace qi::labels;
+
+        argument = word | proc_name | variable | number | list | start;
+        function = proc_name[at_c<0>(_val) = _1] >>
+                        *argument[push_back(at_c<1>(_val), _1)];
 
         // In UCBLogo if you have a variable like :a45+4, :45+4+4 is a valid expression.
         // In mLogo this is not possible, or at least you should handle this case like a variable
@@ -136,14 +142,19 @@ struct ExpressionParser: qi::grammar<Iterator, Expression(), ascii::space_type> 
         expression = char_("+*/-") [ref(_val) += _1] >> start [ref(_val) += _1] >>
                 -(expression [ref(_val) += _1]);
         start = -char_('-') [ref(_val) += _1] >>
-                (number [ref(_val) += _1] | variable [ref(_val) += _1]
+                (number [ref(_val) += _1] | variable [ref(_val) += _1] | function [ref(_val) += _1]
                 | char_('(') [ref(_val) += _1] >> start [ref(_val) += _1] >> char_(')') [ref(_val) += _1]
                 ) >>
                 -(expression [ref(_val) += _1]);
     }
 
+    WordParser<Iterator> word;
     NumberParser<Iterator> number;
     VariableParser<Iterator> variable;
+    ProcNameParser<Iterator> proc_name;
+    ListParser<Iterator> list;
+    qi::rule<Iterator, Argument(), ascii::space_type> argument;
+    qi::rule<Iterator, Statement(), ascii::space_type> function;
     qi::rule<Iterator, Expression(), ascii::space_type> expression;
     qi::rule<Iterator, Expression(), ascii::space_type> start;
 };
