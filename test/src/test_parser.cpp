@@ -112,8 +112,6 @@ TEST(Parser, parseExpr) {
     ASSERT_EQ(Expression("(sqrt ln var)/5"), f("(sqrt ln :var)/5"));
 
     ASSERT_ANY_THROW(f(":var+ 1"));
-
-    FAIL() << "Incomplete Test";
 }
 
 TEST(Parser, parseList) {
