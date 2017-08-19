@@ -106,6 +106,8 @@ TEST(Parser, parseExpr) {
     ASSERT_EQ(Expression("(var)+1"), f("(:var)+1"));
     ASSERT_EQ(Expression("((1.5+2)*PI)/4.23"), f("((1.5+2)*:PI)/4.23"));
     ASSERT_EQ(Expression("((abcd+2)*PI)/4.23"), f("((:abcd +2)*:PI)/4.23"));
+    ASSERT_EQ(Expression("-var+1"), f("-:var + 1"));
+    ASSERT_EQ(Expression("var+-1"), f(":var + -1"));
 
     ASSERT_ANY_THROW(f(":var+ 1"));
 

@@ -163,9 +163,11 @@ struct ExpressionParser: qi::grammar<Iterator, Expression(), ascii::space_type> 
         // and manage the expression when you look up in the memory.
         expression = char_("+*/-") [ref(_val) += _1] >> start [ref(_val) += _1] >>
                 -(expression [ref(_val) += _1]);
-        start = (number [ref(_val) += _1] | variable [ref(_val) += _1]
+        start = -char_('-') [ref(_val) += _1] >>
+                (number [ref(_val) += _1] | variable [ref(_val) += _1]
                 | char_('(') [ref(_val) += _1] >> start [ref(_val) += _1] >> char_(')') [ref(_val) += _1]
-                ) >> -(expression [ref(_val) += _1]);
+                ) >>
+                -(expression [ref(_val) += _1]);
     }
 
     NumberParser<Iterator> number;
