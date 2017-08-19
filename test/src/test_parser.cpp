@@ -33,6 +33,8 @@ TEST(Parser, parseWord) {
 	ASSERT_EQ(Word("h45.32"), f("\"h45.32"));
 	ASSERT_EQ(Word(";h45.32"), f("\";h45.32"));
 	ASSERT_EQ(Word(",max.32"), f("\",max.32"));
+	ASSERT_EQ(Word("(max).32"), f("\"(max).32"));
+	ASSERT_EQ(Word("(max))(.32"), f("\"(max))(.32"));
 	ASSERT_ANY_THROW(f("1c"));
 	ASSERT_ANY_THROW(f("hello"));
 	ASSERT_ANY_THROW(f("h4532"));
@@ -51,6 +53,8 @@ TEST(Parser, parseVariable) {
 	ASSERT_EQ(Variable("h45.32"), f(":h45.32"));
 	ASSERT_EQ(Variable(";h45.32"), f(":;h45.32"));
 	ASSERT_EQ(Variable(",max.32"), f(":,max.32"));
+	ASSERT_EQ(Variable("PI"), f(":PI"));
+	ASSERT_EQ(Variable("var+1"), f(":var+1"));
 	ASSERT_ANY_THROW(f("1c"));
 	ASSERT_ANY_THROW(f("hello"));
 	ASSERT_ANY_THROW(f("h4532"));
@@ -58,6 +62,8 @@ TEST(Parser, parseVariable) {
 	ASSERT_ANY_THROW(f("4532 test"));
 	ASSERT_ANY_THROW(f(":4532 test"));
 	ASSERT_ANY_THROW(f(":test test"));
+	ASSERT_ANY_THROW(f(":test)"));
+	ASSERT_ANY_THROW(f(":(test)"));
 }
 
 TEST(Parser, parseProcName) {
@@ -92,6 +98,17 @@ TEST(Parser, parseExpr) {
     ASSERT_EQ(Expression("4-(1+2)*3"), f("4-(1+2)*3"));
     ASSERT_EQ(Expression("4-(1+2)*4"), f("4-( 1+2 )*4"));
     ASSERT_EQ(Expression("(1+2)*(3)"), f("(1+2)*(3)"));
+    ASSERT_EQ(Expression("((1+2)*(3))/4"), f("((1+2)*(3)) / 4"));
+    ASSERT_EQ(Expression("((1.5+2)*(3.1415))/4.23"), f("((1.5+2)*(3.1415))/4.23"));
+    ASSERT_EQ(Expression("1+var"), f("1+:var"));
+    ASSERT_EQ(Expression("1+var"), f("1 + :var"));
+    ASSERT_EQ(Expression("var+1"), f(":var + 1"));
+    ASSERT_EQ(Expression("(var)+1"), f("(:var)+1"));
+    ASSERT_EQ(Expression("((1.5+2)*PI)/4.23"), f("((1.5+2)*:PI)/4.23"));
+    ASSERT_EQ(Expression("((abcd+2)*PI)/4.23"), f("((:abcd +2)*:PI)/4.23"));
+
+    ASSERT_ANY_THROW(f(":var+ 1"));
+
     FAIL() << "Incomplete Test";
 }
 

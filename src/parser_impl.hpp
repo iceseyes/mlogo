@@ -32,7 +32,7 @@ struct SimpleWordParser: qi::grammar<Iterator, std::string()> {
 		using ascii::alnum;
 		using ascii::punct;
 
-		start = +(alnum | (punct - '[' - ']'));
+		start = +(alnum | (punct - '[' - ']' - '(' - ')'));
 	}
 
 	qi::rule<Iterator, std::string()> start;
@@ -42,10 +42,14 @@ template<typename Iterator>
 struct WordParser: qi::grammar<Iterator, Word()> {
 	WordParser() :
 		WordParser::base_type(start, "Word") {
-		start = '"' >> simpleWord;
+	    using ascii::alnum;
+        using ascii::punct;
+
+        word = +(alnum | punct);
+        start = '"' >> word;
 	}
 
-	SimpleWordParser<Iterator> simpleWord;
+	qi::rule<Iterator, std::string()> word;
 	qi::rule<Iterator, Word()> start;
 };
 
@@ -154,8 +158,12 @@ struct ExpressionParser: qi::grammar<Iterator, Expression(), ascii::space_type> 
         using phoenix::val;
         using namespace qi::labels;
 
-        expression = char_("+*/-") [ref(_val) += _1] >> start [ref(_val) += _1] >> -(expression [ref(_val) += _1]);
-        start = (number [ref(_val) += _1]
+        // In UCBLogo if you have a variable like :a45+4, :45+4+4 is a valid expression.
+        // In mLogo this is not possible, or at least you should handle this case like a variable
+        // and manage the expression when you look up in the memory.
+        expression = char_("+*/-") [ref(_val) += _1] >> start [ref(_val) += _1] >>
+                -(expression [ref(_val) += _1]);
+        start = (number [ref(_val) += _1] | variable [ref(_val) += _1]
                 | char_('(') [ref(_val) += _1] >> start [ref(_val) += _1] >> char_(')') [ref(_val) += _1]
                 ) >> -(expression [ref(_val) += _1]);
     }

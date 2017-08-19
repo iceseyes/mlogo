@@ -25,6 +25,10 @@ struct Word {
 	Word(const std::string &name) :
 			name(name) {}
 
+	Word(const char ch) {
+	    name += ch;
+	}
+
 	bool operator!=(const Word &b) const { return !(*this == b); }
 	bool operator==(const Word &b) const { return name==b.name; }
 };
@@ -53,6 +57,18 @@ struct Variable {
 	bool operator==(const Variable &b) const { return name==b.name; }
 };
 
+struct ProcName {
+	std::string name;
+
+	ProcName() {}
+
+	ProcName(const std::string &name) :
+			name(name) {}
+
+	bool operator!=(const ProcName &b) const { return !(*this == b); }
+	bool operator==(const ProcName &b) const { return name==b.name; }
+};
+
 struct Expression {
     std::string name;
 
@@ -68,21 +84,12 @@ struct Expression {
         this->name += name;
     }
 
+    Expression(const Variable &name) :
+        name(name.name) {}
+
     bool operator!=(const Expression &b) const { return !(*this == b); }
     bool operator==(const Expression &b) const { return name==b.name; }
     Expression &operator+=(const Expression &b) { name += b.name; return *this; }
-};
-
-struct ProcName {
-	std::string name;
-
-	ProcName() {}
-
-	ProcName(const std::string &name) :
-			name(name) {}
-
-	bool operator!=(const ProcName &b) const { return !(*this == b); }
-	bool operator==(const ProcName &b) const { return name==b.name; }
 };
 
 struct List {
