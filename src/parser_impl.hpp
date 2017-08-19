@@ -146,7 +146,7 @@ struct StatementParser: qi::grammar<Iterator, Statement(), ascii::space_type> {
 };
 
 template<typename Iterator>
-struct ExpressionParser: qi::grammar<Iterator, Expression()> {
+struct ExpressionParser: qi::grammar<Iterator, Expression(), ascii::space_type> {
     ExpressionParser() :
         ExpressionParser::base_type(start, "Expression") {
         using ascii::digit;
@@ -154,7 +154,7 @@ struct ExpressionParser: qi::grammar<Iterator, Expression()> {
         using phoenix::val;
         using namespace qi::labels;
 
-        expression = char_('+') [ref(_val) += _1] >>
+        expression = char_("+") [ref(_val) += _1] >>
                 start [ref(_val) += _1] >>
                 -(expression [ref(_val) += _1]);
         start = number [ref(_val) += _1] >>
@@ -163,8 +163,8 @@ struct ExpressionParser: qi::grammar<Iterator, Expression()> {
 
     NumberParser<Iterator> number;
     VariableParser<Iterator> variable;
-    qi::rule<Iterator, Expression> expression;
-    qi::rule<Iterator, Expression()> start;
+    qi::rule<Iterator, Expression(), ascii::space_type> expression;
+    qi::rule<Iterator, Expression(), ascii::space_type> start;
 };
 
 template<template<class > class Parser, typename Result = std::string>
