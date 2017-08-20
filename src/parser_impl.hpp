@@ -173,15 +173,15 @@ struct StatementParser: qi::grammar<Iterator, Statement(), ascii::space_type> {
 
 		using namespace qi::labels;
 
-		// TODO number and variable are expressions, so they can not be returned as arguments!
-		argument = word | proc_name | list | expression | number | variable;
+		// We prefere that a procedure call is not consider an expression unless
+		// call happens in the expression. For example, "ln 5" is not an expression, but
+		// "5 + ln 5" is so. So, we select proc_name before expression in argument rule.
+		argument = word | proc_name | list | expression;
 		start = proc_name[at_c<0>(_val) = _1] >>
 				*argument[push_back(at_c<1>(_val), _1)];
 	}
 
 	WordParser<Iterator> word;
-	NumberParser<Iterator> number;
-	VariableParser<Iterator> variable;
 	ProcNameParser<Iterator> proc_name;
 	ListParser<Iterator> list;
 	ExpressionParser<Iterator> expression;
