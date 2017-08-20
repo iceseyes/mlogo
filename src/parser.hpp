@@ -71,31 +71,6 @@ struct ProcName {
 	bool operator==(const ProcName &b) const { return name==b.name; }
 };
 
-struct Expression {
-    std::string name;
-
-    Expression() {}
-
-    Expression(const std::string &name) :
-            name(name) {}
-
-    Expression(const Number &name) :
-            name(name.value) {}
-
-    Expression(char name) {
-        this->name += name;
-    }
-
-    Expression(const Variable &name) :
-        name(name.name) {}
-
-    Expression(const Statement &name);
-
-    bool operator!=(const Expression &b) const { return !(*this == b); }
-    bool operator==(const Expression &b) const { return name==b.name; }
-    Expression &operator+=(const Expression &b) { name += b.name; return *this; }
-};
-
 struct List {
 	std::vector<Word> items;
 
@@ -106,6 +81,32 @@ struct List {
 
 	void push_back(const Word &w) { items.push_back(w); }
 	void push_back(Word &&w) { items.push_back(w); }
+};
+
+struct Expression {
+    enum class Node { NUMBER, VARIABLE, FUNCTION, ROOT };
+
+    std::string name;
+    Node node { Node::ROOT };
+    std::vector<Expression> children;
+
+    Expression() {}
+
+    Expression(const std::string &name) :
+            name(name) {}
+
+    Expression(const Number &name) :
+            name(name.value), node(Node::NUMBER) {}
+
+    Expression(const Variable &name) :
+            name(name.name), node(Node::VARIABLE) {}
+
+    Expression(char functor);
+    Expression(const Statement &function);
+
+    bool operator!=(const Expression &b) const { return !(*this == b); };
+    bool operator==(const Expression &b) const;
+    Expression &operator+=(const Expression &b);
 };
 
 using Argument = boost::variant<ProcName, Word, Number, Variable, List, Expression>;
