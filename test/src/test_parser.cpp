@@ -140,10 +140,12 @@ TEST(Parser, parseList) {
 }
 
 TEST(Parser, parseStatement) {
-	auto stmt = parse("fd 10");
+    auto stmt = parse("fd 10");
 	ASSERT_EQ(ProcName("fd"), stmt.name);
 	ASSERT_EQ(1u, stmt.arguments.size());
-	ASSERT_EQ(Expression("10"), boost::get<Expression>(stmt.arguments[0]));
+	ASSERT_EQ(
+	        Expression(Number("10")),
+	        boost::get<Expression>(stmt.arguments[0]));
 
 	stmt = parse("fd 10 rt 90 fd 10 rt 90 fd 10 rt 90 fd 10");
 	ASSERT_EQ(ProcName("fd"), stmt.name);
@@ -173,17 +175,27 @@ TEST(Parser, parseExprStatement) {
     auto stmt = parse("fd 10/2");
     ASSERT_EQ(ProcName("fd"), stmt.name);
     ASSERT_EQ(1u, stmt.arguments.size());
-    ASSERT_EQ(Expression("10/2"), boost::get<Expression>(stmt.arguments[0]));
+    ASSERT_EQ(
+            Expression('/') << Number("10") << Number("2"),
+            boost::get<Expression>(stmt.arguments[0]));
 
     stmt = parse("fd 10 / :var");
     ASSERT_EQ(ProcName("fd"), stmt.name);
     ASSERT_EQ(1u, stmt.arguments.size());
-    ASSERT_EQ(Expression("10/var"), boost::get<Expression>(stmt.arguments[0]));
+    ASSERT_EQ(
+            Expression('/') << Number("10") << Variable("var"),
+            boost::get<Expression>(stmt.arguments[0]));
 
+    Statement sqrt5("sqrt"); sqrt5.arguments.push_back(Expression(Number("5")));
     stmt = parse("rt (2*:PI * (360/2*:PI)) / sqrt 5");
     ASSERT_EQ(ProcName("rt"), stmt.name);
     ASSERT_EQ(1u, stmt.arguments.size());
-    ASSERT_EQ(Expression("(2*PI*(360/2*PI))/sqrt 5"), boost::get<Expression>(stmt.arguments[0]));
+    ASSERT_EQ(
+            Expression('/')
+                << Expression('*') << Expression('*') << Number("2") << Variable("PI")
+                    << Expression('/') << Number("360") << Expression('*') << Number("2") << Variable("PI")
+                << Expression(sqrt5),
+            boost::get<Expression>(stmt.arguments[0]));
 
     stmt = parse("rt sqrt 5 * 2");
     ASSERT_EQ(ProcName("rt"), stmt.name);

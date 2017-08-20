@@ -84,29 +84,30 @@ struct List {
 };
 
 struct Expression {
-    enum class Node { NUMBER, VARIABLE, FUNCTION, ROOT };
+    enum class Node { NUMBER, VARIABLE, FUNCTION, STATEMENT };
 
-    std::string name;
-    Node node { Node::ROOT };
+    std::string name { 0 };
+    Node node { Node::NUMBER };
     std::vector<Expression> children;
 
-    Expression() {}
-
-    Expression(const std::string &name) :
-            name(name) {}
-
-    Expression(const Number &name) :
-            name(name.value), node(Node::NUMBER) {}
-
-    Expression(const Variable &name) :
-            name(name.name), node(Node::VARIABLE) {}
-
+    Expression();
+    Expression(const std::string &name);
+    Expression(const Number &name);
+    Expression(const Variable &name);
     Expression(char functor);
     Expression(const Statement &function);
+
+    ~Expression();
 
     bool operator!=(const Expression &b) const { return !(*this == b); };
     bool operator==(const Expression &b) const;
     Expression &operator+=(const Expression &b);
+    Expression &operator<<(const Expression &b) { return (*this += b); }
+
+private:
+    Statement *stmt { nullptr };
+
+    friend ::std::ostream &operator<<(::std::ostream &s, const Expression &n);
 };
 
 using Argument = boost::variant<ProcName, Word, Number, Variable, List, Expression>;
@@ -121,6 +122,8 @@ struct Statement {
 		this->name = name;
 	}
 
+    bool operator!=(const Statement &b) const { return !(*this == b); };
+    bool operator==(const Statement &b) const;
 };
 
 Statement parse(const std::string &line);
@@ -155,9 +158,9 @@ struct DisplayArgumentVisitor : boost::static_visitor<std::string> {
 }
 
 BOOST_FUSION_ADAPT_STRUCT(
-	mlogo::parser::Statement,
-	(mlogo::parser::ProcName, name)
-	(std::vector<mlogo::parser::Argument>, arguments)
+    mlogo::parser::Statement,
+    (mlogo::parser::ProcName, name)
+    (std::vector<mlogo::parser::Argument>, arguments)
 )
 
 #endif

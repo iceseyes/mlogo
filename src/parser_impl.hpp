@@ -7,6 +7,8 @@
 
 #include "parser.hpp"
 
+#include <boost/optional/optional_io.hpp>
+
 #include <boost/spirit/include/qi_core.hpp>
 #include <boost/spirit/include/qi_grammar.hpp>
 #include <boost/spirit/include/qi_rule.hpp>
@@ -123,6 +125,29 @@ struct NumberParser: qi::grammar<Iterator, Number()> {
 
 template<typename Iterator>
 struct ExpressionParser: qi::grammar<Iterator, Expression(), ascii::space_type> {
+    struct make_expression_impl {
+        template <typename Sig>
+        struct result;
+
+        template <typename This, typename Left, typename Right>
+        struct result<This(const Left &, const Right &)> {
+            using type = Left;
+        };
+
+        template <typename Left, typename Right>
+        Left operator()(const Left &left, const Right &right) const {
+            if(right) {
+                Left l(*right);
+                l.children.insert(l.children.begin(), left);
+                return l;
+            }
+
+            return left;
+        }
+    };
+
+    phoenix::function<make_expression_impl> make_expression;
+
     ExpressionParser() :
         ExpressionParser::base_type(start, "Expression") {
         using ascii::digit;
@@ -130,22 +155,27 @@ struct ExpressionParser: qi::grammar<Iterator, Expression(), ascii::space_type> 
         using phoenix::val;
         using phoenix::at_c;
         using phoenix::push_back;
+        using phoenix::construct;
         using namespace qi::labels;
-
-        argument = word | proc_name | variable | number | list | start;
-        function = proc_name[at_c<0>(_val) = _1] >>
-                        *argument[push_back(at_c<1>(_val), _1)];
 
         // In UCBLogo if you have a variable like :a45+4, :45+4+4 is a valid expression.
         // In mLogo this is not possible, or at least you should handle this case like a variable
         // and manage the expression when you look up in the memory.
-        expression = char_("+*/-") [ref(_val) += _1] >> start [ref(_val) += _1] >>
-                -(expression [ref(_val) += _1]);
-        start = -char_('-') [ref(_val) += _1] >>
-                (number [ref(_val) += _1] | variable [ref(_val) += _1] | function [ref(_val) += _1]
-                | char_('(') [ref(_val) += _1] >> start [ref(_val) += _1] >> char_(')') [ref(_val) += _1]
-                ) >>
-                -(expression [ref(_val) += _1]);
+
+        argument = word | proc_name | list | start;
+
+        function = proc_name[at_c<0>(_val) = _1] >>
+                        *argument[push_back(at_c<1>(_val), _1)];
+
+        simply_expression = number [_val = construct<Expression>(_1)]
+                | variable [_val = construct<Expression>(_1)]
+                | function [_val = construct<Expression>(_1)]
+                | ('(' >> start >> ')') [_val = construct<Expression>(_1)]
+                | ('-' >> start) [_val = construct<Expression>(_1)];
+
+        expression = (char_("+*/-") >> start) [ (_val = _1) << _2 ] >> -(expression [ref(_val) << _1]);
+
+        start = (simply_expression >> -expression) [ _val = make_expression(_1, _2)];
     }
 
     WordParser<Iterator> word;
@@ -155,6 +185,7 @@ struct ExpressionParser: qi::grammar<Iterator, Expression(), ascii::space_type> 
     ListParser<Iterator> list;
     qi::rule<Iterator, Argument(), ascii::space_type> argument;
     qi::rule<Iterator, Statement(), ascii::space_type> function;
+    qi::rule<Iterator, Expression(), ascii::space_type> simply_expression;
     qi::rule<Iterator, Expression(), ascii::space_type> expression;
     qi::rule<Iterator, Expression(), ascii::space_type> start;
 };
