@@ -85,6 +85,19 @@ TEST(Parser, parseProcName) {
 TEST(Parser, parseExpr) {
     auto f = [](const std::string &v) { return parse<ExpressionParser, Expression>(v); };
 
+    // Check for Not Equal Operator in Expression
+    ASSERT_NE(Expression(Number("2")), Expression(Number("3")));
+    ASSERT_NE(
+        Expression('/') << Expression(Number("2")) << Expression(Number("3")),
+        Expression(Number("3")));
+    ASSERT_NE(
+        Expression('/') << Expression(Number("2")) << Expression(Number("3")),
+        Expression(Number("2")));
+    ASSERT_NE(
+        Expression('/') << Expression(Number("2")) << Expression(Number("3")),
+        Expression('/'));
+
+
     // a Number is an Expression.
     ASSERT_EQ(Expression(Number("2")), f("2"));
 
