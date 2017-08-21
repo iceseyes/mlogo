@@ -34,6 +34,7 @@ std::string operator2proc_name(char op) {
     case '-': return "DIFFERENCE"; break;
     case '*': return "PRODUCT"; break;
     case '/': return "QUOTIENT"; break;
+    case '_': return "MINUS"; break;
     }
 
     std::stringstream ss;
