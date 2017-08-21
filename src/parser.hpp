@@ -104,10 +104,9 @@ struct Expression {
     Expression& operator=(const Expression &e);
     Expression& operator=(Expression &&e);
 
-    bool operator!=(const Expression &b) const { return !(*this == b); };
+    bool operator!=(const Expression &b) const { return !(*this == b); }
     bool operator==(const Expression &b) const;
-    Expression &operator+=(const Expression &b);
-    Expression &operator<<(const Expression &b) { return (*this += b); }
+    Expression &operator<<(const Expression &b);
 
     static const Expression MINUS;  ///< The expression for unary minus
 private:

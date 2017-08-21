@@ -109,7 +109,7 @@ bool Expression::operator==(const Expression &b) const {
     return eq && (name==b.name) && (node==b.node);
 }
 
-Expression &Expression::operator+=(const Expression &b) {
+Expression &Expression::operator<<(const Expression &b) {
     if(node!=Node::FUNCTION)
         throw std::logic_error("Only Function node can have children");
 
