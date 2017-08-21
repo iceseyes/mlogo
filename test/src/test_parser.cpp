@@ -330,3 +330,7 @@ TEST(Parser, parseExprStatement) {
     ASSERT_EQ(Expression('/') << Variable("var") << Number("2"), boost::get<Expression>(stmt.arguments[3]));
     ASSERT_EQ(Expression(Expression::MINUS) << Number("6"), boost::get<Expression>(stmt.arguments[4]));
 }
+
+TEST(Parser, ExpressionToStatement) {
+    FAIL() << "Incomplete Test";
+}
