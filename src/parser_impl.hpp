@@ -136,9 +136,15 @@ struct ExpressionParser: qi::grammar<Iterator, Expression(), ascii::space_type> 
 
         template <typename Left, typename Right>
         Left operator()(const Left &left, const Right &right) const {
-            if(right) {
-                Left l(*right);
-                l.children.insert(l.children.begin(), left);
+            if(!right.empty()) {
+                Left l;
+                Left tmp(left);
+                for(auto &r : right) {
+                    l = Left(r);
+                    l.children.insert(l.children.begin(), tmp);
+                    tmp = l;
+                }
+
                 return l;
             }
 
@@ -158,6 +164,8 @@ struct ExpressionParser: qi::grammar<Iterator, Expression(), ascii::space_type> 
         using phoenix::construct;
         using namespace qi::labels;
 
+        static std::vector<Expression> MINUS { Expression::MINUS };
+
         // In UCBLogo if you have a variable like :a45+4, :45+4+4 is a valid expression.
         // In mLogo this is not possible, or at least you should handle this case like a variable
         // and manage the expression when you look up in the memory.
@@ -167,16 +175,20 @@ struct ExpressionParser: qi::grammar<Iterator, Expression(), ascii::space_type> 
         function = proc_name[at_c<0>(_val) = _1] >>
                         *argument[push_back(at_c<1>(_val), _1)];
 
-        simply_expression = number [_val = construct<Expression>(_1)]
+        factor = number [_val = construct<Expression>(_1)]
                 | variable [_val = construct<Expression>(_1)]
                 | function [_val = construct<Expression>(_1)]
                 | ('(' >> start >> ')') [_val = construct<Expression>(_1)]
-                | ('-' >> simply_expression)
-                    [_val = make_expression(_1, boost::optional<Expression>(Expression::MINUS))];
+                | ('-' >> factor)
+                    [_val = make_expression(_1, MINUS)];
 
-        expression = (char_("+*/-") >> start) [ (_val = _1) << _2 ] >> -(expression [ref(_val) << _1]);
+        rfactor = (char_("*/") >> factor) [ (_val = _1) << _2 ];
 
-        start = (simply_expression >> -expression) [ _val = make_expression(_1, _2)];
+        term = (factor >> *rfactor) [ _val = make_expression(_1, _2) ];
+
+        rterm = (char_("+-") >> term) [ (_val = _1) << _2 ];
+
+        start = (term >> *rterm) [ _val = make_expression(_1, _2) ];
     }
 
     WordParser<Iterator> word;
@@ -186,8 +198,10 @@ struct ExpressionParser: qi::grammar<Iterator, Expression(), ascii::space_type> 
     ListParser<Iterator> list;
     qi::rule<Iterator, Argument(), ascii::space_type> argument;
     qi::rule<Iterator, Statement(), ascii::space_type> function;
-    qi::rule<Iterator, Expression(), ascii::space_type> simply_expression;
-    qi::rule<Iterator, Expression(), ascii::space_type> expression;
+    qi::rule<Iterator, Expression(), ascii::space_type> factor;
+    qi::rule<Iterator, Expression(), ascii::space_type> rfactor;
+    qi::rule<Iterator, Expression(), ascii::space_type> term;
+    qi::rule<Iterator, Expression(), ascii::space_type> rterm;
     qi::rule<Iterator, Expression(), ascii::space_type> start;
 };
 
