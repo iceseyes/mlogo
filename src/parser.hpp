@@ -91,7 +91,6 @@ struct Expression {
     std::vector<Expression> children;
 
     Expression();
-    Expression(const std::string &name); // TODO Delete this! Expression is a Tree!
     Expression(const Number &name);
     Expression(const Variable &name);
     Expression(char functor);

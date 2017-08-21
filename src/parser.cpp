@@ -44,9 +44,6 @@ std::string operator2proc_name(char op) {
 
 Expression::Expression() {}
 
-Expression::Expression(const std::string &name) :
-        name(name) {}
-
 Expression::Expression(const Number &name) :
         name(name.value), node(Node::NUMBER) {}
 

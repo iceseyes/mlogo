@@ -107,26 +107,87 @@ TEST(Parser, parseExpr) {
     ASSERT_EQ(Expression('+') << Number("3") << Number("4"), f("3+ 4"));
     ASSERT_EQ(Expression('+') << Number("3") << Number("4"), f("3 +4"));
 
-    ASSERT_EQ(Expression("5*6"), f("5 * 6"));
-    ASSERT_EQ(Expression("5/6"), f("5 / 6"));
-    ASSERT_EQ(Expression("5-6"), f("5 - 6"));
-    ASSERT_EQ(Expression("(1+2)"), f("(1+2)"));
-    ASSERT_EQ(Expression("(1+2)*3"), f("(1+2)*3"));
-    ASSERT_EQ(Expression("4-(1+2)*3"), f("4-(1+2)*3"));
-    ASSERT_EQ(Expression("4-(1+2)*4"), f("4-( 1+2 )*4"));
-    ASSERT_EQ(Expression("(1+2)*(3)"), f("(1+2)*(3)"));
-    ASSERT_EQ(Expression("((1+2)*(3))/4"), f("((1+2)*(3)) / 4"));
-    ASSERT_EQ(Expression("((1.5+2)*(3.1415))/4.23"), f("((1.5+2)*(3.1415))/4.23"));
-    ASSERT_EQ(Expression("1+var"), f("1+:var"));
-    ASSERT_EQ(Expression("1+var"), f("1 + :var"));
-    ASSERT_EQ(Expression("var+1"), f(":var + 1"));
-    ASSERT_EQ(Expression("(var)+1"), f("(:var)+1"));
-    ASSERT_EQ(Expression("((1.5+2)*PI)/4.23"), f("((1.5+2)*:PI)/4.23"));
-    ASSERT_EQ(Expression("((abcd+2)*PI)/4.23"), f("((:abcd +2)*:PI)/4.23"));
-    ASSERT_EQ(Expression("-var+1"), f("-:var + 1"));
-    ASSERT_EQ(Expression("var+-1"), f(":var + -1"));
-    ASSERT_EQ(Expression("sqrt 10/5"), f("sqrt 10/5"));
-    ASSERT_EQ(Expression("(sqrt ln var)/5"), f("(sqrt ln :var)/5"));
+    // other operations
+    ASSERT_EQ(Expression('*') << Number("5") << Number("6"), f("5 * 6"));
+    ASSERT_EQ(Expression('/') << Number("5") << Number("6"), f("5 / 6"));
+    ASSERT_EQ(Expression('-') << Number("5") << Number("6"), f("5 - 6"));
+
+    // Brackets and operators priority
+    ASSERT_EQ(Expression('+') << Number("1") << Number("2"), f("(1+2)"));
+    ASSERT_EQ(
+            Expression('*')
+                << (Expression('+') << Number("1") << Number("2"))
+                << Number("3"),
+            f("(1+2)*3"));
+    ASSERT_EQ(
+            Expression('-')
+                << Number("4")
+                << Expression('+')
+                    << (Expression('+') << Number("1") << Number("2"))
+                    << Number("3"),
+            f("4-(1+2)*3"));
+    ASSERT_EQ(
+            Expression('-')
+                << Number("4")
+                << Expression('+')
+                    << (Expression('+') << Number("1") << Number("2"))
+                    << Number("4"),
+            f("4-( 1+2 )*4"));
+    ASSERT_EQ(
+            Expression('*')
+                << (Expression('+') << Number("1") << Number("2"))
+                << Number("3"),
+            f("(1+2)*(3)"));
+    ASSERT_EQ(
+            Expression('/')
+                << Expression('*')
+                    << (Expression('+') << Number("1") << Number("2"))
+                    << Number("3")
+                 << Number("4"),
+            f("((1+2)*(3)) / 4"));
+    ASSERT_EQ(
+            Expression('/')
+                << Expression('*')
+                    << (Expression('+') << Number("1.5") << Number("2"))
+                    << Number("3.1415")
+                 << Number("4.23"),
+            f("((1.5+2)*(3.1415))/4.23"));
+
+    // Variables
+    ASSERT_EQ(Expression('+') << Number("1") << Variable("var"), f("1+:var"));
+    ASSERT_EQ(Expression('+') << Number("1") << Variable("var"), f("1 + :var"));
+    ASSERT_EQ(Expression('+') << Variable("var") << Number("1"), f(":var + 1"));
+    ASSERT_EQ(Expression('+') << Variable("var") << Number("1"), f("(:var)+1"));
+
+    // All-in
+    ASSERT_EQ(
+            Expression('/')
+                << Expression('*')
+                    << (Expression('+') << Number("1.5") << Number("2"))
+                    << Variable("PI")
+                 << Number("4.23"),
+            f("((1.5+2)*:PI)/4.23"));
+    ASSERT_EQ(
+            Expression('/')
+                << Expression('*')
+                    << (Expression('+') << Variable("abcd") << Number("2"))
+                    << Variable("PI")
+                 << Number("4.23"),
+            f("((:abcd +2)*:PI)/4.23"));
+    ASSERT_EQ(Expression('+') << (Expression('-') << Variable("var")) << Number("1"), f("-:var + 1"));
+    ASSERT_EQ(Expression('+') << Variable("var") << (Expression('-') << Number("1")), f(":var + -1"));
+
+    // Statement
+    Statement stmt("sqrt");
+    stmt.arguments.push_back(Expression('/') << Number("10") << Number("5"));
+    ASSERT_EQ(Expression(stmt), f("sqrt 10/5"));
+
+    Statement ln("ln");
+    ln.arguments.push_back(Expression(Variable("var")));
+    stmt = Statement("sqrt");
+    stmt.arguments.push_back(ln);
+
+    ASSERT_EQ(Expression('/') << stmt << Number("5"), f("(sqrt ln :var)/5"));
 
     ASSERT_ANY_THROW(f(":var+ 1"));
 }
@@ -223,14 +284,14 @@ TEST(Parser, parseExprStatement) {
     ASSERT_EQ(ProcName("rt"), stmt.name);
     ASSERT_EQ(2u, stmt.arguments.size());
     ASSERT_EQ(ProcName("sqrt"), boost::get<ProcName>(stmt.arguments[0]));
-    ASSERT_EQ(Expression("5*2"), boost::get<Expression>(stmt.arguments[1]));
+    ASSERT_EQ(Expression('*') << Number("5") << Number("2"), boost::get<Expression>(stmt.arguments[1]));
 
     stmt = parse("func sqrt 5 * 2 ln :var / 2 (-6)");
     ASSERT_EQ(ProcName("func"), stmt.name);
     ASSERT_EQ(5u, stmt.arguments.size());
     ASSERT_EQ(ProcName("sqrt"), boost::get<ProcName>(stmt.arguments[0]));
-    ASSERT_EQ(Expression("5*2"), boost::get<Expression>(stmt.arguments[1]));
+    ASSERT_EQ(Expression('*') << Number("5") << Number("2"), boost::get<Expression>(stmt.arguments[1]));
     ASSERT_EQ(ProcName("ln"), boost::get<ProcName>(stmt.arguments[2]));
-    ASSERT_EQ(Expression("var/2"), boost::get<Expression>(stmt.arguments[3]));
-    ASSERT_EQ(Expression("(-6)"), boost::get<Expression>(stmt.arguments[4]));
+    ASSERT_EQ(Expression('/') << Variable("var") << Number("2"), boost::get<Expression>(stmt.arguments[3]));
+    ASSERT_EQ(Expression('-') << Number("6"), boost::get<Expression>(stmt.arguments[4]));
 }
