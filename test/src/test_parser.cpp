@@ -175,17 +175,16 @@ TEST(Parser, parseExpr) {
                  << Number("4.23"),
             f("((:abcd +2)*:PI)/4.23"));
     ASSERT_EQ(Expression('+') << (Expression(Expression::MINUS) << Variable("var")) << Number("1"), f("-:var + 1"));
-    ASSERT_EQ(Expression('+') << Variable("var") << (Expression('-') << Number("1")), f(":var + -1"));
+    ASSERT_EQ(Expression('+') << Variable("var") << (Expression(Expression::MINUS) << Number("1")), f(":var + -1"));
 
     // Statement
     Statement stmt("sqrt");
     stmt.arguments.push_back(Expression('/') << Number("10") << Number("5"));
     ASSERT_EQ(Expression(stmt), f("sqrt 10/5"));
 
-    Statement ln("ln");
-    ln.arguments.push_back(Expression(Variable("var")));
     stmt = Statement("sqrt");
-    stmt.arguments.push_back(ln);
+    stmt.arguments.push_back(ProcName("ln"));
+    stmt.arguments.push_back(Expression(Variable("var")));
 
     ASSERT_EQ(Expression('/') << stmt << Number("5"), f("(sqrt ln :var)/5"));
 

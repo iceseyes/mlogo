@@ -171,7 +171,8 @@ struct ExpressionParser: qi::grammar<Iterator, Expression(), ascii::space_type> 
                 | variable [_val = construct<Expression>(_1)]
                 | function [_val = construct<Expression>(_1)]
                 | ('(' >> start >> ')') [_val = construct<Expression>(_1)]
-                | ('-' >> start) [_val = make_expression(_1, boost::optional<Expression>(Expression::MINUS))];
+                | ('-' >> simply_expression)
+                    [_val = make_expression(_1, boost::optional<Expression>(Expression::MINUS))];
 
         expression = (char_("+*/-") >> start) [ (_val = _1) << _2 ] >> -(expression [ref(_val) << _1]);
 
