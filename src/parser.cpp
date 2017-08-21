@@ -19,6 +19,11 @@ namespace parser {
 using iterator_type = std::string::const_iterator;
 using Parser = StatementParser<iterator_type>;
 
+/// To disambiguate the minus symbol, for unary operator we use this
+static const char MINUS_SYMBOL { '_' };
+
+const Expression Expression::MINUS { MINUS_SYMBOL };
+
 namespace {
 
 /**
@@ -34,7 +39,7 @@ std::string operator2proc_name(char op) {
     case '-': return "DIFFERENCE"; break;
     case '*': return "PRODUCT"; break;
     case '/': return "QUOTIENT"; break;
-    case '_': return "MINUS"; break;
+    case MINUS_SYMBOL: return "MINUS"; break;
     }
 
     std::stringstream ss;
