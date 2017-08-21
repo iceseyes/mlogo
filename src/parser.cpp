@@ -65,6 +65,14 @@ Expression::Expression(const Expression &e) :
     if(e.stmt) stmt = new Statement(*e.stmt);
 }
 
+Expression::Expression(Expression &&e) :
+    name(std::move(e.name)), node(e.node), children(std::move(e.children)) {
+    if(e.stmt) {
+        stmt = e.stmt;
+        e.stmt = nullptr;
+    }
+}
+
 Expression::~Expression() {
     delete stmt;
 }
@@ -75,6 +83,19 @@ Expression& Expression::operator=(const Expression &e) {
     children = e.children;
 
     if(e.stmt) stmt = new Statement(*e.stmt);
+
+    return *this;
+}
+
+Expression& Expression::operator=(Expression &&e) {
+    name = std::move(e.name);
+    node = e.node;
+    children = std::move(e.children);
+
+    if(e.stmt) {
+        stmt = e.stmt;
+        e.stmt = nullptr;
+    }
 
     return *this;
 }

@@ -98,10 +98,12 @@ struct Expression {
     Expression(const Statement &function);
 
     Expression(const Expression &e);
+    Expression(Expression &&e);
 
     ~Expression();
 
     Expression& operator=(const Expression &e);
+    Expression& operator=(Expression &&e);
 
     bool operator!=(const Expression &b) const { return !(*this == b); };
     bool operator==(const Expression &b) const;
