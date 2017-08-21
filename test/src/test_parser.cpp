@@ -115,13 +115,13 @@ TEST(Parser, parseExpr) {
     // priority
     ASSERT_EQ(
             Expression('+')
-                << Number("4")
-                << (Expression('+') << Number("5") << Number("6")),
+                << (Expression('+') << Number("4") << Number("5"))
+                << Number("6"),
             f("4 + 5 + 6"));
     ASSERT_EQ(
-            Expression('+')
-                << Number("4")
-                << (Expression('-') << Number("5") << Number("6")),
+            Expression('-')
+                << (Expression('+') << Number("4") << Number("5"))
+                << Number("6"),
             f("4 + 5 - 6"));
     ASSERT_EQ(
             Expression('+')
@@ -144,6 +144,11 @@ TEST(Parser, parseExpr) {
                 << (Expression('/') << Number("4") << Number("5"))
                 << Number("6"),
             f("4 / 5 + 6"));
+    ASSERT_EQ(
+            Expression('/')
+                << (Expression('/') << Number("4") << Number("5"))
+                << Number("6"),
+            f("4 / 5 /xe 6"));
 
     // Brackets and operators priority
     ASSERT_EQ(Expression('+') << Number("1") << Number("2"), f("(1+2)"));
@@ -303,12 +308,10 @@ TEST(Parser, parseExprStatement) {
     ASSERT_EQ(
             Expression('/')
                 << (Expression('*')
-                    << Number("2")
+                    << (Expression('*') << Number("2") << Variable("PI"))
                     << (Expression('*')
-                        << Variable("PI")
-                        << (Expression('/')
-                            << Number("360")
-                            << (Expression('*') << Number("2") << Variable("PI")))))
+                        << (Expression('/') << Number("360") << Number("2"))
+                        << Variable("PI")))
                 << Expression(sqrt5),
             boost::get<Expression>(stmt.arguments[0]));
 
