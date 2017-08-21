@@ -60,12 +60,27 @@ Expression::Expression(const Statement &function) :
        name(function.name.name), node(Node::STATEMENT),
        stmt(new Statement(function)) {} // Statement is stored as-it-is and not unpacked.
 
+Expression::Expression(const Expression &e) :
+    name(e.name), node(e.node), children(e.children) {
+    if(e.stmt) stmt = new Statement(*e.stmt);
+}
+
 Expression::~Expression() {
     delete stmt;
 }
 
+Expression& Expression::operator=(const Expression &e) {
+    name = e.name;
+    node = e.node;
+    children = e.children;
+
+    if(e.stmt) stmt = new Statement(*e.stmt);
+
+    return *this;
+}
+
 bool Expression::operator==(const Expression &b) const {
-    bool eq = std::equal(children.begin(), children.end(), b.children.begin());
+    bool eq = std::equal(children.begin(), children.end(), b.children.begin(), b.children.end());
     if(node==Node::STATEMENT) eq = eq && stmt && b.stmt && ((*stmt)==(*b.stmt));
     return eq && (name==b.name) && (node==b.node);
 }
@@ -107,6 +122,8 @@ Statement parse(const std::string &line) {
 }
 
 ::std::ostream &operator<<(::std::ostream &s, const Expression &n) {
+    s << "(";
+
     switch(n.node) {
     case Expression::Node::NUMBER:
     case Expression::Node::VARIABLE:
@@ -120,6 +137,8 @@ Statement parse(const std::string &line) {
     }
 
     for(auto &child : n.children) s << " " << child;
+    s << ")";
+
     return s;
 }
 

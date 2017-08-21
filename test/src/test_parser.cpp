@@ -85,11 +85,15 @@ TEST(Parser, parseProcName) {
 TEST(Parser, parseExpr) {
     auto f = [](const std::string &v) { return parse<ExpressionParser, Expression>(v); };
 
-    ASSERT_EQ(Expression("2"), f("2"));
-    ASSERT_EQ(Expression("1+2"), f("1+2"));
-    ASSERT_EQ(Expression("3+4"), f("3 + 4"));
-    ASSERT_EQ(Expression("3+4"), f("3+ 4"));
-    ASSERT_EQ(Expression("3+4"), f("3 +4"));
+    // a Number is an Expression.
+    ASSERT_EQ(Expression(Number("2")), f("2"));
+
+    // SUM of expressions is an expression.
+    ASSERT_EQ(Expression('+') << Number("1") << Number("2"), f("1+2"));
+    ASSERT_EQ(Expression('+') << Number("3") << Number("4"), f("3 + 4"));
+    ASSERT_EQ(Expression('+') << Number("3") << Number("4"), f("3+ 4"));
+    ASSERT_EQ(Expression('+') << Number("3") << Number("4"), f("3 +4"));
+
     ASSERT_EQ(Expression("5*6"), f("5 * 6"));
     ASSERT_EQ(Expression("5/6"), f("5 / 6"));
     ASSERT_EQ(Expression("5-6"), f("5 - 6"));
@@ -192,8 +196,13 @@ TEST(Parser, parseExprStatement) {
     ASSERT_EQ(1u, stmt.arguments.size());
     ASSERT_EQ(
             Expression('/')
-                << Expression('*') << Expression('*') << Number("2") << Variable("PI")
-                    << Expression('/') << Number("360") << Expression('*') << Number("2") << Variable("PI")
+                << (Expression('*')
+                    << Number("2")
+                    << (Expression('*')
+                        << Variable("PI")
+                        << (Expression('/')
+                            << Number("360")
+                            << (Expression('*') << Number("2") << Variable("PI")))))
                 << Expression(sqrt5),
             boost::get<Expression>(stmt.arguments[0]));
 
