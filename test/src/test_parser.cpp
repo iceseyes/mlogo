@@ -332,5 +332,40 @@ TEST(Parser, parseExprStatement) {
 }
 
 TEST(Parser, ExpressionToStatement) {
+    auto f = [](const std::string &v) { return parse<ExpressionParser, Expression>(v); };
+    Statement stmt("SUM");
+    stmt.arguments.push_back(Number("1"));
+    stmt.arguments.push_back(Number("2"));
+    ASSERT_EQ(stmt, f("1 + 2").asStatement());
+
+    stmt = Statement("SUM");
+    stmt.arguments.push_back(ProcName("SUM"));
+    stmt.arguments.push_back(Number("1"));
+    stmt.arguments.push_back(Number("2"));
+    stmt.arguments.push_back(Number("3"));
+    ASSERT_EQ(stmt, f("1 + 2 + 3").asStatement());
+
+    stmt = Statement("SUM");
+    stmt.arguments.push_back(ProcName("PRODUCT"));
+    stmt.arguments.push_back(Number("1"));
+    stmt.arguments.push_back(Number("2"));
+    stmt.arguments.push_back(Number("3"));
+    ASSERT_EQ(stmt, f("1 * 2 + 3").asStatement());
+
+    stmt = Statement("SUM");
+    stmt.arguments.push_back(Variable("V3"));
+    stmt.arguments.push_back(ProcName("PRODUCT"));
+    stmt.arguments.push_back(Number("1"));
+    stmt.arguments.push_back(Number("2"));
+    ASSERT_EQ(stmt, f(":V3 + 1 * 2 ").asStatement());
+
+    stmt = Statement("LN");
+    stmt.arguments.push_back(ProcName("SUM"));
+    stmt.arguments.push_back(Variable("V3"));
+    stmt.arguments.push_back(ProcName("PRODUCT"));
+    stmt.arguments.push_back(Number("1"));
+    stmt.arguments.push_back(Number("2"));
+    ASSERT_EQ(stmt, f("LN :V3 + 1 * 2 ").asStatement());
+
     FAIL() << "Incomplete Test";
 }

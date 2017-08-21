@@ -46,6 +46,24 @@ std::string operator2proc_name(char op) {
     ss << "Unknown infix operator: " << op;
     throw std::logic_error(ss.str());
 }
+
+struct StmtBuilderVisitor : boost::static_visitor<Argument> {
+    template<typename Value>
+    Argument operator()(Value &&v) const {
+        return v;
+    }
+
+    Argument operator()(Expression &v) const {
+        switch(v.node) {
+        case Expression::Node::STATEMENT: return v.asStatement(); break;
+        case Expression::Node::NUMBER: return Number(v.name); break;
+        case Expression::Node::VARIABLE: return Variable(v.name); break;
+        case Expression::Node::FUNCTION: return v.asStatement(); break;
+        }
+    }
+};
+
+
 }
 
 Expression::Expression() {}
@@ -116,6 +134,37 @@ Expression &Expression::operator<<(const Expression &b) {
     children.push_back(b);
 
     return *this;
+}
+
+Statement Expression::asStatement() const {
+    Statement tmp(name);
+
+    if(this->stmt && node==Node::STATEMENT) {
+        for(auto &a : stmt->arguments) tmp.arguments.push_back(apply_visitor(StmtBuilderVisitor(), a));
+    } else if(node!=Node::FUNCTION)
+        throw std::logic_error("This is not a statement.");
+    else {
+        for(auto &child : children) child.buildStatement(tmp);
+    }
+
+    return tmp;
+}
+
+void Expression::buildStatement(Statement &tmp) const {
+    switch(node) {
+    case Node::STATEMENT:
+        if(this->stmt) {
+            tmp.arguments.push_back(stmt->name);
+            for(auto &a : stmt->arguments) tmp.arguments.push_back(apply_visitor(StmtBuilderVisitor(), a));
+        }
+        break;
+    case Node::NUMBER: tmp.arguments.push_back(Number(name)); break;
+    case Node::VARIABLE: tmp.arguments.push_back(Variable(name)); break;
+    case Node::FUNCTION:
+        tmp.arguments.push_back(ProcName(name));
+        for(auto &child : children) child.buildStatement(tmp);
+        break;
+    }
 }
 
 bool Statement::operator==(const Statement &b) const {
