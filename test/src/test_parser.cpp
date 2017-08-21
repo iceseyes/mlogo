@@ -148,7 +148,7 @@ TEST(Parser, parseExpr) {
             Expression('/')
                 << (Expression('/') << Number("4") << Number("5"))
                 << Number("6"),
-            f("4 / 5 /xe 6"));
+            f("4 / 5 / 6"));
 
     // Brackets and operators priority
     ASSERT_EQ(Expression('+') << Number("1") << Number("2"), f("(1+2)"));
