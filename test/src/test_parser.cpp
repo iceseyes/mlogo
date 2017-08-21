@@ -112,6 +112,39 @@ TEST(Parser, parseExpr) {
     ASSERT_EQ(Expression('/') << Number("5") << Number("6"), f("5 / 6"));
     ASSERT_EQ(Expression('-') << Number("5") << Number("6"), f("5 - 6"));
 
+    // priority
+    ASSERT_EQ(
+            Expression('+')
+                << Number("4")
+                << (Expression('+') << Number("5") << Number("6")),
+            f("4 + 5 + 6"));
+    ASSERT_EQ(
+            Expression('+')
+                << Number("4")
+                << (Expression('-') << Number("5") << Number("6")),
+            f("4 + 5 - 6"));
+    ASSERT_EQ(
+            Expression('+')
+                << Number("4")
+                << (Expression('*') << Number("5") << Number("6")),
+            f("4 + 5 * 6"));
+    ASSERT_EQ(
+            Expression('+')
+                << Number("4")
+                << (Expression('/') << Number("5") << Number("6")),
+            f("4 + 5 / 6"));
+
+    ASSERT_EQ(
+            Expression('+')
+                << (Expression('*') << Number("4") << Number("5"))
+                << Number("6"),
+            f("4 * 5 + 6"));
+    ASSERT_EQ(
+            Expression('+')
+                << (Expression('/') << Number("4") << Number("5"))
+                << Number("6"),
+            f("4 / 5 + 6"));
+
     // Brackets and operators priority
     ASSERT_EQ(Expression('+') << Number("1") << Number("2"), f("(1+2)"));
     ASSERT_EQ(
