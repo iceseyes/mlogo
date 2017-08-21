@@ -122,16 +122,16 @@ TEST(Parser, parseExpr) {
     ASSERT_EQ(
             Expression('-')
                 << Number("4")
-                << Expression('+')
+                << (Expression('*')
                     << (Expression('+') << Number("1") << Number("2"))
-                    << Number("3"),
+                    << Number("3")),
             f("4-(1+2)*3"));
     ASSERT_EQ(
             Expression('-')
                 << Number("4")
-                << Expression('+')
+                << (Expression('*')
                     << (Expression('+') << Number("1") << Number("2"))
-                    << Number("4"),
+                    << Number("4")),
             f("4-( 1+2 )*4"));
     ASSERT_EQ(
             Expression('*')
@@ -140,16 +140,16 @@ TEST(Parser, parseExpr) {
             f("(1+2)*(3)"));
     ASSERT_EQ(
             Expression('/')
-                << Expression('*')
+                << (Expression('*')
                     << (Expression('+') << Number("1") << Number("2"))
-                    << Number("3")
+                    << Number("3"))
                  << Number("4"),
             f("((1+2)*(3)) / 4"));
     ASSERT_EQ(
             Expression('/')
-                << Expression('*')
+                << (Expression('*')
                     << (Expression('+') << Number("1.5") << Number("2"))
-                    << Number("3.1415")
+                    << Number("3.1415"))
                  << Number("4.23"),
             f("((1.5+2)*(3.1415))/4.23"));
 
@@ -162,19 +162,19 @@ TEST(Parser, parseExpr) {
     // All-in
     ASSERT_EQ(
             Expression('/')
-                << Expression('*')
+                << (Expression('*')
                     << (Expression('+') << Number("1.5") << Number("2"))
-                    << Variable("PI")
+                    << Variable("PI"))
                  << Number("4.23"),
             f("((1.5+2)*:PI)/4.23"));
     ASSERT_EQ(
             Expression('/')
-                << Expression('*')
+                << (Expression('*')
                     << (Expression('+') << Variable("abcd") << Number("2"))
-                    << Variable("PI")
+                    << Variable("PI"))
                  << Number("4.23"),
             f("((:abcd +2)*:PI)/4.23"));
-    ASSERT_EQ(Expression('+') << (Expression('-') << Variable("var")) << Number("1"), f("-:var + 1"));
+    ASSERT_EQ(Expression('+') << (Expression(Expression::MINUS) << Variable("var")) << Number("1"), f("-:var + 1"));
     ASSERT_EQ(Expression('+') << Variable("var") << (Expression('-') << Number("1")), f(":var + -1"));
 
     // Statement
