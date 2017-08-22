@@ -115,7 +115,7 @@ private:
     friend ::std::ostream &operator<<(::std::ostream &s, const Expression &n);
 };
 
-using Argument = boost::variant<ProcName, Word, Number, Variable, List, Expression>;
+using Argument = boost::variant<ProcName, Word, List, Expression>;
 
 struct Statement {
 	ProcName name;
