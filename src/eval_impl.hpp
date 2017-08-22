@@ -42,11 +42,7 @@ struct EvalStmtBuilderVisitor : boost::static_visitor<void> {
 		switch(e.node) {
 		case parser::Expression::Node::NUMBER: this->operator()(parser::Number(e.name)); break;
 		case parser::Expression::Node::VARIABLE: this->operator()(parser::Variable(e.name)); break;
-		case parser::Expression::Node::STATEMENT:
-			setParent(true);
-
-			if(!node) node = new ASTNode(make_statement(e.statement()));
-			else
+		case parser::Expression::Node::STATEMENT: this->operator()(e.statement()); break;
 		case parser::Expression::Node::FUNCTION:
 			this->operator()(parser::ProcName(e.name));
 			for(auto &child: e.children) this->operator()(child);
@@ -79,7 +75,7 @@ struct EvalStmtBuilderVisitor : boost::static_visitor<void> {
 		}
 	}
 
-	void operator()(mlogo::parser::Statement &s) const {
+	void operator()(const mlogo::parser::Statement &s) const {
 		ASTNode *parent = node;
 		setParent(true);
 

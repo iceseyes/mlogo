@@ -58,10 +58,38 @@ struct SimpleSum : SimpleOp {
     }
 };
 
+struct SimpleProduct : SimpleOp {
+    double op(double a, double b) const override {
+        return a * b;
+    }
+};
+
+struct SimpleDifference : SimpleOp {
+    double op(double a, double b) const override {
+        return a - b;
+    }
+};
+
+struct SimpleQuotient : SimpleOp {
+    double op(double a, double b) const override {
+        return a / b;
+    }
+};
+
+struct SimpleMax : SimpleOp {
+    double op(double a, double b) const override {
+        return std::max(a,b);
+    }
+};
+
 void initProcedures() {
     Stack::instance().globalFrame().setProcedure<Nop>("eNop");
 	Stack::instance().globalFrame().setProcedure<SimpleSum>("eSum");
     Stack::instance().globalFrame().setProcedure<SimpleSum>("sum");
+    Stack::instance().globalFrame().setProcedure<SimpleProduct>("product");
+    Stack::instance().globalFrame().setProcedure<SimpleDifference>("difference");
+    Stack::instance().globalFrame().setProcedure<SimpleQuotient>("quotient");
+    Stack::instance().globalFrame().setProcedure<SimpleMax>("max");
 }
 
 void clearValue() {
@@ -182,4 +210,63 @@ TEST(Eval, makeASTFromParser) {
 TEST(Eval, makeASTFromParserExpression) {
     using eval::make_ast;
     using parser::parse;
+
+    initProcedures();
+
+    auto ast = make_ast(parse("eNop 1+2"));
+    clearValue();
+    ast();
+    ASSERT_EQ(3, readValue());
+
+    ast = make_ast(parse("eNop 1 +2"));
+    clearValue();
+    ast();
+    ASSERT_EQ(3, readValue());
+
+    ast = make_ast(parse("eNop 1 + 2"));
+    clearValue();
+    ast();
+    ASSERT_EQ(3, readValue());
+
+    ast = make_ast(parse("eNop 1+2*3"));
+    clearValue();
+    ast();
+    ASSERT_EQ(7, readValue());
+
+    ast = make_ast(parse("eNop 2*3+1"));
+    clearValue();
+    ast();
+    ASSERT_EQ(7, readValue());
+
+    ast = make_ast(parse("eNop 2*(3+1)/2+1"));
+    clearValue();
+    ast();
+    ASSERT_EQ(5, readValue());
+
+    ast = make_ast(parse("eNop 2*5+(3+1)/2+1"));
+    clearValue();
+    ast();
+    ASSERT_EQ(13, readValue());
+
+    ast = make_ast(parse("eNop max 5 9"));
+    clearValue();
+    ast();
+    ASSERT_EQ(9, readValue());
+
+    ast = make_ast(parse("eNop max 5 + 2 9"));
+    clearValue();
+    ast();
+    ASSERT_EQ(9, readValue());
+
+    ast = make_ast(parse("eNop max 5 2 *9"));
+    clearValue();
+    ast();
+    ASSERT_EQ(18, readValue());
+
+    ast = make_ast(parse("eNop 2 * max 5 2 *9"));
+    clearValue();
+    ast();
+    ASSERT_EQ(36, readValue());
+
+    FAIL() << "Incomplete Test";
 }

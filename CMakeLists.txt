@@ -36,6 +36,11 @@ if(WITH_WINDOW_ALWAYS_ON_TOP)
     add_definitions(-DWITH_WINDOW_ALWAYS_ON_TOP)
 endif()
 
+# Workaround for libstdc++ using clang and gdb
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+  add_definitions(-D_GLIBCXX_DEBUG)
+endif()
+
 set(MLOGO_DEPS
     ${Boost_LIBRARIES} rt ${CMAKE_THREAD_LIBS_INIT} ${SDL2_LIBRARY})
 
