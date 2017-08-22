@@ -108,13 +108,10 @@ struct Expression {
     bool operator==(const Expression &b) const;
     Expression &operator<<(const Expression &b);
 
-    Statement asStatement() const;
-
     static const Expression MINUS;  ///< The expression for unary minus
 private:
     Statement *stmt { nullptr };
 
-    void buildStatement(Statement &tmp) const;
     friend ::std::ostream &operator<<(::std::ostream &s, const Expression &n);
 };
 
