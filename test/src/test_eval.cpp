@@ -31,14 +31,14 @@ struct Nop : types::BasicProcedure {
     }
 };
 
-struct SimpleSum : types::BasicProcedure {
-    SimpleSum() : BasicProcedure(2, true) {}
+struct SimpleOp : types::BasicProcedure {
+    SimpleOp() : BasicProcedure(2, true) {}
     void operator()() const {
         stringstream ss;
 		double arg0 = fetchArg(0).asDouble();
 		double arg1 = fetchArg(1).asDouble();
 
-		double result = arg0 + arg1;
+		double result = op(arg0, arg1);
 		long rlong = static_cast<long>(result);
 
 		if(result - rlong < 1e-5)
@@ -48,11 +48,20 @@ struct SimpleSum : types::BasicProcedure {
 
 		setReturnValue(ss.str());
     }
+
+    virtual double op(double a, double b) const = 0;
+};
+
+struct SimpleSum : SimpleOp {
+    double op(double a, double b) const override {
+        return a + b;
+    }
 };
 
 void initProcedures() {
     Stack::instance().globalFrame().setProcedure<Nop>("eNop");
 	Stack::instance().globalFrame().setProcedure<SimpleSum>("eSum");
+    Stack::instance().globalFrame().setProcedure<SimpleSum>("sum");
 }
 
 void clearValue() {
@@ -167,4 +176,10 @@ TEST(Eval, makeASTFromParser) {
     ASSERT_THROW(testAST(), std::logic_error);
 
     ASSERT_THROW(make_ast(parse("eNop \"Hello \"World")), std::logic_error);
+}
+
+
+TEST(Eval, makeASTFromParserExpression) {
+    using eval::make_ast;
+    using parser::parse;
 }
