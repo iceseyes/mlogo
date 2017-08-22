@@ -90,6 +90,8 @@ void initProcedures() {
     Stack::instance().globalFrame().setProcedure<SimpleDifference>("difference");
     Stack::instance().globalFrame().setProcedure<SimpleQuotient>("quotient");
     Stack::instance().globalFrame().setProcedure<SimpleMax>("max");
+
+    Stack::instance().globalFrame().setVariable("a_num", "123");
 }
 
 void clearValue() {
@@ -268,5 +270,18 @@ TEST(Eval, makeASTFromParserExpression) {
     ast();
     ASSERT_EQ(36, readValue());
 
-    FAIL() << "Incomplete Test";
+    ast = make_ast(parse("eNop 2 + (max 5 2 *9) * 2"));
+    clearValue();
+    ast();
+    ASSERT_EQ(38, readValue());
+
+    ast = make_ast(parse("eNop :a_num + (max 5 2 *9) * 2"));
+    clearValue();
+    ast();
+    ASSERT_EQ(159, readValue());
+
+    ast = make_ast(parse("eNop 1 + max :a_num 2 *9"));
+    clearValue();
+    ast();
+    ASSERT_EQ(124, readValue());
 }
