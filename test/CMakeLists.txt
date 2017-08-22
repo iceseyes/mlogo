@@ -72,8 +72,14 @@ include_directories(../src)
 
 # setup mlogo_test
 add_executable(mlogo_test ${TEST_SRC})
-target_link_libraries(mlogo_test ${MLOGO_DEPS} ${MLOGO_LIBRARY} gtest_main)
+target_link_libraries(mlogo_test ${MLOGO_DEPS} ${MLOGO_LIBRARY} gcov gtest_main)
 add_test(NAME "mLogo automatic test" COMMAND mlogo_test)
 
-
+# setup coverage
+if(GCOV_PATH AND LCOV_PATH)
+    setup_target_for_coverage(
+        NAME mlogo_test_coverage 
+        EXECUTABLE mlogo_test 
+        DEPENDENCIES mlogo_test)
+endif()
 

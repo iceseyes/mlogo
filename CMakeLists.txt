@@ -7,6 +7,7 @@ include (CheckFunctionExists)
 option(WITH_TESTS "Enable build for mLogo Automatic Tests" ON)
 option(USE_BOOST_STATIC  "Static link for boost librerees" OFF)
 option(WITH_WINDOW_ALWAYS_ON_TOP "Requires that graphics window is always on top" ON)
+option(WITH_COVERAGE "Run coverage for tests" OFF)
 
 # Basic Configuration
 set(MLOGO_PROGRAM mlogo)
@@ -31,6 +32,19 @@ endif(USE_BOOST_STATIC)
 find_package(Threads)
 find_package(Boost REQUIRED)
 find_package(SDL2 REQUIRED)
+
+if(WITH_COVERAGE)
+    find_program(GCOV_PATH gcov)
+    find_program(LCOV_PATH lcov)
+endif()
+
+if(GCOV_PATH AND LCOV_PATH)
+    include(CodeCoverage)
+    APPEND_COVERAGE_COMPILER_FLAGS()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-command-line-argument")    
+else()
+    message(WARNING "Coverage disabled: install gcov/lcov")
+endif()
 
 if(WITH_WINDOW_ALWAYS_ON_TOP)
     add_definitions(-DWITH_WINDOW_ALWAYS_ON_TOP)
