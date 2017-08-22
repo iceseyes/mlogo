@@ -31,23 +31,45 @@ struct EvalStmtBuilderVisitor : boost::static_visitor<void> {
 	EvalStmtBuilderVisitor(AST *node) :
 	    ast(node) {}
 
-	template<typename Value>
-	void operator()(Value &&v) const {
+	void operator()(mlogo::parser::Word &v) const {
 		setParent();
 
 		new ASTNode (
 			new ASTNode::Const(v.name), node);
 	}
 
-	void operator()(mlogo::parser::Number &v) const {
+	void operator()(mlogo::parser::Expression &e) const {
+		switch(e.node) {
+		case parser::Expression::Node::NUMBER: this->operator()(parser::Number(e.name)); break;
+		case parser::Expression::Node::VARIABLE: this->operator()(parser::Variable(e.name)); break;
+		case parser::Expression::Node::STATEMENT:
+			setParent(true);
+
+			if(!node) node = new ASTNode(make_statement(e.statement()));
+			else
+		case parser::Expression::Node::FUNCTION:
+			this->operator()(parser::ProcName(e.name));
+			for(auto &child: e.children) this->operator()(child);
+			break;
+		}
+	}
+
+	void operator()(const mlogo::parser::Number &n) const {
 		setParent();
 
 		new ASTNode (
-			new ASTNode::Const(v.value), node);
+			new ASTNode::Const(n.value), node);
+    }
 
-	}
 
-	void operator()(mlogo::parser::ProcName &v) const {
+	void operator()(const mlogo::parser::Variable &v) const {
+		setParent();
+
+		new ASTNode (
+			new ASTNode::Variable(v.name), node);
+    }
+
+	void operator()(const mlogo::parser::ProcName &v) const {
 		setParent(true);
 
 		if(!node) node = ast->createNode(v.name);
@@ -57,12 +79,14 @@ struct EvalStmtBuilderVisitor : boost::static_visitor<void> {
 		}
 	}
 
-	void operator()(mlogo::parser::Variable &v) const {
-        setParent();
+	void operator()(mlogo::parser::Statement &s) const {
+		ASTNode *parent = node;
+		setParent(true);
 
-        new ASTNode (
-            new ASTNode::Variable(v.name), node);
-    }
+		node = { new ASTNode(make_statement(s)) };
+
+		if(parent) node->setParent(parent);
+	}
 
     void operator()(mlogo::parser::List &v) const {
 		setParent();

@@ -86,6 +86,16 @@ public:
     std::size_t size() const { return children.size(); }
     bool completed() const { return nArgs() == size(); }
 
+    ASTNode *setParent(ASTNode *node) {
+        if(!_parent) {
+            _parent = node;
+            _parent->children.push_back(this);
+        } else {
+            throw std::logic_error("This ASTNode belongs to another parent.");
+        }
+        return this;
+    }
+
 private:
     ASTNode(const ASTNode &stmt) = delete;
     ASTNode &operator=(const ASTNode &stmt) = delete;

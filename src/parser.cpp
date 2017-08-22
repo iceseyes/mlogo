@@ -119,6 +119,12 @@ Expression &Expression::operator<<(const Expression &b) {
     return *this;
 }
 
+Statement Expression::statement() const {
+    if(stmt) return *stmt;
+
+    throw std::logic_error("This expression is not a statement.");
+}
+
 bool Statement::operator==(const Statement &b) const {
     std::stringstream ss, ss1;
     ss << *this;
