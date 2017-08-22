@@ -109,6 +109,9 @@ struct Expression {
     Expression &operator<<(const Expression &b);
 
     Statement statement() const;
+    Number number() const;
+    Variable variable() const;
+    ProcName functor() const;
 
     static const Expression MINUS;  ///< The expression for unary minus
 private:

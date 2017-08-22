@@ -125,6 +125,24 @@ Statement Expression::statement() const {
     throw std::logic_error("This expression is not a statement.");
 }
 
+Number Expression::number() const {
+    if(node==Node::NUMBER) return Number(name);
+
+    throw std::logic_error("This expression is not a number.");
+}
+
+Variable Expression::variable() const {
+    if(node==Node::VARIABLE) return Variable(name);
+
+    throw std::logic_error("This expression is not a variable.");
+}
+
+ProcName Expression::functor() const {
+    if(node==Node::FUNCTION) return ProcName(name);
+
+    throw std::logic_error("This expression is not a function.");
+}
+
 bool Statement::operator==(const Statement &b) const {
     std::stringstream ss, ss1;
     ss << *this;

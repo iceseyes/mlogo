@@ -40,11 +40,11 @@ struct EvalStmtBuilderVisitor : boost::static_visitor<void> {
 
 	void operator()(mlogo::parser::Expression &e) const {
 		switch(e.node) {
-		case parser::Expression::Node::NUMBER: this->operator()(parser::Number(e.name)); break;
-		case parser::Expression::Node::VARIABLE: this->operator()(parser::Variable(e.name)); break;
+		case parser::Expression::Node::NUMBER: this->operator()(e.number()); break;
+		case parser::Expression::Node::VARIABLE: this->operator()(e.variable()); break;
 		case parser::Expression::Node::STATEMENT: this->operator()(e.statement()); break;
 		case parser::Expression::Node::FUNCTION:
-			this->operator()(parser::ProcName(e.name));
+			this->operator()(e.functor());
 			for(auto &child: e.children) this->operator()(child);
 			break;
 		}
