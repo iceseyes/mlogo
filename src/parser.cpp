@@ -13,7 +13,10 @@
 #include <stdexcept>
 #include <string>
 
+#include <boost/algorithm/string.hpp>
+
 namespace mlogo {
+
 namespace parser {
 
 using iterator_type = std::string::const_iterator;
@@ -163,13 +166,41 @@ bool Statement::operator==(const Statement &b) const {
 }
 
 bool Statement::isStartProcedure() const {
-    return name == START_PROCEDURE_KEYWORD;
+    return boost::to_upper_copy(name.name) == START_PROCEDURE_KEYWORD;
 }
 
-bool Statement::isEndProcedure() const { return name == END_PROCEDURE_KEYWORD; }
+bool Statement::isEndProcedure() const {
+    return boost::to_upper_copy(name.name) == END_PROCEDURE_KEYWORD;
+}
 
 Statement parse(const std::string &line) {
-    return parse<StatementParser, Statement>(line);
+    auto stmt = parse<StatementParser, Statement>(line);
+
+    if (stmt.isStartProcedure()) {
+        if (stmt.arguments.size() > 1) {
+            try {
+                boost::get<ProcName>(stmt.arguments[0]);
+            } catch (std::exception &e) {
+                throw std::logic_error("Procedure name must be a valid word.");
+            }
+
+            int i{-1};
+            try {
+                for (i = 1; i < stmt.arguments.size(); ++i)
+                    boost::get<Expression>(stmt.arguments[i]).variable();
+            } catch (std::exception &e) {
+                std::stringstream ss;
+                ss << "Argument " << i << "-th should be a valid variable";
+                throw std::logic_error(ss.str());
+            }
+        } else {
+            throw std::logic_error("Procedure must have a name!");
+        }
+    } else if (stmt.isEndProcedure() && stmt.arguments.size() > 0) {
+        throw std::logic_error(END_PROCEDURE_KEYWORD +
+                               " cannot have arguments.");
+    }
+    return stmt;
 }
 
 ::std::ostream &operator<<(::std::ostream &s, const Number &n) {

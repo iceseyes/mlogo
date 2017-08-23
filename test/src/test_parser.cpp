@@ -396,4 +396,16 @@ TEST(Parser, parseProcedureDef) {
     ASSERT_FALSE(stmt.isStartProcedure());
     ASSERT_TRUE(stmt.isEndProcedure());
     ASSERT_EQ(0u, stmt.arguments.size());
+
+    stmt = parse("TO CENTER :side :beside :x :y");
+    ASSERT_EQ(ProcName("TO"), stmt.name);
+    ASSERT_TRUE(stmt.isStartProcedure());
+    ASSERT_FALSE(stmt.isEndProcedure());
+    ASSERT_EQ(5u, stmt.arguments.size());
+
+    ASSERT_ANY_THROW(parse("TO :VAR"));
+    ASSERT_ANY_THROW(parse("TO 12"));
+    ASSERT_ANY_THROW(parse("TO 12+2"));
+    ASSERT_ANY_THROW(parse("TO 12 :VAR"));
+    ASSERT_ANY_THROW(parse("TO SUM 2+2 :VAR"));
 }
