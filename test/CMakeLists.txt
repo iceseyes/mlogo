@@ -76,7 +76,8 @@ target_link_libraries(mlogo_test ${MLOGO_DEPS} ${MLOGO_LIBRARY} gcov gtest_main)
 add_test(NAME "mLogo automatic test" COMMAND mlogo_test)
 
 # setup coverage
-if(GCOV_PATH AND LCOV_PATH)
+if(ENABLE_COVERAGE)
+  set(COVERAGE_EXCLUDES '*/test/*' '*/boost/*' '*/c++/*')
     setup_target_for_coverage(
         NAME mlogo_test_coverage 
         EXECUTABLE mlogo_test 
