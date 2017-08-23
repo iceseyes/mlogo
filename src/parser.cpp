@@ -162,6 +162,12 @@ bool Statement::operator==(const Statement &b) const {
     return ss.str() == ss1.str();
 }
 
+bool Statement::isStartProcedure() const {
+    return name == START_PROCEDURE_KEYWORD;
+}
+
+bool Statement::isEndProcedure() const { return name == END_PROCEDURE_KEYWORD; }
+
 Statement parse(const std::string &line) {
     return parse<StatementParser, Statement>(line);
 }

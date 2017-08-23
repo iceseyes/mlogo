@@ -8,6 +8,7 @@ option(WITH_TESTS "Enable build for mLogo Automatic Tests" ON)
 option(USE_BOOST_STATIC  "Static link for boost librerees" OFF)
 option(WITH_WINDOW_ALWAYS_ON_TOP "Requires that graphics window is always on top" ON)
 option(WITH_COVERAGE "Run coverage for tests" OFF)
+option(WITH_BOOST_SPIRIT_DEBUG "Enable Boost Spirit DEBUG informations" OFF)
 
 # Basic Configuration
 set(MLOGO_PROGRAM mlogo)
@@ -49,6 +50,10 @@ endif()
 
 if(WITH_WINDOW_ALWAYS_ON_TOP)
     add_definitions(-DWITH_WINDOW_ALWAYS_ON_TOP)
+endif()
+
+if(WITH_BOOST_SPIRIT_DEBUG)
+    add_definitions(-DBOOST_SPIRIT_DEBUG)
 endif()
 
 # Workaround for libstdc++ using clang and gdb

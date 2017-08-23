@@ -214,10 +214,14 @@ struct ExpressionParser
 template <typename Iterator>
 struct StatementParser : qi::grammar<Iterator, Statement(), ascii::space_type> {
     StatementParser() : StatementParser::base_type(start, "statement") {
+        using qi::lexeme;
+        using qi::no_case;
+
         using ascii::char_;
         using ascii::alnum;
         using ascii::punct;
         using ascii::space;
+        using ascii::string;
 
         using phoenix::val;
         using phoenix::construct;
@@ -226,24 +230,47 @@ struct StatementParser : qi::grammar<Iterator, Statement(), ascii::space_type> {
 
         using namespace qi::labels;
 
-        // We prefere that a procedure call is not consider an expression unless
+        // We prefere that a procedure call is not consider an expression
+        // unless
         // call happens in the expression. For example, "ln 5" is not an
         // expression, but
         // "5 + ln 5" is so. So, we select proc_name before expression in
         // argument rule.
         argument = word | proc_name | list | expression;
+
         comment = ';' >> *char_;
-        start = -(proc_name[at_c<0>(_val) = _1] >>
-                  *argument[push_back(at_c<1>(_val), _1)]) >>
+
+        definition_start =
+            no_case[string(START_PROCEDURE_KEYWORD)][at_c<0>(_val) = _1] >>
+            proc_name[push_back(at_c<1>(_val), _1)] >>
+            *(variable[push_back(at_c<1>(_val), _1)]);
+
+        definition_end =
+            no_case[string(END_PROCEDURE_KEYWORD)][at_c<0>(_val) = _1];
+
+        statement = proc_name[at_c<0>(_val) = _1] >>
+                    *argument[push_back(at_c<1>(_val), _1)];
+        start = -(definition_start | definition_end | statement)[_val = _1] >>
                 -comment;
+
+        BOOST_SPIRIT_DEBUG_NODE(start);
+        BOOST_SPIRIT_DEBUG_NODE(statement);
+        BOOST_SPIRIT_DEBUG_NODE(definition_start);
+        BOOST_SPIRIT_DEBUG_NODE(definition_end);
+        BOOST_SPIRIT_DEBUG_NODE(comment);
+        BOOST_SPIRIT_DEBUG_NODE(argument);
     }
 
     WordParser<Iterator> word;
     ProcNameParser<Iterator> proc_name;
     ListParser<Iterator> list;
     ExpressionParser<Iterator> expression;
+    VariableParser<Iterator> variable;
     qi::rule<Iterator, std::string(), ascii::space_type> comment;
     qi::rule<Iterator, Argument(), ascii::space_type> argument;
+    qi::rule<Iterator, Statement(), ascii::space_type> definition_start;
+    qi::rule<Iterator, Statement(), ascii::space_type> definition_end;
+    qi::rule<Iterator, Statement(), ascii::space_type> statement;
     qi::rule<Iterator, Statement(), ascii::space_type> start;
 };
 

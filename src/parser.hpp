@@ -14,7 +14,10 @@
 #include <boost/fusion/include/adapt_struct.hpp>
 #include <boost/variant.hpp>
 
+#include "defines.hpp"
+
 namespace mlogo {
+
 namespace parser {
 
 struct Statement;
@@ -115,7 +118,7 @@ private:
     friend ::std::ostream &operator<<(::std::ostream &s, const Expression &n);
 };
 
-using Argument = boost::variant<ProcName, Word, List, Expression>;
+using Argument = boost::variant<ProcName, Word, List, Expression, Statement>;
 
 struct Statement {
     ProcName name;
@@ -128,6 +131,9 @@ struct Statement {
     bool operator!=(const Statement &b) const { return !(*this == b); };
     bool operator==(const Statement &b) const;
     operator bool() const { return name; }
+
+    bool isStartProcedure() const;
+    bool isEndProcedure() const;
 };
 
 Statement parse(const std::string &line);
@@ -154,12 +160,16 @@ struct DisplayArgumentVisitor : boost::static_visitor<std::string> {
         return ss.str();
     }
 };
-}
-}
 
-BOOST_FUSION_ADAPT_STRUCT(mlogo::parser::Statement,
-                          (mlogo::parser::ProcName,
-                           name)(std::vector<mlogo::parser::Argument>,
-                                 arguments))
+} /* ns: parser */
+
+} /* ns: mlogo */
+
+// clang-format off
+BOOST_FUSION_ADAPT_STRUCT(
+        mlogo::parser::Statement,
+        (mlogo::parser::ProcName, name)
+        (std::vector<mlogo::parser::Argument>, arguments))
+// clang-format on
 
 #endif

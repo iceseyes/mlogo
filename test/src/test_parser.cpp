@@ -366,3 +366,34 @@ TEST(Parser, parseComments) {
     tmp.push_back(Word("hello;world"));
     ASSERT_EQ(tmp, boost::get<List>(stmt.arguments[0]));
 }
+
+TEST(Parser, parseProcedureDef) {
+    auto stmt = parse("TO SQUARE :side");
+    ASSERT_EQ(ProcName("TO"), stmt.name);
+    ASSERT_TRUE(stmt.isStartProcedure());
+    ASSERT_FALSE(stmt.isEndProcedure());
+    ASSERT_EQ(2u, stmt.arguments.size());
+    ASSERT_EQ(ProcName("SQUARE"), boost::get<ProcName>(stmt.arguments[0]));
+    ASSERT_EQ(Expression(Variable("side")),
+              boost::get<Expression>(stmt.arguments[1]));
+
+    stmt = parse("REPEAT 4 [FD 10 RT 90]");
+    ASSERT_EQ(ProcName("REPEAT"), stmt.name);
+    ASSERT_FALSE(stmt.isStartProcedure());
+    ASSERT_FALSE(stmt.isEndProcedure());
+    ASSERT_EQ(2u, stmt.arguments.size());
+    ASSERT_EQ(Expression(Number("4")),
+              boost::get<Expression>(stmt.arguments[0]));
+    List tmp;
+    tmp.push_back(Word("FD"));
+    tmp.push_back(Word("10"));
+    tmp.push_back(Word("RT"));
+    tmp.push_back(Word("90"));
+    ASSERT_EQ(tmp, boost::get<List>(stmt.arguments[1]));
+
+    stmt = parse("END");
+    ASSERT_EQ(ProcName("END"), stmt.name);
+    ASSERT_FALSE(stmt.isStartProcedure());
+    ASSERT_TRUE(stmt.isEndProcedure());
+    ASSERT_EQ(0u, stmt.arguments.size());
+}
