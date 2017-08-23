@@ -209,8 +209,10 @@ template<typename Iterator>
 struct StatementParser: qi::grammar<Iterator, Statement(), ascii::space_type> {
 	StatementParser() :
 			StatementParser::base_type(start, "statement") {
+        using ascii::char_;
 		using ascii::alnum;
 		using ascii::punct;
+        using ascii::space;
 
 		using phoenix::val;
 		using phoenix::construct;
@@ -223,14 +225,16 @@ struct StatementParser: qi::grammar<Iterator, Statement(), ascii::space_type> {
 		// call happens in the expression. For example, "ln 5" is not an expression, but
 		// "5 + ln 5" is so. So, we select proc_name before expression in argument rule.
 		argument = word | proc_name | list | expression;
-		start = proc_name[at_c<0>(_val) = _1] >>
-				*argument[push_back(at_c<1>(_val), _1)];
+        comment = ';' >> *char_;
+		start =
+            -(proc_name [at_c<0>(_val) = _1] >> *argument[push_back(at_c<1>(_val), _1)]) >> -comment;
 	}
 
 	WordParser<Iterator> word;
 	ProcNameParser<Iterator> proc_name;
 	ListParser<Iterator> list;
 	ExpressionParser<Iterator> expression;
+    qi::rule<Iterator, std::string(), ascii::space_type> comment;
 	qi::rule<Iterator, Argument(), ascii::space_type> argument;
 	qi::rule<Iterator, Statement(), ascii::space_type> start;
 };

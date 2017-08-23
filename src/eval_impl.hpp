@@ -66,6 +66,8 @@ struct EvalStmtBuilderVisitor : boost::static_visitor<void> {
     }
 
 	void operator()(const mlogo::parser::ProcName &v) const {
+		if(v.name.empty()) return;  // if no name procedure... is a comment!
+
 		setParent(true);
 
 		if(!node) node = ast->createNode(v.name);
