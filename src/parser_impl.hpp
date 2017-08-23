@@ -40,16 +40,27 @@ struct SimpleWordParser : qi::grammar<Iterator, std::string()> {
 };
 
 template <typename Iterator>
+struct StringParser : qi::grammar<Iterator, std::string()> {
+    StringParser() : StringParser::base_type(start, "String") {
+        using ascii::alnum;
+        using ascii::punct;
+
+        start = +(alnum | (punct - ';' - '[' - ']' - '(' - ')'));
+    }
+
+    qi::rule<Iterator, std::string()> start;
+};
+
+template <typename Iterator>
 struct WordParser : qi::grammar<Iterator, Word()> {
     WordParser() : WordParser::base_type(start, "Word") {
         using ascii::alnum;
         using ascii::punct;
 
-        word = +(alnum | punct);
         start = '"' >> word;
     }
 
-    qi::rule<Iterator, std::string()> word;
+    StringParser<Iterator> word;
     qi::rule<Iterator, Word()> start;
 };
 
@@ -59,7 +70,7 @@ struct VariableParser : qi::grammar<Iterator, Variable()> {
         start = ':' >> simpleWord;
     }
 
-    SimpleWordParser<Iterator> simpleWord;
+    StringParser<Iterator> simpleWord;
     qi::rule<Iterator, Variable()> start;
 };
 

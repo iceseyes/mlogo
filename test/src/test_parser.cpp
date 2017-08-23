@@ -35,10 +35,7 @@ TEST(Parser, parseWord) {
     ASSERT_EQ(Word("1c"), f("\"1c"));
     ASSERT_EQ(Word("hello"), f("\"hello"));
     ASSERT_EQ(Word("h45.32"), f("\"h45.32"));
-    ASSERT_EQ(Word(";h45.32"), f("\";h45.32"));
     ASSERT_EQ(Word(",max.32"), f("\",max.32"));
-    ASSERT_EQ(Word("(max).32"), f("\"(max).32"));
-    ASSERT_EQ(Word("(max))(.32"), f("\"(max))(.32"));
     ASSERT_ANY_THROW(f("1c"));
     ASSERT_ANY_THROW(f("hello"));
     ASSERT_ANY_THROW(f("h4532"));
@@ -46,6 +43,9 @@ TEST(Parser, parseWord) {
     ASSERT_ANY_THROW(f("4532 test"));
     ASSERT_ANY_THROW(f("\"4532 test"));
     ASSERT_ANY_THROW(f("\"test test"));
+    ASSERT_ANY_THROW(f(";h45.32"));
+    ASSERT_ANY_THROW(f("\"(max).32"));
+    ASSERT_ANY_THROW(f("\"(max))(.32"));
 }
 
 TEST(Parser, parseVariable) {
@@ -58,7 +58,6 @@ TEST(Parser, parseVariable) {
     ASSERT_EQ(Variable("1c"), f(":1c"));
     ASSERT_EQ(Variable("hello"), f(":hello"));
     ASSERT_EQ(Variable("h45.32"), f(":h45.32"));
-    ASSERT_EQ(Variable(";h45.32"), f(":;h45.32"));
     ASSERT_EQ(Variable(",max.32"), f(":,max.32"));
     ASSERT_EQ(Variable("PI"), f(":PI"));
     ASSERT_EQ(Variable("var+1"), f(":var+1"));
@@ -71,6 +70,7 @@ TEST(Parser, parseVariable) {
     ASSERT_ANY_THROW(f(":test test"));
     ASSERT_ANY_THROW(f(":test)"));
     ASSERT_ANY_THROW(f(":(test)"));
+    ASSERT_ANY_THROW(f(";h45.32"));
 }
 
 TEST(Parser, parseProcName) {
@@ -321,4 +321,48 @@ TEST(Parser, parseExprStatement) {
               boost::get<Expression>(stmt.arguments[3]));
     ASSERT_EQ(Expression(Expression::MINUS) << Number("6"),
               boost::get<Expression>(stmt.arguments[4]));
+}
+
+TEST(Parser, parseComments) {
+    auto stmt = parse("; This is a comment line");
+    ASSERT_TRUE(stmt.name.name.empty());
+    ASSERT_FALSE(stmt);
+    ASSERT_FALSE(stmt.name);
+
+    stmt = parse(
+        "func sqrt 5 * 2 ln :var / 2 (-6)     ;;; This  iS an   expression");
+    ASSERT_EQ(ProcName("func"), stmt.name);
+    ASSERT_EQ(5u, stmt.arguments.size());
+    ASSERT_EQ(Expression(Expression::MINUS) << Number("6"),
+              boost::get<Expression>(stmt.arguments[4]));
+
+    stmt = parse("print \"hello;world");
+    ASSERT_EQ(ProcName("print"), stmt.name);
+    ASSERT_EQ(1u, stmt.arguments.size());
+    ASSERT_EQ(Word("hello"), boost::get<Word>(stmt.arguments[0]));
+
+    stmt = parse("print :hello;world");
+    ASSERT_EQ(ProcName("print"), stmt.name);
+    ASSERT_EQ(1u, stmt.arguments.size());
+    ASSERT_EQ(Expression(Variable("hello")),
+              boost::get<Expression>(stmt.arguments[0]));
+
+    stmt = parse("print 10;world");
+    ASSERT_EQ(ProcName("print"), stmt.name);
+    ASSERT_EQ(1u, stmt.arguments.size());
+    ASSERT_EQ(Expression(Number("10")),
+              boost::get<Expression>(stmt.arguments[0]));
+
+    stmt = parse("print 10;");
+    ASSERT_EQ(ProcName("print"), stmt.name);
+    ASSERT_EQ(1u, stmt.arguments.size());
+    ASSERT_EQ(Expression(Number("10")),
+              boost::get<Expression>(stmt.arguments[0]));
+
+    stmt = parse("print [hello;world]");
+    ASSERT_EQ(ProcName("print"), stmt.name);
+    ASSERT_EQ(1u, stmt.arguments.size());
+    List tmp;
+    tmp.push_back(Word("hello;world"));
+    ASSERT_EQ(tmp, boost::get<List>(stmt.arguments[0]));
 }

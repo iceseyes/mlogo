@@ -63,6 +63,7 @@ struct ProcName {
 
     bool operator!=(const ProcName &b) const { return !(*this == b); }
     bool operator==(const ProcName &b) const { return name == b.name; }
+    operator bool() const { return !name.empty(); }
 };
 
 struct List {
@@ -126,6 +127,7 @@ struct Statement {
 
     bool operator!=(const Statement &b) const { return !(*this == b); };
     bool operator==(const Statement &b) const;
+    operator bool() const { return name; }
 };
 
 Statement parse(const std::string &line);
