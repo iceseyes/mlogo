@@ -4,13 +4,13 @@
 
 #include "value.hpp"
 
-#include <string>
-#include <sstream>
 #include <algorithm>
+#include <sstream>
+#include <string>
 
 using bad_get = boost::bad_get;
 
-template<typename T>
+template <typename T>
 using Visitor = boost::static_visitor<T>;
 
 using boost::apply_visitor;
@@ -22,15 +22,14 @@ namespace types {
 namespace {
 
 struct IsEmptyVisitor : Visitor<bool> {
-    template<typename T>
+    template <typename T>
     bool operator()(const T &v) const {
         return v.empty();
     }
 };
 
 struct PushAllBack : Visitor<ListValue> {
-    PushAllBack(ListValue &container) :
-        _container (container) {}
+    PushAllBack(ListValue &container) : _container(container) {}
 
     ListValue &operator()(const WordValue &w) {
         _container.push_back(w);
@@ -38,8 +37,7 @@ struct PushAllBack : Visitor<ListValue> {
     }
 
     ListValue &operator()(const ListValue &l) {
-        for(auto &item : l)
-            _container.push_back(item);
+        for (auto &item : l) _container.push_back(item);
         return _container;
     }
 
@@ -47,9 +45,7 @@ struct PushAllBack : Visitor<ListValue> {
 };
 
 struct FrontVisitor : Visitor<Value> {
-    Value operator()(const ListValue &v) const {
-        return v.front();
-    }
+    Value operator()(const ListValue &v) const { return v.front(); }
 
     Value operator()(const WordValue &v) const {
         return WordValue() + v.front();
@@ -57,9 +53,7 @@ struct FrontVisitor : Visitor<Value> {
 };
 
 struct BackVisitor : Visitor<Value> {
-    Value operator()(const ListValue &v) const {
-        return v.back();
-    }
+    Value operator()(const ListValue &v) const { return v.back(); }
 
     Value operator()(const WordValue &v) const {
         return WordValue() + v.back();
@@ -67,12 +61,9 @@ struct BackVisitor : Visitor<Value> {
 };
 
 struct AtVisitor : Visitor<Value> {
-    AtVisitor(std::size_t index) :
-        index(index) {}
+    AtVisitor(std::size_t index) : index(index) {}
 
-    Value operator()(const ListValue &v) const {
-        return v.at(index);
-    }
+    Value operator()(const ListValue &v) const { return v.at(index); }
 
     Value operator()(const WordValue &v) const {
         return WordValue() + v.at(index);
@@ -82,7 +73,7 @@ struct AtVisitor : Visitor<Value> {
 };
 
 struct ButFirstVisitor : Visitor<Value> {
-    template<typename T>
+    template <typename T>
     Value operator()(const T &v) const {
         T out;
         auto start = std::begin(v);
@@ -95,7 +86,7 @@ struct ButFirstVisitor : Visitor<Value> {
 };
 
 struct ButLastVisitor : Visitor<Value> {
-    template<typename T>
+    template <typename T>
     Value operator()(const T &v) const {
         T out;
         auto end = std::end(v);
@@ -108,42 +99,34 @@ struct ButLastVisitor : Visitor<Value> {
 };
 
 struct Find : Visitor<bool> {
-    Find(const Value &v) :
-        target(v) {}
+    Find(const Value &v) : target(v) {}
 
-    template<typename T>
-	bool operator()(const T &v) const {
-		return v == target;
-	}
+    template <typename T>
+    bool operator()(const T &v) const {
+        return v == target;
+    }
 
     bool operator()(const ListValue &v) const {
-        auto iter = std::find_if(
-                std::begin(v), std::end(v),
-                [this](const Value &item){
-                    return item == target;
-                });
+        auto iter =
+            std::find_if(std::begin(v), std::end(v),
+                         [this](const Value &item) { return item == target; });
 
         return iter != std::end(v);
     }
 
     Value target;
 };
-
 }
 
 ValueBox::ValueBox() {}
 
-ValueBox::ValueBox(const char v[]) :
-    _value(std::string(v)) {}
+ValueBox::ValueBox(const char v[]) : _value(std::string(v)) {}
 
-ValueBox::ValueBox(const std::string &v) :
-        _value(v) {}
+ValueBox::ValueBox(const std::string &v) : _value(v) {}
 
-ValueBox::ValueBox(const ListValue &v) :
-        _value(v) {}
+ValueBox::ValueBox(const ListValue &v) : _value(v) {}
 
-ValueBox::ValueBox(const Value &v) :
-        _value(v) {}
+ValueBox::ValueBox(const Value &v) : _value(v) {}
 
 ValueBox &ValueBox::operator=(const ValueBox &v) {
     _value = v._value;
@@ -151,18 +134,16 @@ ValueBox &ValueBox::operator=(const ValueBox &v) {
 }
 
 bool ValueBox::isWord() const {
-	try {
-		word();
-	} catch (bad_get &e) {
-		return false;
-	}
+    try {
+        word();
+    } catch (bad_get &e) {
+        return false;
+    }
 
-	return true;
+    return true;
 }
 
-bool ValueBox::empty() const {
-    return apply_visitor(IsEmptyVisitor(), _value);
-}
+bool ValueBox::empty() const { return apply_visitor(IsEmptyVisitor(), _value); }
 
 std::string ValueBox::toString() const {
     std::stringstream ss;
@@ -171,29 +152,19 @@ std::string ValueBox::toString() const {
     return ss.str();
 }
 
-double ValueBox::asDouble() const {
-    return std::stod(word());
-}
+double ValueBox::asDouble() const { return std::stod(word()); }
 
-int32_t ValueBox::asInteger() const {
-    return std::stoi(word());
-}
+int32_t ValueBox::asInteger() const { return std::stoi(word()); }
 
-uint32_t ValueBox::asUnsigned() const {
-    return std::stoul(word());
-}
+uint32_t ValueBox::asUnsigned() const { return std::stoul(word()); }
 
-WordValue &ValueBox::word() {
-    return boost::get<WordValue>(_value);
-}
+WordValue &ValueBox::word() { return boost::get<WordValue>(_value); }
 
 const WordValue &ValueBox::word() const {
     return boost::get<WordValue>(_value);
 }
 
-ListValue &ValueBox::list() {
-    return boost::get<ListValue>(_value);
-}
+ListValue &ValueBox::list() { return boost::get<ListValue>(_value); }
 
 const ListValue &ValueBox::list() const {
     return boost::get<ListValue>(_value);
@@ -210,7 +181,7 @@ ValueBox &ValueBox::push_back(const ValueBox &v) {
 }
 
 ValueBox &ValueBox::push_all_back(const ValueBox &v) {
-    PushAllBack pab { list() };
+    PushAllBack pab{list()};
     apply_visitor(pab, v._value);
 
     return *this;
@@ -228,9 +199,7 @@ ValueBox ValueBox::front() const {
     return apply_visitor(FrontVisitor(), _value);
 }
 
-ValueBox ValueBox::back() const {
-    return apply_visitor(BackVisitor(), _value);
-}
+ValueBox ValueBox::back() const { return apply_visitor(BackVisitor(), _value); }
 
 ValueBox ValueBox::butFirst() const {
     return apply_visitor(ButFirstVisitor(), _value);
@@ -252,21 +221,14 @@ bool operator==(const ValueBox &v1, const ValueBox &v2) {
     return v1._value == v2._value;
 }
 
-bool operator!=(const ValueBox &v1, const ValueBox &v2) {
-    return !(v1 == v2);
-}
+bool operator!=(const ValueBox &v1, const ValueBox &v2) { return !(v1 == v2); }
 
 bool operator<(const ValueBox &v1, const ValueBox &v2) {
-	return v1.isWord() && v2.isWord() && v1 < v2;
+    return v1.isWord() && v2.isWord() && v1 < v2;
 }
 
-bool in(const ValueBox &v1, const ValueBox &v2) {
-    return v1.in(v2);
-}
+bool in(const ValueBox &v1, const ValueBox &v2) { return v1.in(v2); }
 
 } /* ns: types */
 
 } /* ns: mlogo */
-
-
-

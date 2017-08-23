@@ -19,40 +19,39 @@ namespace types {
 
 class ActualArguments {
 public:
-	ActualArguments() {}
+    ActualArguments() {}
 
-	ActualArguments &push_back(const ValueBox &value);
-	ActualArguments &push_back(ValueBox &&value);
+    ActualArguments &push_back(const ValueBox &value);
+    ActualArguments &push_back(ValueBox &&value);
 
-	const ValueBox &at(uint8_t index) const;
-	ValueBox &at(uint8_t index);
+    const ValueBox &at(uint8_t index) const;
+    ValueBox &at(uint8_t index);
 
 private:
-	std::vector<ValueBox> arguments;
+    std::vector<ValueBox> arguments;
 };
 
 class BasicProcedure {
 public:
-	BasicProcedure(uint8_t args, bool funct = false);
-	virtual ~BasicProcedure() {}
-	virtual void operator()() const = 0;
+    BasicProcedure(uint8_t args, bool funct = false);
+    virtual ~BasicProcedure() {}
+    virtual void operator()() const = 0;
 
-	uint8_t nArgs() const { return _nArgs; }
-	bool isFunction() const { return _funct; }
+    uint8_t nArgs() const { return _nArgs; }
+    bool isFunction() const { return _funct; }
 
 protected:
-	ValueBox &fetchArg(uint8_t index) const;
-	void setReturnValue(const ValueBox &output) const;
-	void setReturnValue(bool output) const;
+    ValueBox &fetchArg(uint8_t index) const;
+    void setReturnValue(const ValueBox &output) const;
+    void setReturnValue(bool output) const;
 
 private:
-	uint8_t _nArgs;
-	bool _funct;
+    uint8_t _nArgs;
+    bool _funct;
 };
 
 } /* ns types */
 
 } /* ns mlogo */
-
 
 #endif /* TYPES_HPP_ */

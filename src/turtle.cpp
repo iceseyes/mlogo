@@ -5,7 +5,6 @@
  *      author: Massimo Bianchi <bianchi.massimo@gmail.com>
  */
 
-
 #include "turtle_impl.hpp"
 
 #include "graphics.hpp"
@@ -16,18 +15,13 @@ namespace mlogo {
 
 namespace turtle {
 
-Turtle::Turtle() :
-    impl (new _pImpl) {
-    render();
-}
+Turtle::Turtle() : impl(new _pImpl) { render(); }
 
-Turtle::~Turtle() {
-    delete impl;
-}
+Turtle::~Turtle() { delete impl; }
 
 Turtle &Turtle::home() {
     heading(0);
-    currentPosition(make_pair(0,0));
+    currentPosition(make_pair(0, 0));
     render();
 
     return *this;
@@ -51,9 +45,7 @@ Turtle &Turtle::right(double angle) {
     return *this;
 }
 
-Turtle::Position Turtle::currentPosition() const {
-    return impl->lastPos();
-}
+Turtle::Position Turtle::currentPosition() const { return impl->lastPos(); }
 
 Turtle &Turtle::currentPosition(const Position &pos) {
     impl->moveTo(pos);
@@ -73,9 +65,7 @@ Turtle &Turtle::currentYPosition(int y) {
     return currentPosition(pos);
 }
 
-double Turtle::heading() const {
-    return impl->angle.degrees().value();
-}
+double Turtle::heading() const { return impl->angle.degrees().value(); }
 
 Turtle &Turtle::heading(double h) {
     impl->setAngle(h);
@@ -94,8 +84,8 @@ Turtle &Turtle::scrunch(double xScrunch, double yScrunch) {
 }
 
 double Turtle::towards(int x, int y) const {
-    StraightLine line { Point(x, y, impl->turtleSystem), impl->turtlePosition };
-    Angle heading { line.angle() };
+    StraightLine line{Point(x, y, impl->turtleSystem), impl->turtlePosition};
+    Angle heading{line.angle()};
     heading -= impl->angle;
 
     return heading.degrees().value();
@@ -113,9 +103,7 @@ Turtle &Turtle::hideTurtle() {
     return *this;
 }
 
-bool &Turtle::visible() const {
-    return impl->showTurtle;
-}
+bool &Turtle::visible() const { return impl->showTurtle; }
 
 Turtle &Turtle::penUp() {
     impl->pen.state = Pen::State::UP;
@@ -132,32 +120,32 @@ Turtle &Turtle::mode(Mode m) {
     return *this;
 }
 
-Mode Turtle::mode() const {
-    return impl->mode;
-}
+Mode Turtle::mode() const { return impl->mode; }
 
-Pen &Turtle::pen() {
-    return impl->pen;
-}
+Pen &Turtle::pen() { return impl->pen; }
 
-const Pen &Turtle::pen() const {
-    return impl->pen;
-}
+const Pen &Turtle::pen() const { return impl->pen; }
 
 void Turtle::render() {
     GC::instance().window()->clear();
-    if(impl->showTurtle) {
+    if (impl->showTurtle) {
         GC::instance().window()->draw(impl->turtle());
     }
-    for(auto p : impl->paths) GC::instance().window()->draw(p);
+    for (auto p : impl->paths) GC::instance().window()->draw(p);
     GC::instance().window()->paint();
 }
 
 std::ostream &operator<<(std::ostream &s, const Mode &value) {
-    switch(value) {
-    case Mode::WINDOW: s << "WINDOW"; break;
-    case Mode::FENCE: s << "FENCE"; break;
-    case Mode::WRAP: s << "WRAP"; break;
+    switch (value) {
+    case Mode::WINDOW:
+        s << "WINDOW";
+        break;
+    case Mode::FENCE:
+        s << "FENCE";
+        break;
+    case Mode::WRAP:
+        s << "WRAP";
+        break;
     }
 
     return s;

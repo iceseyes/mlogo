@@ -5,7 +5,6 @@
  *      author: Massimo Bianchi <bianchi.massimo@gmail.com>
  */
 
-
 #ifndef __EVAL_HPP__
 #define __EVAL_HPP__
 
@@ -29,16 +28,16 @@ using ValueBox = types::ValueBox;
 class ASTNode {
 public:
     struct Type {
-        virtual ~Type() {};
+        virtual ~Type(){};
 
-        virtual ValueBox value(const ASTNode *) const = 0;
+        virtual ValueBox value(const ASTNode*) const = 0;
 
         virtual std::size_t nArgs() const { return 0; }
     };
 
     struct Procedure : Type {
-        Procedure(const std::string &name);
-        ValueBox value(const ASTNode *) const override;
+        Procedure(const std::string& name);
+        ValueBox value(const ASTNode*) const override;
 
         const std::string procName;
         std::size_t nArgs() const override { return _nargs; }
@@ -48,91 +47,90 @@ public:
     };
 
     struct Variable : Type {
-        Variable(const std::string &name);
-        ValueBox value(const ASTNode *) const override;
+        Variable(const std::string& name);
+        ValueBox value(const ASTNode*) const override;
 
         const std::string varName;
     };
 
     struct Const : Type {
-        Const(const std::string &value) :
-            _value (value) {}
+        Const(const std::string& value) : _value(value) {}
 
-        ValueBox value(const ASTNode *) const override { return _value; }
+        ValueBox value(const ASTNode*) const override { return _value; }
 
         const std::string _value;
     };
 
     struct List : Type {
-        List(const types::ListValue &value) :
-            _value (value) {}
+        List(const types::ListValue& value) : _value(value) {}
 
-        ValueBox value(const ASTNode *) const override { return _value; }
+        ValueBox value(const ASTNode*) const override { return _value; }
 
         const types::ListValue _value;
     };
 
-    ASTNode(Type *t, ASTNode *parent = nullptr);
-    ASTNode(ASTNode &&stmt);
+    ASTNode(Type* t, ASTNode* parent = nullptr);
+    ASTNode(ASTNode&& stmt);
     ~ASTNode();
 
-    ASTNode &operator=(ASTNode &&stmt);
+    ASTNode& operator=(ASTNode&& stmt);
 
     ValueBox apply() const;
     ValueBox operator()() const { return apply(); }
 
-    ASTNode *parent() { return _parent; }
+    ASTNode* parent() { return _parent; }
     std::size_t nArgs() const { return type->nArgs(); }
     std::size_t size() const { return children.size(); }
     bool completed() const { return nArgs() == size(); }
 
-    ASTNode *setParent(ASTNode *node) {
-        if(!_parent) {
+    ASTNode* setParent(ASTNode* node) {
+        if (!_parent) {
             _parent = node;
             _parent->children.push_back(this);
         } else {
             throw std::logic_error("This ASTNode belongs to another parent.");
         }
+
         return this;
     }
 
 private:
-    ASTNode(const ASTNode &stmt) = delete;
-    ASTNode &operator=(const ASTNode &stmt) = delete;
+    ASTNode(const ASTNode& stmt) = delete;
+    ASTNode& operator=(const ASTNode& stmt) = delete;
 
-    Type *type;
-    ASTNode *_parent { nullptr };
-    std::vector<ASTNode *> children;
+    Type* type;
+    ASTNode* _parent{nullptr};
+    std::vector<ASTNode*> children;
 
     friend struct ASTNode::Procedure;
 };
 
 class AST {
 public:
-    AST() {};
-    AST(AST &&ast);
+    AST(){};
+    AST(AST&& ast);
     ~AST();
 
-    AST &operator=(AST &&ast);
+    AST& operator=(AST&& ast);
 
     void apply() const;
     void operator()() const { apply(); }
 
-    ASTNode *createNode(const std::string &name);
+    ASTNode* createNode(const std::string& name);
 
     std::size_t size() const { return statements.size(); }
 
 private:
-    AST(const AST &) = delete;
-    AST &operator=(const AST &) = delete;
+    AST(const AST&) = delete;
+    AST& operator=(const AST&) = delete;
 
-    std::vector<ASTNode *> statements;
+    std::vector<ASTNode*> statements;
 
-    friend AST make_ast(const mlogo::parser::Statement &stmt);
+    friend AST make_ast(const mlogo::parser::Statement& stmt);
 };
 
-ASTNode make_statement(const mlogo::parser::Statement &stmt);
-AST make_ast(const mlogo::parser::Statement &stmt);
+ASTNode make_statement(const mlogo::parser::Statement& stmt);
+AST make_ast(const mlogo::parser::Statement& stmt);
 
 } /* ns: eval */
 

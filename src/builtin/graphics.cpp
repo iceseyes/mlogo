@@ -5,10 +5,10 @@
  *      author: Massimo Bianchi <bianchi.massimo@gmail.com>
  */
 
-
 #include "common.hpp"
 
-namespace mlogo { namespace builtin {
+namespace mlogo {
+namespace builtin {
 
 namespace {
 
@@ -16,42 +16,40 @@ namespace {
  * Turtle Graphics
  */
 struct Forward : BuiltinProcedure {
-	Forward() : BuiltinProcedure(1) {}
-	void operator()() const override {
-		int arg = fetchArg(0).asUnsigned();
-		Turtle::instance().forward(arg);
-	}
+    Forward() : BuiltinProcedure(1) {}
+    void operator()() const override {
+        int arg = fetchArg(0).asUnsigned();
+        Turtle::instance().forward(arg);
+    }
 };
 
 struct Right : BuiltinProcedure {
-	Right() : BuiltinProcedure(1) {}
-	void operator()() const override {
-		double arg = fetchArg(0).asDouble();
-		Turtle::instance().right(arg);
-	}
+    Right() : BuiltinProcedure(1) {}
+    void operator()() const override {
+        double arg = fetchArg(0).asDouble();
+        Turtle::instance().right(arg);
+    }
 };
 
 struct Backward : BuiltinProcedure {
-	Backward() : BuiltinProcedure(1) {}
-	void operator()() const override {
-		int arg = fetchArg(0).asUnsigned();
-		Turtle::instance().forward(-1 * arg);
-	}
+    Backward() : BuiltinProcedure(1) {}
+    void operator()() const override {
+        int arg = fetchArg(0).asUnsigned();
+        Turtle::instance().forward(-1 * arg);
+    }
 };
 
 struct Left : BuiltinProcedure {
-	Left() : BuiltinProcedure(1) {}
-	void operator()() const override {
-		double arg = fetchArg(0).asDouble();
-		Turtle::instance().right(-1 * arg);
-	}
+    Left() : BuiltinProcedure(1) {}
+    void operator()() const override {
+        double arg = fetchArg(0).asDouble();
+        Turtle::instance().right(-1 * arg);
+    }
 };
 
 struct Home : BuiltinProcedure {
-	Home() : BuiltinProcedure(0) {}
-	void operator()() const override {
-		Turtle::instance().home();
-	}
+    Home() : BuiltinProcedure(0) {}
+    void operator()() const override { Turtle::instance().home(); }
 };
 
 struct Clean : BuiltinProcedure {
@@ -64,22 +62,21 @@ struct Clean : BuiltinProcedure {
 };
 
 struct ClearScreen : BuiltinProcedure {
-	ClearScreen() : BuiltinProcedure(0) {}
-	void operator()() const override {
+    ClearScreen() : BuiltinProcedure(0) {}
+    void operator()() const override {
         Turtle::instance().home();
-		Turtle::instance().clear();
-	}
+        Turtle::instance().clear();
+    }
 };
 
 struct SetPos : BuiltinProcedure {
     SetPos() : BuiltinProcedure(1) {}
     void operator()() const override {
         auto pos = fetchArg(0).list();
-        if(pos.size()!=2) throw std::logic_error("Expected X,Y Coordinates");
+        if (pos.size() != 2) throw std::logic_error("Expected X,Y Coordinates");
         int x = ValueBox(pos[0]).asInteger();
         int y = ValueBox(pos[1]).asInteger();
-        Turtle::instance().currentPosition(
-            std::make_pair(x, y));
+        Turtle::instance().currentPosition(std::make_pair(x, y));
     }
 };
 
@@ -155,11 +152,11 @@ struct GetY : BuiltinProcedure {
 struct Heading : BuiltinProcedure {
     Heading() : BuiltinProcedure(0, true) {}
     void operator()() const override {
-        double h { -1 * Turtle::instance().heading() };
+        double h{-1 * Turtle::instance().heading()};
         stringstream ss;
 
-        while(h<0) h += 360;
-        while(h>359) h -= 360;
+        while (h < 0) h += 360;
+        while (h > 359) h -= 360;
         ss << h;
         setReturnValue(ss.str());
     }
@@ -193,16 +190,12 @@ struct SetScrunch : BuiltinProcedure {
 
 struct ShowTurtle : BuiltinProcedure {
     ShowTurtle() : BuiltinProcedure(0) {}
-    void operator()() const override {
-        Turtle::instance().showTurtle();
-    }
+    void operator()() const override { Turtle::instance().showTurtle(); }
 };
 
 struct HideTurtle : BuiltinProcedure {
     HideTurtle() : BuiltinProcedure(0) {}
-    void operator()() const override {
-        Turtle::instance().hideTurtle();
-    }
+    void operator()() const override { Turtle::instance().hideTurtle(); }
 };
 
 struct WindowMode : BuiltinProcedure {
@@ -240,7 +233,7 @@ struct Shownp : BuiltinProcedure {
     Shownp() : BuiltinProcedure(0, true) {}
     void operator()() const override {
         stringstream ss;
-        ss << (Turtle::instance().visible()?"TRUE":"FALSE");
+        ss << (Turtle::instance().visible() ? "TRUE" : "FALSE");
 
         setReturnValue(ss.str());
     }
@@ -248,16 +241,12 @@ struct Shownp : BuiltinProcedure {
 
 struct PenUp : BuiltinProcedure {
     PenUp() : BuiltinProcedure(0) {}
-    void operator()() const override {
-        Turtle::instance().penUp();
-    }
+    void operator()() const override { Turtle::instance().penUp(); }
 };
 
 struct PenDown : BuiltinProcedure {
     PenDown() : BuiltinProcedure(0) {}
-    void operator()() const override {
-        Turtle::instance().penDown();
-    }
+    void operator()() const override { Turtle::instance().penDown(); }
 };
 
 struct Towards : BuiltinProcedure {
@@ -265,7 +254,7 @@ struct Towards : BuiltinProcedure {
     void operator()() const override {
         stringstream ss;
         auto pos = fetchArg(0).list();
-        if(pos.size()!=2) throw std::logic_error("Expected X,Y Coordinates");
+        if (pos.size() != 2) throw std::logic_error("Expected X,Y Coordinates");
         int x = ValueBox(pos[0]).asInteger();
         int y = ValueBox(pos[1]).asInteger();
         double heading = Turtle::instance().towards(x, y);
@@ -274,7 +263,6 @@ struct Towards : BuiltinProcedure {
         setReturnValue(ss.str());
     }
 };
-
 }
 
 /**
@@ -282,8 +270,8 @@ struct Towards : BuiltinProcedure {
  */
 
 void initGraphicsBuiltInProcedures() {
-	Stack::instance()
-	    .setProcedure<Forward>("forward")
+    Stack::instance()
+        .setProcedure<Forward>("forward")
         .setProcedure<Forward>("fd")
         .setProcedure<Backward>("back")
         .setProcedure<Backward>("bk")
@@ -323,5 +311,5 @@ void initGraphicsBuiltInProcedures() {
         .setProcedure<PenDown>("pd")
         .setProcedure<Towards>("towards");
 }
-
-}}
+}
+}

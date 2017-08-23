@@ -17,92 +17,92 @@ struct Point;
 
 class Angle {
 public:
-	struct Rad {
-		explicit Rad(double value) : _value(value) {}
-		double value() const { return _value; }
+    struct Rad {
+        explicit Rad(double value) : _value(value) {}
+        double value() const { return _value; }
 
-	private:
-		double _value;
-	};
+    private:
+        double _value;
+    };
 
-	struct Degrees {
-		explicit Degrees(double value) : _value(value) {}
-		double value() const { return _value; }
+    struct Degrees {
+        explicit Degrees(double value) : _value(value) {}
+        double value() const { return _value; }
 
-	private:
-		double _value;
-	};
+    private:
+        double _value;
+    };
 
-	Angle(const Rad &angle);
-	Angle(Rad &&angle);
-	Angle(const Degrees &angle);
-	Angle(Degrees &&angle);
+    Angle(const Rad &angle);
+    Angle(Rad &&angle);
+    Angle(const Degrees &angle);
+    Angle(Degrees &&angle);
 
-	Degrees degrees() const;
-	Rad radians() const;
+    Degrees degrees() const;
+    Rad radians() const;
 
-	bool equals(const Angle &angle) const;
+    bool equals(const Angle &angle) const;
 
-	Angle &operator+=(const Angle &another);
-	Angle &operator-=(const Angle &another);
-	Angle &operator*=(double k);
-	Angle &operator/=(double k);
+    Angle &operator+=(const Angle &another);
+    Angle &operator-=(const Angle &another);
+    Angle &operator*=(double k);
+    Angle &operator/=(double k);
 
-	Angle &inv();
+    Angle &inv();
 
-	double sin() const;
-	double cos() const;
-	double tan() const;
+    double sin() const;
+    double cos() const;
+    double tan() const;
 
 private:
-	double _value;
+    double _value;
 };
 
 class Reference {
 public:
-	explicit Reference(double kx=1, int ox=0, double ky=1, int oy=0);
+    explicit Reference(double kx = 1, int ox = 0, double ky = 1, int oy = 0);
 
-	Point toGPS(const Point &p) const;
-	Point fromGPS(const Point &p) const;
+    Point toGPS(const Point &p) const;
+    Point fromGPS(const Point &p) const;
 
-	bool operator==(const Reference &ref) const;
-	bool operator!=(const Reference &ref) const;
+    bool operator==(const Reference &ref) const;
+    bool operator!=(const Reference &ref) const;
 
-	bool global() const;
+    bool global() const;
 
 private:
-	double kx { 1 };
-	double ky { 1 };
-	int ox { 0 };
-	int oy { 0 };
+    double kx{1};
+    double ky{1};
+    int ox{0};
+    int oy{0};
 };
 
 struct Point {
-	Point(int x, int y, const Reference &system = Reference());
+    Point(int x, int y, const Reference &system = Reference());
 
-	bool same(const Point &p) const;
+    bool same(const Point &p) const;
 
-	bool operator==(const Point &p) const;
-	bool operator!=(const Point &p) const;
-	bool operator<(const Point &p) const;
-	bool operator<=(const Point &p) const;
-	bool operator>(const Point &p) const;
-	bool operator>=(const Point &p) const;
+    bool operator==(const Point &p) const;
+    bool operator!=(const Point &p) const;
+    bool operator<(const Point &p) const;
+    bool operator<=(const Point &p) const;
+    bool operator>(const Point &p) const;
+    bool operator>=(const Point &p) const;
 
-	Point &operator+=(const Point &p);
-	Point &operator-=(const Point &p);
-	Point &operator*=(double k);
-	Point &operator/=(double k);
+    Point &operator+=(const Point &p);
+    Point &operator-=(const Point &p);
+    Point &operator*=(double k);
+    Point &operator/=(double k);
     Point &scale(double a, double b);
 
-	Point toGPS() const;
-	Point rotate(const Angle &a) const;
+    Point toGPS() const;
+    Point rotate(const Angle &a) const;
 
-	double distance(const Point &p);
+    double distance(const Point &p);
 
-	int x;
-	int y;
-	Reference system;
+    int x;
+    int y;
+    Reference system;
 };
 
 class Path {
@@ -144,8 +144,9 @@ class StraightLine {
 public:
     static const double VERTICAL;
 
-    StraightLine(double m, double q, const Reference &system=Reference());
-    StraightLine(const Angle &a, double q, const Reference &system=Reference());
+    StraightLine(double m, double q, const Reference &system = Reference());
+    StraightLine(const Angle &a, double q,
+                 const Reference &system = Reference());
     StraightLine(const Point &a, const Point &b);
     StraightLine(double m, const Point &a);
 
@@ -156,9 +157,7 @@ public:
     bool belongTo(const Point &p) const;
 
     bool operator==(const StraightLine &line) const;
-    bool operator!=(const StraightLine &line) const {
-        return !(*this == line);
-    }
+    bool operator!=(const StraightLine &line) const { return !(*this == line); }
 
     bool parallel(const StraightLine &line) const;
     StraightLine parallel(double q) const;

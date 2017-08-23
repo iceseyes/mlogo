@@ -15,5 +15,3 @@ extern "C" void initBuiltInProcedures() {
     mlogo::builtin::initControlBuiltInProcedures();
     mlogo::builtin::initGraphicsBuiltInProcedures();
 }
-
-

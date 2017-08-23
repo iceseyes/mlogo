@@ -5,10 +5,10 @@
  *      Author: Massimo Bianchi <bianchi.massimo@gmail.com>
  */
 
-
 #include "common.hpp"
 
-namespace mlogo { namespace builtin {
+namespace mlogo {
+namespace builtin {
 
 namespace {
 
@@ -33,9 +33,7 @@ struct List : BuiltinProcedure {
         auto arg1 = fetchArg(1);
 
         ValueBox out = ListValue();
-        out
-            .push_back(arg0)
-            .push_back(arg1);
+        out.push_back(arg0).push_back(arg1);
 
         setReturnValue(out);
     }
@@ -48,9 +46,7 @@ struct Sentence : BuiltinProcedure {
         auto arg1 = fetchArg(1);
 
         ValueBox out = ListValue();
-        out
-            .push_all_back(arg0)
-            .push_all_back(arg1);
+        out.push_all_back(arg0).push_all_back(arg1);
 
         setReturnValue(out);
     }
@@ -63,7 +59,7 @@ struct Fput : BuiltinProcedure {
         auto arg1 = fetchArg(1);
 
         ValueBox out;
-        if(arg1.isList()) {
+        if (arg1.isList()) {
             out = Value(arg1.value());
             out.push_front(arg0);
         } else {
@@ -81,7 +77,7 @@ struct Lput : BuiltinProcedure {
         auto arg1 = fetchArg(1);
 
         ValueBox out;
-        if(arg1.isList()) {
+        if (arg1.isList()) {
             out = Value(arg1.value());
             out.push_back(arg0);
         } else {
@@ -229,31 +225,31 @@ struct MemberP : BuiltinProcedure {
         setReturnValue(arg1.in(arg0));
     }
 };
-
 }
 
 void initDataBuiltInProcedures() {
     /* Constructors */
-    Stack::instance().setProcedure<Word>("word")
+    Stack::instance()
+        .setProcedure<Word>("word")
         .setProcedure<Sentence>("sentence")
         .setProcedure<List>("list")
         .setProcedure<Fput>("Fput")
         .setProcedure<Lput>("Lput")
 
-    /* Data Selector*/
+        /* Data Selector*/
         .setProcedure<First>("first")
         .setProcedure<Last>("last")
         .setProcedure<ButFirst>("butfirst")
         .setProcedure<ButLast>("butlast")
         .setProcedure<Item>("item")
 
-    /* Data Mutators */
+        /* Data Mutators */
         .setProcedure<SetItem>("setitem")
         .setProcedure<SetItem>(".setitem")
         .setProcedure<SetFirst>("setfirst")
         .setProcedure<SetFirst>(".setfirst")
 
-    /* Predicates */
+        /* Predicates */
         .setProcedure<WordP>("wordp")
         .setProcedure<WordP>("word?")
         .setProcedure<ListP>("listp")
@@ -269,8 +265,6 @@ void initDataBuiltInProcedures() {
         .setProcedure<BeforeP>("before?")
         .setProcedure<MemberP>("memberp")
         .setProcedure<MemberP>("member?");
-
 }
-
-}}
-
+}
+}

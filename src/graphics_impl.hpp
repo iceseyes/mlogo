@@ -5,7 +5,6 @@
  *      author: Massimo Bianchi <bianchi.massimo@gmail.com>
  */
 
-
 #ifndef __GRAPHICS_IMPL_HPP__
 #define __GRAPHICS_IMPL_HPP__
 
@@ -13,11 +12,11 @@
 
 #include <cmath>
 #include <cstdint>
-#include <string>
 #include <sstream>
 #include <stdexcept>
-#include <vector>
+#include <string>
 #include <tuple>
+#include <vector>
 
 #include <SDL2/SDL.h>
 
@@ -27,17 +26,15 @@ namespace graphics {
 
 namespace impl {
 
-static constexpr double EPSILON  { 10e-5 };
-static constexpr uint32_t WIN_FLAGS {
-    SDL_WINDOW_SHOWN
+static constexpr double EPSILON{10e-5};
+static constexpr uint32_t WIN_FLAGS{SDL_WINDOW_SHOWN
 #ifdef WITH_WINDOW_ALWAYS_ON_TOP
-        |SDL_WINDOW_ALWAYS_ON_TOP
+                                    | SDL_WINDOW_ALWAYS_ON_TOP
 #endif
 };
 
 inline double zeroif(double val) {
-    if(fabs(val)<EPSILON)
-        return 0.0;
+    if (fabs(val) < EPSILON) return 0.0;
 
     return val;
 }
@@ -58,13 +55,11 @@ public:
         using std::stringstream;
         using std::logic_error;
 
-        window = SDL_CreateWindow(
-            title.c_str(),
-            SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-            width, height,
-            WIN_FLAGS);
+        window =
+            SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_UNDEFINED,
+                             SDL_WINDOWPOS_UNDEFINED, width, height, WIN_FLAGS);
 
-        if(!window) {
+        if (!window) {
             stringstream ss;
             ss << "Window could not be created! SDL_Error: " << SDL_GetError();
             throw logic_error(ss.str());
@@ -72,19 +67,18 @@ public:
 
         renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-        if(!renderer){
+        if (!renderer) {
             SDL_DestroyWindow(window);
             window = nullptr;
 
             stringstream ss;
-            ss << "Window Renderer could not be created! SDL_Error: " << SDL_GetError();
+            ss << "Window Renderer could not be created! SDL_Error: "
+               << SDL_GetError();
             throw logic_error(ss.str());
         }
     }
 
-    ~SDLWindow() {
-        SDL_DestroyWindow(window);
-    }
+    ~SDLWindow() { SDL_DestroyWindow(window); }
 
     Window *background(const Color &color) {
         _background = color;
@@ -106,11 +100,9 @@ public:
     Window *draw(const geometry::Path &path) {
         auto iter = path.begin();
         auto a = toSDLPoint(*(iter++));
-        while(iter!=path.end()) {
+        while (iter != path.end()) {
             auto b = toSDLPoint(*(iter++));
-            SDL_RenderDrawLine(
-                renderer,
-                a.x, a.y, b.x, b.y);
+            SDL_RenderDrawLine(renderer, a.x, a.y, b.x, b.y);
 
             a = b;
         }
@@ -134,10 +126,10 @@ private:
     Window &operator=(const Window &) = delete;
     Window &operator=(Window &&) = delete;
 
-    SDL_Window* window { nullptr };
-    SDL_Renderer *renderer { nullptr };
-    Color _background { 0, 0, 0 };
-    Color _foreground { 255, 255, 255 };
+    SDL_Window *window{nullptr};
+    SDL_Renderer *renderer{nullptr};
+    Color _background{0, 0, 0};
+    Color _foreground{255, 255, 255};
 };
 
 } /* ns: impl */
@@ -147,6 +139,5 @@ using SDLWindow = impl::SDLWindow;
 } /* ns: graphics */
 
 } /* ns: mlogo */
-
 
 #endif /* __GRAPHICS_IMPL_HPP__ */

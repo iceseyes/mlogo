@@ -7,7 +7,8 @@
 
 #include "common.hpp"
 
-namespace mlogo { namespace builtin {
+namespace mlogo {
+namespace builtin {
 
 namespace {
 
@@ -21,7 +22,7 @@ struct ArithmeticOperation : BuiltinProcedure {
         double result = _result(arg0, arg1);
         long rlong = static_cast<long>(result);
 
-        if(result - rlong < 1e-5)
+        if (result - rlong < 1e-5)
             ss << rlong;
         else
             ss << result;
@@ -41,7 +42,7 @@ struct ArithmeticUnary : BuiltinProcedure {
         double result = _result(arg0);
         long rlong = static_cast<long>(result);
 
-        if(result - rlong < 1e-5)
+        if (result - rlong < 1e-5)
             ss << rlong;
         else
             ss << result;
@@ -103,53 +104,38 @@ struct Power : ArithmeticOperation {
 
 struct Int : ArithmeticUnary {
     Int() : ArithmeticUnary() {}
-    double _result(double arg0) const override {
-        return trunc(arg0);
-    }
+    double _result(double arg0) const override { return trunc(arg0); }
 };
 
 struct Minus : ArithmeticUnary {
     Minus() : ArithmeticUnary() {}
-    double _result(double arg0) const override {
-        return -1 * arg0;
-    }
+    double _result(double arg0) const override { return -1 * arg0; }
 };
 
 struct Round : ArithmeticUnary {
     Round() : ArithmeticUnary() {}
-    double _result(double arg0) const override {
-        return round(arg0);
-    }
+    double _result(double arg0) const override { return round(arg0); }
 };
 
 struct Sqrt : ArithmeticUnary {
     Sqrt() : ArithmeticUnary() {}
-    double _result(double arg0) const override {
-        return sqrt(arg0);
-    }
+    double _result(double arg0) const override { return sqrt(arg0); }
 };
 
 struct Exp : ArithmeticUnary {
     Exp() : ArithmeticUnary() {}
-    double _result(double arg0) const override {
-        return exp(arg0);
-    }
+    double _result(double arg0) const override { return exp(arg0); }
 };
 
 struct Log10 : ArithmeticUnary {
     Log10() : ArithmeticUnary() {}
-    double _result(double arg0) const override {
-        return log10(arg0);
-    }
+    double _result(double arg0) const override { return log10(arg0); }
 };
 
 struct Ln : ArithmeticUnary {
     Ln() : ArithmeticUnary() {}
-    double _result(double arg0) const override {
-        return log(arg0);
-    }
+    double _result(double arg0) const override { return log(arg0); }
 };
-
 }
 
 /**
@@ -173,8 +159,5 @@ void initArithmeticBuiltInProcedures() {
         .setProcedure<Log10>("log10")
         .setProcedure<Ln>("ln");
 }
-
-}}
-
-
-
+}
+}

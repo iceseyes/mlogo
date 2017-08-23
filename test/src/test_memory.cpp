@@ -5,7 +5,6 @@
  *      author: Massimo Bianchi <bianchi.massimo@gmail.com>
  */
 
-
 #include <gtest/gtest.h>
 
 #include <sstream>
@@ -26,42 +25,53 @@ TEST(Memory, globalFrameVariables) {
 
     ASSERT_TRUE(frame.hasVariable("test"));
     ASSERT_TRUE(mem::Stack::instance().globalFrame().hasVariable("test"));
-    ASSERT_EQ(mem::ValueBox("testValue"), mem::Stack::instance().getVariable("test"));
+    ASSERT_EQ(mem::ValueBox("testValue"),
+              mem::Stack::instance().getVariable("test"));
 
     frame.setVariable("test", "newValue");
-    ASSERT_EQ(mem::ValueBox("newValue"), mem::Stack::instance().getVariable("test"));
-    ASSERT_EQ(mem::ValueBox("newValue"), mem::Stack::instance().globalFrame().getVariable("test"));
+    ASSERT_EQ(mem::ValueBox("newValue"),
+              mem::Stack::instance().getVariable("test"));
+    ASSERT_EQ(mem::ValueBox("newValue"),
+              mem::Stack::instance().globalFrame().getVariable("test"));
     ASSERT_EQ(mem::ValueBox("newValue"), frame.getVariable("test"));
 
     frame.setVariable("test2", "value2");
-    ASSERT_EQ(mem::ValueBox("newValue"), mem::Stack::instance().getVariable("test"));
-    ASSERT_EQ(mem::ValueBox("newValue"), mem::Stack::instance().globalFrame().getVariable("test"));
+    ASSERT_EQ(mem::ValueBox("newValue"),
+              mem::Stack::instance().getVariable("test"));
+    ASSERT_EQ(mem::ValueBox("newValue"),
+              mem::Stack::instance().globalFrame().getVariable("test"));
     ASSERT_EQ(mem::ValueBox("newValue"), frame.getVariable("test"));
-    ASSERT_EQ(mem::ValueBox("value2"), mem::Stack::instance().getVariable("test2"));
-    ASSERT_EQ(mem::ValueBox("value2"), mem::Stack::instance().globalFrame().getVariable("test2"));
+    ASSERT_EQ(mem::ValueBox("value2"),
+              mem::Stack::instance().getVariable("test2"));
+    ASSERT_EQ(mem::ValueBox("value2"),
+              mem::Stack::instance().globalFrame().getVariable("test2"));
     ASSERT_EQ(mem::ValueBox("value2"), frame.getVariable("test2"));
 
     auto &ref = frame.getVariable("test2");
     ref = "HelloWorld";
-    ASSERT_EQ(mem::ValueBox("HelloWorld"), mem::Stack::instance().getVariable("test2"));
+    ASSERT_EQ(mem::ValueBox("HelloWorld"),
+              mem::Stack::instance().getVariable("test2"));
 
-    mem::Stack::instance()
-        .openFrame().currentFrame()
-        .setVariable("test3", "not visible in global");
+    mem::Stack::instance().openFrame().currentFrame().setVariable(
+        "test3", "not visible in global");
 
-    ASSERT_EQ(mem::ValueBox("not visible in global"), mem::Stack::instance().getVariable("test3"));
-    ASSERT_THROW(mem::Stack::instance().globalFrame().getVariable("test3"), std::out_of_range);
+    ASSERT_EQ(mem::ValueBox("not visible in global"),
+              mem::Stack::instance().getVariable("test3"));
+    ASSERT_THROW(mem::Stack::instance().globalFrame().getVariable("test3"),
+                 std::out_of_range);
 
     // a new frame was opened, so reference to global frame is changed.
     ASSERT_TRUE(&frame != &mem::Stack::instance().globalFrame())
-        << "Stack has opened e new stack causing a realloc for the stack itself";
+        << "Stack has opened e new stack causing a realloc for the stack "
+           "itself";
 
     mem::Stack::instance().closeFrame();
 }
 
 TEST(Memory, nonGlobalFrameVariables) {
     ASSERT_THROW(mem::Stack::instance().getVariable("ctest"), std::logic_error);
-    ASSERT_THROW(mem::Stack::instance().getVariable("ctest2"), std::logic_error);
+    ASSERT_THROW(mem::Stack::instance().getVariable("ctest2"),
+                 std::logic_error);
 
     // open a new frame on the top of the stack
     mem::Stack::instance().openFrame();
@@ -72,7 +82,8 @@ TEST(Memory, nonGlobalFrameVariables) {
     ASSERT_FALSE(frame.hasVariable("ctest"));
     ASSERT_FALSE(frame.hasVariable("ctest2"));
     ASSERT_THROW(mem::Stack::instance().getVariable("ctest"), std::logic_error);
-    ASSERT_THROW(mem::Stack::instance().getVariable("ctest2"), std::logic_error);
+    ASSERT_THROW(mem::Stack::instance().getVariable("ctest2"),
+                 std::logic_error);
 
     frame.setVariable("ctest", "testValue");
 
@@ -87,7 +98,8 @@ TEST(Memory, nonGlobalFrameVariables) {
 
     frame.setVariable("ctest", "newValue");
     ASSERT_EQ(t2, mem::Stack::instance().getVariable("ctest"));
-    ASSERT_THROW(mem::Stack::instance().globalFrame().getVariable("ctest"), std::out_of_range);
+    ASSERT_THROW(mem::Stack::instance().globalFrame().getVariable("ctest"),
+                 std::out_of_range);
     ASSERT_EQ(t2, mem::Stack::instance().currentFrame().getVariable("ctest"));
     ASSERT_EQ(t2, frame.getVariable("ctest"));
     ASSERT_THROW(global.getVariable("ctest"), std::out_of_range);
@@ -100,12 +112,14 @@ TEST(Memory, nonGlobalFrameVariables) {
 
     auto &ref = frame.getVariable("ctest2");
     ref = "HelloWorld";
-    ASSERT_EQ(mem::ValueBox("HelloWorld"), mem::Stack::instance().getVariable("ctest2"));
+    ASSERT_EQ(mem::ValueBox("HelloWorld"),
+              mem::Stack::instance().getVariable("ctest2"));
 
     mem::Stack::instance().openFrame();
 
     ASSERT_TRUE(&frame != &mem::Stack::instance().currentFrame())
-        << "Stack has opened e new stack causing a realloc for the stack itself";
+        << "Stack has opened e new stack causing a realloc for the stack "
+           "itself";
 
     mem::Stack::instance().closeFrame();
     mem::Stack::instance().closeFrame();
@@ -116,12 +130,15 @@ TEST(Memory, globalFrameProcedureNoArgs) {
 
     ASSERT_FALSE(frame.hasProcedure("f_test"));
     ASSERT_FALSE(frame.hasProcedure("f_test2"));
-    ASSERT_THROW(mem::Stack::instance().callProcedure("f_test", {}), std::logic_error);
-    ASSERT_THROW(mem::Stack::instance().callProcedure("f_test2", {}), std::logic_error);
+    ASSERT_THROW(mem::Stack::instance().callProcedure("f_test", {}),
+                 std::logic_error);
+    ASSERT_THROW(mem::Stack::instance().callProcedure("f_test2", {}),
+                 std::logic_error);
 
     struct Nop : mlogo::types::BasicProcedure {
         Nop() : mlogo::types::BasicProcedure(0) {}
-        void operator()() const override { /* empty procedure */ }
+        void operator()() const override { /* empty procedure */
+        }
     };
 
     ASSERT_EQ(1u, mem::Stack::instance().nFrames());
@@ -142,13 +159,18 @@ TEST(Memory, globalFrameProcedureNoArgs) {
 
     ASSERT_EQ(1u, mem::Stack::instance().nFrames());
     mem::Stack::instance().setProcedure<updateGlobal>("update_global");
-    ASSERT_TRUE(mem::Stack::instance().globalFrame().hasProcedure("update_global"));
+    ASSERT_TRUE(
+        mem::Stack::instance().globalFrame().hasProcedure("update_global"));
 
-    ASSERT_EQ(mem::ValueBox("empty"), mem::Stack::instance().getVariable("globalLocalVar2"));
-    ASSERT_THROW(mem::Stack::instance().getVariable("globalNewVar1"), std::logic_error);
+    ASSERT_EQ(mem::ValueBox("empty"),
+              mem::Stack::instance().getVariable("globalLocalVar2"));
+    ASSERT_THROW(mem::Stack::instance().getVariable("globalNewVar1"),
+                 std::logic_error);
     ASSERT_NO_THROW(mem::Stack::instance().callProcedure("update_global", {}));
-    ASSERT_EQ(mem::ValueBox("321"), mem::Stack::instance().getVariable("globalLocalVar2"));
-    ASSERT_EQ(mem::ValueBox("123"), mem::Stack::instance().getVariable("globalNewVar1"));
+    ASSERT_EQ(mem::ValueBox("321"),
+              mem::Stack::instance().getVariable("globalLocalVar2"));
+    ASSERT_EQ(mem::ValueBox("123"),
+              mem::Stack::instance().getVariable("globalNewVar1"));
     ASSERT_EQ(1u, mem::Stack::instance().nFrames());
 }
 
@@ -157,51 +179,53 @@ TEST(Memory, ProcedureWithArgs) {
         SimplePrint1() : mlogo::types::BasicProcedure(1) {}
         void operator()() const override {
             auto arg0 = fetchArg(0);
-            mem::Stack::instance()
-                .setVariable("__simple_print_result__", arg0);
+            mem::Stack::instance().setVariable("__simple_print_result__", arg0);
         }
     };
 
-    mem::Stack::instance()
-        .setLocalProcedure<SimplePrint1>("simple_print_1");
+    mem::Stack::instance().setLocalProcedure<SimplePrint1>("simple_print_1");
 
-    ASSERT_THROW(mem::Stack::instance().getVariable("__simple_print_result__"), std::logic_error);
+    ASSERT_THROW(mem::Stack::instance().getVariable("__simple_print_result__"),
+                 std::logic_error);
 
     mem::ActualArguments args1;
     args1.push_back("test");
     mem::Stack::instance().callProcedure("simple_print_1", args1);
-    ASSERT_EQ(mem::ValueBox("test"), mem::Stack::instance().getVariable("__simple_print_result__"));
+    ASSERT_EQ(mem::ValueBox("test"),
+              mem::Stack::instance().getVariable("__simple_print_result__"));
 
     mem::ActualArguments args2;
     args2.push_back("tset");
     mem::Stack::instance().callProcedure("simple_print_1", args2);
-    ASSERT_EQ(mem::ValueBox("tset"), mem::Stack::instance().getVariable("__simple_print_result__"));
+    ASSERT_EQ(mem::ValueBox("tset"),
+              mem::Stack::instance().getVariable("__simple_print_result__"));
 
-    struct SimplePrint2: mlogo::types::BasicProcedure {
-        SimplePrint2() :
-                mlogo::types::BasicProcedure(2) {}
+    struct SimplePrint2 : mlogo::types::BasicProcedure {
+        SimplePrint2() : mlogo::types::BasicProcedure(2) {}
 
         void operator()() const override {
             auto arg0 = fetchArg(0).toString();
             auto arg1 = fetchArg(1).toString();
 
-            mem::Stack::instance()
-                    .setVariable("__simple_print_result__", arg0 + " " + arg1);
+            mem::Stack::instance().setVariable("__simple_print_result__",
+                                               arg0 + " " + arg1);
         }
     };
 
-    mem::Stack::instance()
-            .setLocalProcedure<SimplePrint2>("simple_print_2");
+    mem::Stack::instance().setLocalProcedure<SimplePrint2>("simple_print_2");
 
     mem::ActualArguments args3;
     args3.push_back("alpha");
     args3.push_back("beta");
     mem::Stack::instance().callProcedure("simple_print_2", args3);
-    ASSERT_EQ(mem::ValueBox("alpha beta"), mem::Stack::instance().getVariable("__simple_print_result__"));
+    ASSERT_EQ(mem::ValueBox("alpha beta"),
+              mem::Stack::instance().getVariable("__simple_print_result__"));
 
     mem::Stack::instance().callProcedure("simple_print_1", args3);
-    ASSERT_EQ(mem::ValueBox("alpha"), mem::Stack::instance().getVariable("__simple_print_result__"));
-    ASSERT_THROW(mem::Stack::instance().callProcedure("simple_print_2", args2), std::logic_error);
+    ASSERT_EQ(mem::ValueBox("alpha"),
+              mem::Stack::instance().getVariable("__simple_print_result__"));
+    ASSERT_THROW(mem::Stack::instance().callProcedure("simple_print_2", args2),
+                 std::logic_error);
 }
 
 TEST(Memory, ProcedureWithArgsAndReturnValue) {
@@ -225,8 +249,7 @@ TEST(Memory, ProcedureWithArgsAndReturnValue) {
 
             mem::Stack::instance().callProcedure("sum", args, "res");
             auto arg0 = mem::Stack::instance().getVariable("res");
-            mem::Stack::instance()
-                .setVariable("__simple_print_result__", arg0);
+            mem::Stack::instance().setVariable("__simple_print_result__", arg0);
         }
     };
 
@@ -236,7 +259,8 @@ TEST(Memory, ProcedureWithArgsAndReturnValue) {
 
     mem::ActualArguments args;
     mem::Stack::instance().callProcedure("simple_print_3", args);
-    ASSERT_EQ(mem::ValueBox("5"), mem::Stack::instance().getVariable("__simple_print_result__"));
+    ASSERT_EQ(mem::ValueBox("5"),
+              mem::Stack::instance().getVariable("__simple_print_result__"));
 }
 
 TEST(Memory, ignoreCase) {
@@ -262,4 +286,3 @@ TEST(Memory, ignoreCase) {
     ASSERT_EQ(ptr, mem::Stack::instance().getProcedure("UPPERCaSESUm"));
     ASSERT_EQ(ptr, mem::Stack::instance().getProcedure("UPPERcaseSuM"));
 }
-

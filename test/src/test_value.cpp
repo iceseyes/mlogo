@@ -23,11 +23,11 @@ TEST(Value, creationAndStreaming) {
     ASSERT_EQ("Test", boost::get<WordValue>(word));
     ASSERT_THROW(boost::get<ListValue>(word), boost::bad_get);
 
-    Value w1 { "hello" }, w2 { "world" }, w3 { "test" };
+    Value w1{"hello"}, w2{"world"}, w3{"test"};
     Value list;
 
     ASSERT_EQ("", boost::get<WordValue>(list));
-    list = ListValue({ w1, w2, w3 });
+    list = ListValue({w1, w2, w3});
     ASSERT_THROW(boost::get<WordValue>(list), boost::bad_get);
 
     ASSERT_EQ("world", boost::get<WordValue>(boost::get<ListValue>(list)[1]));
@@ -44,12 +44,12 @@ TEST(Value, equality) {
     Value word2;
     ASSERT_EQ(word2, word);
 
-    word="test";
+    word = "test";
     ASSERT_NE(word2, word);
 
-    word2="test";
+    word2 = "test";
     ASSERT_EQ(word2, word);
-    ASSERT_TRUE(word2==word);
+    ASSERT_TRUE(word2 == word);
     ASSERT_EQ(Value("test"), word);
 
     Value list;
@@ -69,12 +69,12 @@ TEST(ValueBox, equality) {
     Value word2;
     ASSERT_EQ(ValueBox(word2), ValueBox(word));
 
-    word="test";
+    word = "test";
     ASSERT_NE(ValueBox(word2), ValueBox(word));
 
-    word2="test";
+    word2 = "test";
     ASSERT_EQ(ValueBox(word2), ValueBox(word));
-    ASSERT_TRUE(ValueBox(word2)==ValueBox(word));
+    ASSERT_TRUE(ValueBox(word2) == ValueBox(word));
     ASSERT_EQ(ValueBox(Value("test")), ValueBox(word2));
 
     Value list;
@@ -95,11 +95,11 @@ TEST(ValueBox, valueBoxFromString) {
     unknown = "test";
     ASSERT_EQ("test", unknown);
 
-    ValueBox strValue { "test123" };
+    ValueBox strValue{"test123"};
     ASSERT_EQ("test123", strValue);
 
-    std::string abc { "abc" };
-    ValueBox abc_value { abc };
+    std::string abc{"abc"};
+    ValueBox abc_value{abc};
     unknown = abc;
 
     ASSERT_EQ("abc", unknown);
@@ -107,25 +107,25 @@ TEST(ValueBox, valueBoxFromString) {
 }
 
 TEST(ValueBox, valueBoxCheckType) {
-	ValueBox unknown;
+    ValueBox unknown;
 
-	ASSERT_TRUE(unknown.isWord());
-	ASSERT_FALSE(unknown.isList());
+    ASSERT_TRUE(unknown.isWord());
+    ASSERT_FALSE(unknown.isList());
 
-	Value word;
-	ValueBox wordBox { word };
+    Value word;
+    ValueBox wordBox{word};
 
-	ASSERT_TRUE(wordBox.isWord());
-	ASSERT_FALSE(wordBox.isList());
+    ASSERT_TRUE(wordBox.isWord());
+    ASSERT_FALSE(wordBox.isList());
 
-	word = "word";
-	ListValue v {word, "test", "hi", "logo"};
-	ValueBox vbox { v };
+    word = "word";
+    ListValue v{word, "test", "hi", "logo"};
+    ValueBox vbox{v};
 
     ASSERT_EQ("[word test hi logo]", vbox.toString());
     ASSERT_EQ(v, vbox);
 
-    ListValue v1 {v, word};
+    ListValue v1{v, word};
     vbox = v1;
 
     ASSERT_EQ(v1, vbox);
@@ -150,4 +150,3 @@ TEST(ValueBox, empty) {
     list = ListValue({word.word()});
     ASSERT_FALSE(list.empty());
 }
-

@@ -19,15 +19,13 @@ namespace types {
 
 using WordValue = std::string;
 
-using Value = boost::make_recursive_variant<
-    WordValue,
-    std::vector<boost::recursive_variant_>
->::type;
+using Value =
+    boost::make_recursive_variant<WordValue,
+                                  std::vector<boost::recursive_variant_>>::type;
 
 using ListValue = std::vector<Value>;
 
 std::string toString(const Value &v);
-
 
 class ValueBox {
 public:
@@ -88,27 +86,24 @@ bool in(const ValueBox &v1, const ValueBox &v2);
 
 } /* ns: mlogo */
 
-
 namespace std {
-    template<typename S>
-    S &operator<<(S &s, const mlogo::types::ListValue &v) {
-        bool first { true };
+template <typename S>
+S &operator<<(S &s, const mlogo::types::ListValue &v) {
+    bool first{true};
 
-        s << "[";
+    s << "[";
 
-        for(auto &i : v) {
-            if(!first) s << " ";
-            s << i;
+    for (auto &i : v) {
+        if (!first) s << " ";
+        s << i;
 
-            first = false;
-        }
-
-        s << "]";
-
-        return s;
+        first = false;
     }
+
+    s << "]";
+
+    return s;
+}
 } /* ns: std */
-
-
 
 #endif /* VALUE_HPP_ */

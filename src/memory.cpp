@@ -8,9 +8,9 @@
 
 #include "memory.hpp"
 
-#include <sstream>
-#include <iostream>
 #include <algorithm>
+#include <iostream>
+#include <sstream>
 #include <stdexcept>
 
 #include <boost/algorithm/string.hpp>
@@ -22,14 +22,11 @@ using boost::to_lower_copy;
 namespace mlogo {
 namespace memory {
 
-const char Stack::__ARGUMENT_PREFIX[] { "_p" };
+const char Stack::__ARGUMENT_PREFIX[]{"_p"};
 
 namespace {
 
-std::string formatName(const std::string &name) {
-    return to_lower_copy(name);
-}
-
+std::string formatName(const std::string &name) { return to_lower_copy(name); }
 }
 
 bool Frame::hasVariable(const std::string &name) const {
@@ -56,7 +53,7 @@ bool Frame::hasProcedure(const std::string &name) const {
 }
 
 Frame &Frame::setProcedure(const std::string &name, ProcedurePtr ptr) {
-    if(ptr) {
+    if (ptr) {
         procedures[formatName(name)] = ptr;
         return *this;
     }
@@ -79,8 +76,10 @@ Frame &Frame::storeResult(const ValueBox &result) {
 }
 
 Frame &Frame::setResultVariable(const Frame &child) {
-    if(!_lastResultVariable.empty()) {
-        if(!child.hasResultSetted) throw std::logic_error("Current Frame does not mantain a return value.");
+    if (!_lastResultVariable.empty()) {
+        if (!child.hasResultSetted)
+            throw std::logic_error(
+                "Current Frame does not mantain a return value.");
         setVariable(_lastResultVariable, child._lastResult);
         child.hasResultSetted = false;
         _lastResultVariable = "";
@@ -89,21 +88,21 @@ Frame &Frame::setResultVariable(const Frame &child) {
     return *this;
 }
 
-Stack::Stack() :
-        frames(1) {
+Stack::Stack() : frames(1) {
     // Populate global frame with internal symbols.
     // initInternalSymbols();
 }
 
-void Stack::callProcedure(const std::string &name, ActualArguments args, const std::string &returnIn) {
-    auto iter = find_if(
-            frames.rbegin(), frames.rend(),
-            [this, &name](Frame &f) { return f.hasProcedure(name); });
+void Stack::callProcedure(const std::string &name, ActualArguments args,
+                          const std::string &returnIn) {
+    auto iter =
+        find_if(frames.rbegin(), frames.rend(),
+                [this, &name](Frame &f) { return f.hasProcedure(name); });
 
-    if(iter != frames.rend()) {
+    if (iter != frames.rend()) {
         auto &func = *iter->getProcedure(name);
 
-        if(func.isFunction()) currentFrame().waitForValueIn(returnIn);
+        if (func.isFunction()) currentFrame().waitForValueIn(returnIn);
 
         // open a new frame and store arguments
         auto &f = openFrame().currentFrame();
@@ -121,22 +120,22 @@ void Stack::callProcedure(const std::string &name, ActualArguments args, const s
 }
 
 ProcedurePtr Stack::getProcedure(const std::string &name) {
-    auto iter = find_if(
-        frames.rbegin(), frames.rend(),
-        [this, &name](Frame &f) { return f.hasProcedure(name); });
+    auto iter =
+        find_if(frames.rbegin(), frames.rend(),
+                [this, &name](Frame &f) { return f.hasProcedure(name); });
 
-    if(iter != frames.rend()) {
+    if (iter != frames.rend()) {
         return iter->getProcedure(name);
     } else
         throw std::logic_error("Procedure Undefined");
 }
 
 std::size_t Stack::getProcedureNArgs(const std::string &name) {
-    auto iter = find_if(
-        frames.rbegin(), frames.rend(),
-        [this, &name](Frame &f) { return f.hasProcedure(name); });
+    auto iter =
+        find_if(frames.rbegin(), frames.rend(),
+                [this, &name](Frame &f) { return f.hasProcedure(name); });
 
-    if(iter != frames.rend()) {
+    if (iter != frames.rend()) {
         auto &func = *iter->getProcedure(name);
         return func.nArgs();
     } else
@@ -144,11 +143,11 @@ std::size_t Stack::getProcedureNArgs(const std::string &name) {
 }
 
 ValueBox &Stack::getVariable(const std::string &name) {
-    auto iter = find_if(
-            frames.rbegin(), frames.rend(),
-            [this, &name](Frame &f) { return f.hasVariable(name); });
+    auto iter =
+        find_if(frames.rbegin(), frames.rend(),
+                [this, &name](Frame &f) { return f.hasVariable(name); });
 
-    if(iter != frames.rend()) {
+    if (iter != frames.rend()) {
         return iter->getVariable(name);
     }
 
@@ -159,8 +158,9 @@ ValueBox &Stack::getArgument(uint8_t index) {
     return currentFrame().getVariable(argumentName(index));
 }
 
-Stack &Stack::setVariable(const std::string &name, const ValueBox &v, bool global) {
-    if(global) {
+Stack &Stack::setVariable(const std::string &name, const ValueBox &v,
+                          bool global) {
+    if (global) {
         globalFrame().setVariable(name, v);
     } else {
         currentFrame().setVariable(name, v);
@@ -169,8 +169,9 @@ Stack &Stack::setVariable(const std::string &name, const ValueBox &v, bool globa
     return *this;
 }
 
-Stack &Stack::setProcedure(const std::string &name, ProcedurePtr v, bool global) {
-    if(global) {
+Stack &Stack::setProcedure(const std::string &name, ProcedurePtr v,
+                           bool global) {
+    if (global) {
         globalFrame().setProcedure(name, v);
     } else {
         currentFrame().setProcedure(name, v);
@@ -185,18 +186,18 @@ Stack &Stack::openFrame() {
 }
 
 Stack &Stack::closeFrame() {
-    if(nFrames() <= 1) {  // current frame is global frame or no frames at all!
+    if (nFrames() <= 1) {  // current frame is global frame or no frames at all!
         throw std::logic_error("Global Frame cannot be closed.");
     }
 
-    auto &current = frames[frames.size()-1];
-    auto &parent = frames[frames.size()-2];
+    auto &current = frames[frames.size() - 1];
+    auto &parent = frames[frames.size() - 2];
 
-    if(current.hasResult() && parent.waitForValue()) {
+    if (current.hasResult() && parent.waitForValue()) {
         parent.setResultVariable(current);
-    } else if(current.hasResult()) {
+    } else if (current.hasResult()) {
         throw std::logic_error("Procedure can not return a value to none.");
-    } else if(parent.waitForValue()) {
+    } else if (parent.waitForValue()) {
         throw std::logic_error("Expected a function, found procedure instead.");
     }
 

@@ -2,11 +2,9 @@
  * @file: test_geometry.cpp
  */
 
-
 #include <gtest/gtest.h>
 
 #include "geometry.hpp"
-
 
 using Angle = mlogo::geometry::Angle;
 using Reference = mlogo::geometry::Reference;
@@ -14,41 +12,41 @@ using Point = mlogo::geometry::Point;
 using Path = mlogo::geometry::Path;
 using StraightLine = mlogo::geometry::StraightLine;
 
-constexpr double MAX_RAD_ERROR { 0.001 };
-constexpr double MAX_DEG_ERROR { 0.1 };
+constexpr double MAX_RAD_ERROR{0.001};
+constexpr double MAX_DEG_ERROR{0.1};
 
 TEST(Angle, simpleAngles) {
-	Angle zero_rad { Angle::Rad(0) };
-	Angle zero_deg { Angle::Degrees(0) };
+    Angle zero_rad{Angle::Rad(0)};
+    Angle zero_deg{Angle::Degrees(0)};
 
-	ASSERT_EQ(0.0, zero_rad.radians().value());
-	ASSERT_EQ(0.0, zero_rad.degrees().value());
-	ASSERT_EQ(0.0, zero_deg.radians().value());
-	ASSERT_EQ(0.0, zero_deg.degrees().value());
-	ASSERT_EQ(zero_rad, zero_deg);
-	ASSERT_EQ(zero_deg, zero_rad);
+    ASSERT_EQ(0.0, zero_rad.radians().value());
+    ASSERT_EQ(0.0, zero_rad.degrees().value());
+    ASSERT_EQ(0.0, zero_deg.radians().value());
+    ASSERT_EQ(0.0, zero_deg.degrees().value());
+    ASSERT_EQ(zero_rad, zero_deg);
+    ASSERT_EQ(zero_deg, zero_rad);
 
-	Angle right { Angle::Rad(M_PI/2) };
-	ASSERT_NEAR(1.57, right.radians().value(), MAX_RAD_ERROR);
-	ASSERT_EQ(90.0, right.degrees().value());
-
-	right = Angle::Degrees(90);
-	Angle right_deg { Angle::Degrees(90) };
-
-	ASSERT_NEAR(1.57, right.radians().value(), MAX_RAD_ERROR);
+    Angle right{Angle::Rad(M_PI / 2)};
+    ASSERT_NEAR(1.57, right.radians().value(), MAX_RAD_ERROR);
     ASSERT_EQ(90.0, right.degrees().value());
-	ASSERT_EQ(right_deg, right);
 
-	Angle anAngle { Angle::Degrees(180) };
-	ASSERT_NEAR(M_PI, anAngle.radians().value(), MAX_RAD_ERROR);
-	ASSERT_EQ(180.0, anAngle.degrees().value());
+    right = Angle::Degrees(90);
+    Angle right_deg{Angle::Degrees(90)};
 
-	anAngle = Angle::Rad(3*M_PI/2);
-	ASSERT_NEAR(3*M_PI/2, anAngle.radians().value(), MAX_RAD_ERROR);
+    ASSERT_NEAR(1.57, right.radians().value(), MAX_RAD_ERROR);
+    ASSERT_EQ(90.0, right.degrees().value());
+    ASSERT_EQ(right_deg, right);
+
+    Angle anAngle{Angle::Degrees(180)};
+    ASSERT_NEAR(M_PI, anAngle.radians().value(), MAX_RAD_ERROR);
+    ASSERT_EQ(180.0, anAngle.degrees().value());
+
+    anAngle = Angle::Rad(3 * M_PI / 2);
+    ASSERT_NEAR(3 * M_PI / 2, anAngle.radians().value(), MAX_RAD_ERROR);
     ASSERT_EQ(270.0, anAngle.degrees().value());
 
-    anAngle = Angle::Rad(M_PI/4);
-    ASSERT_NEAR(M_PI/4, anAngle.radians().value(), MAX_RAD_ERROR);
+    anAngle = Angle::Rad(M_PI / 4);
+    ASSERT_NEAR(M_PI / 4, anAngle.radians().value(), MAX_RAD_ERROR);
     ASSERT_EQ(45.0, anAngle.degrees().value());
 
     anAngle = right;
@@ -56,9 +54,9 @@ TEST(Angle, simpleAngles) {
 }
 
 TEST(Angle, strangeAngles) {
-    Angle anAngle { Angle::Degrees(30) };
+    Angle anAngle{Angle::Degrees(30)};
 
-    ASSERT_TRUE(Angle::Rad(M_PI/6) == anAngle);
+    ASSERT_TRUE(Angle::Rad(M_PI / 6) == anAngle);
     ASSERT_DOUBLE_EQ(30.0, anAngle.degrees().value());
 
     anAngle = Angle::Rad(0.401426);
@@ -75,73 +73,73 @@ TEST(Angle, strangeAngles) {
 }
 
 TEST(Angle, turnEquivalence) {
-    Angle anAngle { Angle::Degrees(30) };
+    Angle anAngle{Angle::Degrees(30)};
 
-    Angle another { Angle::Degrees(360 + 30) };
+    Angle another{Angle::Degrees(360 + 30)};
     ASSERT_EQ(anAngle, another);
 
     another = Angle::Degrees(-330);
     ASSERT_EQ(anAngle, another);
 
-    another = Angle::Degrees(5*360 + 30);
+    another = Angle::Degrees(5 * 360 + 30);
     ASSERT_EQ(anAngle, another);
 
     anAngle = Angle::Rad(0.401426);
     another = Angle::Degrees(360 + 23);
     ASSERT_EQ(anAngle, another);
 
-    another = Angle::Degrees(-4*360 + 23);
+    another = Angle::Degrees(-4 * 360 + 23);
     ASSERT_EQ(anAngle, another);
 
-    another = Angle::Degrees(7*360 + 23);
+    another = Angle::Degrees(7 * 360 + 23);
     ASSERT_EQ(anAngle, another);
 
-    another = Angle::Rad(6*M_PI + 0.401426);
+    another = Angle::Rad(6 * M_PI + 0.401426);
     ASSERT_EQ(anAngle, another);
 
-    another = Angle::Rad(-4*M_PI + 0.401426);
+    another = Angle::Rad(-4 * M_PI + 0.401426);
     ASSERT_EQ(anAngle, another);
 }
 
 TEST(Angle, basicOperations) {
-    Angle anAngle { Angle::Degrees(30) };
-    Angle another { Angle::Degrees(45) };
+    Angle anAngle{Angle::Degrees(30)};
+    Angle another{Angle::Degrees(45)};
 
     Angle sum = anAngle + another;
     ASSERT_EQ(Angle::Degrees(75), sum);
 
     sum += Angle::Degrees(15);
     ASSERT_EQ(Angle::Degrees(90), sum);
-    ASSERT_EQ(Angle::Rad(M_PI/2), sum);
+    ASSERT_EQ(Angle::Rad(M_PI / 2), sum);
 
     sum -= Angle::Degrees(25);
     ASSERT_EQ(Angle::Degrees(65), sum);
 
-    another = anAngle - sum + Angle::Rad(M_PI/6);
+    another = anAngle - sum + Angle::Rad(M_PI / 6);
     ASSERT_EQ(Angle::Degrees(355), another);
 
     anAngle = Angle::Degrees(45);
-    ASSERT_EQ(Angle::Rad(M_PI), anAngle*4);
+    ASSERT_EQ(Angle::Rad(M_PI), anAngle * 4);
 
     another = 2 * anAngle;
-    ASSERT_EQ(Angle::Rad(M_PI/2), another);
+    ASSERT_EQ(Angle::Rad(M_PI / 2), another);
 
     another *= 2;
     ASSERT_EQ(Angle::Rad(M_PI), another);
 
-    ASSERT_EQ(Angle::Rad(M_PI/2), another/2);
+    ASSERT_EQ(Angle::Rad(M_PI / 2), another / 2);
 
-    anAngle = another/6;
+    anAngle = another / 6;
     ASSERT_EQ(Angle::Degrees(30), anAngle);
-    ASSERT_EQ(Angle::Degrees(30), anAngle+Angle::Degrees(360));
-    ASSERT_EQ(Angle::Degrees(30), anAngle-Angle::Degrees(360));
+    ASSERT_EQ(Angle::Degrees(30), anAngle + Angle::Degrees(360));
+    ASSERT_EQ(Angle::Degrees(30), anAngle - Angle::Degrees(360));
 
-    ASSERT_EQ(Angle::Degrees(3), anAngle/10);
-    ASSERT_EQ(Angle::Degrees(30), 13*anAngle);
+    ASSERT_EQ(Angle::Degrees(3), anAngle / 10);
+    ASSERT_EQ(Angle::Degrees(30), 13 * anAngle);
 }
 
 TEST(Angle, basicTrigonometry) {
-    Angle anAngle { Angle::Degrees(0) };
+    Angle anAngle{Angle::Degrees(0)};
 
     ASSERT_EQ(0.0, anAngle.sin());
     ASSERT_EQ(0.0, sin(anAngle));
@@ -162,7 +160,7 @@ TEST(Angle, basicTrigonometry) {
     ASSERT_EQ(1.0, anAngle.cos());
     ASSERT_EQ(1.0, cos(anAngle));
 
-    anAngle = Angle::Rad(M_PI/2);
+    anAngle = Angle::Rad(M_PI / 2);
 
     ASSERT_EQ(1.0, anAngle.sin());
     ASSERT_EQ(1.0, sin(anAngle));
@@ -185,7 +183,7 @@ TEST(Angle, basicTrigonometry) {
 
     ASSERT_THROW(anAngle.tan(), std::logic_error);
     ASSERT_THROW(tan(anAngle), std::logic_error);
-    ASSERT_THROW((anAngle*3).tan(), std::logic_error);
+    ASSERT_THROW((anAngle * 3).tan(), std::logic_error);
 
     anAngle = Angle::Degrees(0);
     ASSERT_EQ(0.0, tan(anAngle));
@@ -209,7 +207,7 @@ TEST(Reference, globalReference) {
 }
 
 TEST(Reference, turtleLikeReference) {
-    Reference turtle { 1, 320, -1, 240 };
+    Reference turtle{1, 320, -1, 240};
 
     ASSERT_FALSE(turtle.global());
     ASSERT_NE(Reference(1, 0, 1, 0), turtle);
@@ -231,25 +229,25 @@ TEST(Reference, turtleLikeReference) {
     ASSERT_EQ(250, p.y);
     ASSERT_TRUE(p.system.global());
 
-    p = turtle.fromGPS({ 320, 240 });
+    p = turtle.fromGPS({320, 240});
     ASSERT_EQ(0, p.x);
     ASSERT_EQ(0, p.y);
     ASSERT_FALSE(p.system.global());
     ASSERT_EQ(turtle, p.system);
 
-    p = turtle.fromGPS({ 310, 250 });
+    p = turtle.fromGPS({310, 250});
     ASSERT_EQ(-10, p.x);
     ASSERT_EQ(-10, p.y);
     ASSERT_FALSE(p.system.global());
     ASSERT_EQ(turtle, p.system);
 
-    p = turtle.fromGPS({ 330, 230 });
+    p = turtle.fromGPS({330, 230});
     ASSERT_EQ(10, p.x);
     ASSERT_EQ(10, p.y);
     ASSERT_FALSE(p.system.global());
     ASSERT_EQ(turtle, p.system);
 
-    p = turtle.fromGPS({ 330, 250 });
+    p = turtle.fromGPS({330, 250});
     ASSERT_EQ(10, p.x);
     ASSERT_EQ(-10, p.y);
     ASSERT_FALSE(p.system.global());
@@ -257,7 +255,7 @@ TEST(Reference, turtleLikeReference) {
 }
 
 TEST(Reference, halfReference) {
-    Reference ref { 0.5, -50, -0.5, 100 };
+    Reference ref{0.5, -50, -0.5, 100};
 
     ASSERT_FALSE(ref.global());
 
@@ -276,25 +274,25 @@ TEST(Reference, halfReference) {
     ASSERT_EQ(120, p.y);
     ASSERT_TRUE(p.system.global());
 
-    p = ref.fromGPS({ -50, 100 });
+    p = ref.fromGPS({-50, 100});
     ASSERT_EQ(0, p.x);
     ASSERT_EQ(0, p.y);
     ASSERT_FALSE(p.system.global());
     ASSERT_EQ(ref, p.system);
 
-    p = ref.fromGPS({ -70, 120 });
+    p = ref.fromGPS({-70, 120});
     ASSERT_EQ(-10, p.x);
     ASSERT_EQ(-10, p.y);
     ASSERT_FALSE(p.system.global());
     ASSERT_EQ(ref, p.system);
 
-    p = ref.fromGPS({-30, 80 });
+    p = ref.fromGPS({-30, 80});
     ASSERT_EQ(10, p.x);
     ASSERT_EQ(10, p.y);
     ASSERT_FALSE(p.system.global());
     ASSERT_EQ(ref, p.system);
 
-    p = ref.fromGPS({ -30, 120 });
+    p = ref.fromGPS({-30, 120});
     ASSERT_EQ(10, p.x);
     ASSERT_EQ(-10, p.y);
     ASSERT_FALSE(p.system.global());
@@ -302,13 +300,13 @@ TEST(Reference, halfReference) {
 }
 
 TEST(Point, globalPoints) {
-    Point p { 100, 200 };
+    Point p{100, 200};
 
     ASSERT_EQ(100, p.x);
     ASSERT_EQ(200, p.y);
     ASSERT_TRUE(p.system.global());
 
-    p = { 320, 240 };
+    p = {320, 240};
     ASSERT_EQ(320, p.x);
     ASSERT_EQ(240, p.y);
     ASSERT_TRUE(p.system.global());
@@ -318,10 +316,10 @@ TEST(Point, globalPoints) {
 }
 
 TEST(Point, globalOrderedPoints) {
-    Point p1 { 100, 200 };
-    Point p2 { 320, 240 };
-    Point p3 { 320, -200 };
-    Point p4 { -100, 0 };
+    Point p1{100, 200};
+    Point p2{320, 240};
+    Point p3{320, -200};
+    Point p4{-100, 0};
 
     ASSERT_TRUE(p1 < p2);
     ASSERT_TRUE(p1 <= p2);
@@ -333,12 +331,12 @@ TEST(Point, globalOrderedPoints) {
 }
 
 TEST(Point, globalOperations) {
-    Point p1 { 100, 200 };
+    Point p1{100, 200};
     Point t = p1 - Point({-50, 100});
 
     ASSERT_EQ(Point({150, 100}), t);
 
-    t += { 50, 50 };
+    t += {50, 50};
 
     ASSERT_EQ(Point({200, 150}), t);
 
@@ -356,8 +354,8 @@ TEST(Point, globalOperations) {
 }
 
 TEST(Point, localPosition) {
-    Reference system { 1, 320, -1, 240 };
-    Point p1 { 0, 0, system };
+    Reference system{1, 320, -1, 240};
+    Point p1{0, 0, system};
 
     ASSERT_EQ(0, p1.x);
     ASSERT_EQ(0, p1.y);
@@ -367,10 +365,10 @@ TEST(Point, localPosition) {
 
     ASSERT_NE(Point({320, 240}), p1);
 
-    Point globalP1 { p1.toGPS() };
+    Point globalP1{p1.toGPS()};
     ASSERT_EQ(Point({320, 240}), globalP1);
 
-    Point p2 { p1 + Point {100, -25} };
+    Point p2{p1 + Point{100, -25}};
     ASSERT_EQ(100, p2.x);
     ASSERT_EQ(-25, p2.y);
 
@@ -393,7 +391,7 @@ TEST(Point, localPosition) {
 
     p2 /= 2;
     ASSERT_EQ(50, p2.x);
-    ASSERT_EQ(-12, p2.y); // TRUNC-ed!
+    ASSERT_EQ(-12, p2.y);  // TRUNC-ed!
     ASSERT_EQ(system, p2.system);
 
     p2 *= 2;
@@ -403,8 +401,8 @@ TEST(Point, localPosition) {
 }
 
 TEST(Path, turtle) {
-    Reference ref { 1, 320, -1, 240 };
-    Path turtle { ref, 8, 0 };
+    Reference ref{1, 320, -1, 240};
+    Path turtle{ref, 8, 0};
 
     ASSERT_TRUE(turtle.empty());
     ASSERT_EQ(1u, turtle.size());
@@ -437,8 +435,8 @@ TEST(Path, turtle) {
 }
 
 TEST(Path, turtleRotate) {
-    Reference ref { 1, 320, -1, 240 };
-    Path turtle { ref, 8, 0 };
+    Reference ref{1, 320, -1, 240};
+    Path turtle{ref, 8, 0};
     turtle.push_back(-8, 5);
     turtle.push_back(-8, -5);
     turtle.push_back(8, 0);
@@ -479,8 +477,8 @@ TEST(Path, turtleRotate) {
 }
 
 TEST(Path, turtleTranslate) {
-    Reference ref { 1, 320, -1, 240 };
-    Path turtle { ref, 8, 0 };
+    Reference ref{1, 320, -1, 240};
+    Path turtle{ref, 8, 0};
     turtle.push_back(-8, 5);
     turtle.push_back(-8, -5);
     turtle.push_back(8, 0);
@@ -521,8 +519,8 @@ TEST(Path, turtleTranslate) {
 }
 
 TEST(Path, turtleRotateAndTranslate) {
-    Reference ref { 1, 320, -1, 240 };
-    Path turtle { ref, 8, 0 };
+    Reference ref{1, 320, -1, 240};
+    Path turtle{ref, 8, 0};
     turtle.push_back(-8, 5);
     turtle.push_back(-8, -5);
     turtle.push_back(8, 0);
@@ -563,14 +561,16 @@ TEST(Path, turtleRotateAndTranslate) {
 }
 
 TEST(StraightLine, basicLine) {
-    StraightLine line {1, 0};  // from m and q
+    StraightLine line{1, 0};  // from m and q
 
     ASSERT_EQ(Point(1, 1), line.whenX(1));
     ASSERT_EQ(Point(1, 1), line.whenY(1));
     ASSERT_EQ(Point(5, 5), line.whenX(5));
     ASSERT_EQ(Point(5, 5), line.whenY(5));
 
-    StraightLine lineTurtle = {1, 0, Reference (1, 320, -1, 240)};  // from m and q in a different system
+    StraightLine lineTurtle = {
+        1, 0,
+        Reference(1, 320, -1, 240)};  // from m and q in a different system
 
     ASSERT_EQ(Point(1, 1), line.whenX(1));
     ASSERT_EQ(Point(1, 1), line.whenY(1));
@@ -580,7 +580,7 @@ TEST(StraightLine, basicLine) {
     ASSERT_NE(line, lineTurtle);
     ASSERT_NE(lineTurtle, line);
 
-    StraightLine line2 {1, 0};  // from m and q
+    StraightLine line2{1, 0};  // from m and q
     ASSERT_EQ(line, line2);
     ASSERT_EQ(line2, line);
 
@@ -593,24 +593,24 @@ TEST(StraightLine, basicLine) {
     ASSERT_EQ(Point(5, 5), line.whenX(5));
     ASSERT_EQ(Point(5, 5), line.whenY(5));
 
-    line2 = StraightLine(Point(3,4), Point(4, 5));
+    line2 = StraightLine(Point(3, 4), Point(4, 5));
     line = StraightLine(1, 1);
     ASSERT_EQ(line, line2);
     ASSERT_EQ(line2, line);
-    ASSERT_TRUE(line.belongTo({1,2}));
-    ASSERT_TRUE(line.belongTo({3,4}));
-    ASSERT_TRUE(line.belongTo({4,5}));
+    ASSERT_TRUE(line.belongTo({1, 2}));
+    ASSERT_TRUE(line.belongTo({3, 4}));
+    ASSERT_TRUE(line.belongTo({4, 5}));
 
     line = StraightLine(1, Point(4, 5));
     ASSERT_EQ(line, line2);
     ASSERT_EQ(line2, line);
-    ASSERT_TRUE(line.belongTo({1,2}));
-    ASSERT_TRUE(line.belongTo({3,4}));
-    ASSERT_TRUE(line.belongTo({4,5}));
+    ASSERT_TRUE(line.belongTo({1, 2}));
+    ASSERT_TRUE(line.belongTo({3, 4}));
+    ASSERT_TRUE(line.belongTo({4, 5}));
 }
 
 TEST(StraightLine, horizontalLines) {
-    StraightLine horizontalLine {0, 0};  // from m and q
+    StraightLine horizontalLine{0, 0};  // from m and q
 
     ASSERT_TRUE(horizontalLine.isHorizontal());
     ASSERT_FALSE(horizontalLine.isVertical());
@@ -639,7 +639,6 @@ TEST(StraightLine, horizontalLines) {
     ASSERT_EQ(StraightLine(Angle::Degrees(0), 0), horizontalLine);
     ASSERT_EQ(StraightLine(Point(0, 0), Point(100, 0)), horizontalLine);
 
-
     ASSERT_TRUE(horizontalLine.parallel(StraightLine(0, 10)));
     ASSERT_FALSE(horizontalLine.parallel(StraightLine(0.1, 10)));
     ASSERT_FALSE(horizontalLine.parallel(StraightLine(0.1, 20)));
@@ -648,7 +647,7 @@ TEST(StraightLine, horizontalLines) {
 }
 
 TEST(StraightLine, verticalLines) {
-    StraightLine verticalLine {StraightLine::VERTICAL, 0};  // from m and q
+    StraightLine verticalLine{StraightLine::VERTICAL, 0};  // from m and q
 
     ASSERT_FALSE(verticalLine.isHorizontal());
     ASSERT_TRUE(verticalLine.isVertical());
@@ -672,20 +671,22 @@ TEST(StraightLine, verticalLines) {
     ASSERT_FALSE(verticalLine.belongTo(Point(-10, 10)));
     ASSERT_FALSE(verticalLine.belongTo(Point(12, 10)));
 
-    ASSERT_EQ(Angle::Rad(M_PI/2), verticalLine.angle());
+    ASSERT_EQ(Angle::Rad(M_PI / 2), verticalLine.angle());
     ASSERT_EQ(Angle::Degrees(90), verticalLine.angle());
     ASSERT_EQ(StraightLine(Angle::Degrees(90), 0), verticalLine);
     ASSERT_EQ(StraightLine(Point(0, 0), Point(0, 100)), verticalLine);
 
-    ASSERT_TRUE(verticalLine.parallel(StraightLine(StraightLine::VERTICAL, 10)));
+    ASSERT_TRUE(
+        verticalLine.parallel(StraightLine(StraightLine::VERTICAL, 10)));
     ASSERT_FALSE(verticalLine.parallel(StraightLine(1000, 10)));
     ASSERT_FALSE(verticalLine.parallel(StraightLine(1000, 20)));
 
-    ASSERT_EQ(StraightLine(StraightLine::VERTICAL, 10), verticalLine.parallel(10));
+    ASSERT_EQ(StraightLine(StraightLine::VERTICAL, 10),
+              verticalLine.parallel(10));
 }
 
 TEST(StraightLine, othersLines) {
-    StraightLine halfLine {0.5, 2};  // from m and q
+    StraightLine halfLine{0.5, 2};  // from m and q
 
     ASSERT_EQ(Point(0, 2), halfLine.whenX(0));
     ASSERT_EQ(Point(1, 3), halfLine.whenX(1));
@@ -704,9 +705,9 @@ TEST(StraightLine, othersLines) {
     ASSERT_FALSE(halfLine.isHorizontal());
     ASSERT_FALSE(halfLine.isVertical());
 
-    ASSERT_TRUE(halfLine.parallel(StraightLine(0.5,0)));
+    ASSERT_TRUE(halfLine.parallel(StraightLine(0.5, 0)));
 
-    StraightLine thirtyLine { Angle::Degrees(30), 1 };
+    StraightLine thirtyLine{Angle::Degrees(30), 1};
     ASSERT_NEAR(30, thirtyLine.angle().degrees().value(), 0.001);
 
     ASSERT_EQ(Point(0, 1), thirtyLine.whenX(0));
@@ -722,27 +723,32 @@ TEST(StraightLine, othersLines) {
 }
 
 TEST(StraightLine, whereLines) {
-    StraightLine halfLine {1, 0};
-    StraightLine verticalLine {StraightLine::VERTICAL, 0};
-    StraightLine horizontalLine {0, 0};
+    StraightLine halfLine{1, 0};
+    StraightLine verticalLine{StraightLine::VERTICAL, 0};
+    StraightLine horizontalLine{0, 0};
 
-    ASSERT_EQ(Point(0,0), horizontalLine.where(verticalLine));
-    ASSERT_EQ(Point(0,0), verticalLine.where(horizontalLine));
+    ASSERT_EQ(Point(0, 0), horizontalLine.where(verticalLine));
+    ASSERT_EQ(Point(0, 0), verticalLine.where(horizontalLine));
 
-    ASSERT_EQ(Point(0,5), verticalLine.where(horizontalLine.parallel(5)));
-    ASSERT_EQ(Point(0,-10), verticalLine.where(horizontalLine.parallel(-10)));
+    ASSERT_EQ(Point(0, 5), verticalLine.where(horizontalLine.parallel(5)));
+    ASSERT_EQ(Point(0, -10), verticalLine.where(horizontalLine.parallel(-10)));
 
-    ASSERT_EQ(Point(0,5), horizontalLine.parallel(5).where(verticalLine));
-    ASSERT_EQ(Point(0,-10), horizontalLine.parallel(-10).where(verticalLine));
+    ASSERT_EQ(Point(0, 5), horizontalLine.parallel(5).where(verticalLine));
+    ASSERT_EQ(Point(0, -10), horizontalLine.parallel(-10).where(verticalLine));
 
-    ASSERT_EQ(Point(10,5), horizontalLine.parallel(5).where(verticalLine.parallel(10)));
-    ASSERT_EQ(Point(-5,-10), horizontalLine.parallel(-10).where(verticalLine.parallel(-5)));
+    ASSERT_EQ(Point(10, 5),
+              horizontalLine.parallel(5).where(verticalLine.parallel(10)));
+    ASSERT_EQ(Point(-5, -10),
+              horizontalLine.parallel(-10).where(verticalLine.parallel(-5)));
 
-    ASSERT_EQ(Point(10,5), verticalLine.parallel(10).where(horizontalLine.parallel(5)));
-    ASSERT_EQ(Point(-5,-10), verticalLine.parallel(-5).where(horizontalLine.parallel(-10)));
+    ASSERT_EQ(Point(10, 5),
+              verticalLine.parallel(10).where(horizontalLine.parallel(5)));
+    ASSERT_EQ(Point(-5, -10),
+              verticalLine.parallel(-5).where(horizontalLine.parallel(-10)));
 
-    ASSERT_EQ(Point(0,0), horizontalLine.where(halfLine));
-    ASSERT_EQ(Point(0,0), verticalLine.where(halfLine));
+    ASSERT_EQ(Point(0, 0), horizontalLine.where(halfLine));
+    ASSERT_EQ(Point(0, 0), verticalLine.where(halfLine));
 
-    ASSERT_EQ(Point(15,5), horizontalLine.parallel(5).where(halfLine.parallel(-10)));
+    ASSERT_EQ(Point(15, 5),
+              horizontalLine.parallel(5).where(halfLine.parallel(-10)));
 }

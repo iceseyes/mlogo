@@ -5,10 +5,10 @@
  *      Author: Massimo Bianchi <bianchi.massimo@gmail.com>
  */
 
-
 #include "common.hpp"
 
-namespace mlogo { namespace builtin {
+namespace mlogo {
+namespace builtin {
 
 namespace {
 
@@ -59,7 +59,6 @@ struct Thing : BuiltinProcedure {
         setReturnValue(Stack::instance().getVariable(varName));
     }
 };
-
 }
 
 /**
@@ -74,7 +73,5 @@ void initMemoryBuiltInProcedures() {
         .setProcedure<Local>("local")
         .setProcedure<Thing>("thing");
 }
-
-}}
-
-
+}
+}

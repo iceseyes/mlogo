@@ -5,12 +5,11 @@
  *      author: Massimo Bianchi <bianchi.massimo@gmail.com>
  */
 
-
 #include "eval.hpp"
 
-#include <string>
-#include <stdexcept>
 #include <sstream>
+#include <stdexcept>
+#include <string>
 
 #include <boost/variant.hpp>
 
@@ -27,10 +26,10 @@ namespace eval {
 using Stack = memory::Stack;
 
 ASTNode make_statement(const mlogo::parser::Statement &stmt) {
-    ASTNode s { new ASTNode::Procedure(stmt.name.name) };
+    ASTNode s{new ASTNode::Procedure(stmt.name.name)};
     impl::EvalStmtBuilderVisitor v(&s);
 
-    for(auto a : stmt.arguments) {
+    for (auto a : stmt.arguments) {
         boost::apply_visitor(v, a);
     }
 
@@ -39,58 +38,55 @@ ASTNode make_statement(const mlogo::parser::Statement &stmt) {
 
 AST make_ast(const mlogo::parser::Statement &stmt) {
     AST ast;
-    mlogo::parser::Argument proc { stmt.name };
+    mlogo::parser::Argument proc{stmt.name};
     impl::EvalStmtBuilderVisitor v(&ast);
 
     boost::apply_visitor(v, proc);
-    for(auto a : stmt.arguments) {
+    for (auto a : stmt.arguments) {
         boost::apply_visitor(v, a);
     }
 
     return ast;
 }
 
-ASTNode::Procedure::Procedure(const string &name) :
-    procName(name), _nargs(Stack::instance().getProcedureNArgs(name)) {}
+ASTNode::Procedure::Procedure(const string &name)
+    : procName(name), _nargs(Stack::instance().getProcedureNArgs(name)) {}
 
 ValueBox ASTNode::Procedure::value(const ASTNode *current) const {
     memory::ActualArguments args;
-    for(auto child : current->children) {
+    for (auto child : current->children) {
         args.push_back((*child)());
     }
 
-    Stack::instance().currentFrame().setVariable("__internal__returned__value__captured__", "");
-    Stack::instance().callProcedure(procName, args, "__internal__returned__value__captured__");
-    return Stack::instance().currentFrame().getVariable("__internal__returned__value__captured__");
+    Stack::instance().currentFrame().setVariable(
+        "__internal__returned__value__captured__", "");
+    Stack::instance().callProcedure(procName, args,
+                                    "__internal__returned__value__captured__");
+    return Stack::instance().currentFrame().getVariable(
+        "__internal__returned__value__captured__");
 }
 
-
-ASTNode::Variable::Variable(const string &name) :
-    varName(name) {}
-
+ASTNode::Variable::Variable(const string &name) : varName(name) {}
 
 ValueBox ASTNode::Variable::value(const ASTNode *) const {
     return Stack::instance().getVariable(varName);
 }
 
-ASTNode::ASTNode(Type *t, ASTNode *parent) :
-    type(t), _parent(parent) {
-    if(_parent) {
+ASTNode::ASTNode(Type *t, ASTNode *parent) : type(t), _parent(parent) {
+    if (_parent) {
         _parent->children.push_back(this);
     }
 }
 
-ASTNode::ASTNode(ASTNode &&stmt) :
-    type(stmt.type), _parent(stmt._parent),
-    children(move(stmt.children)){
+ASTNode::ASTNode(ASTNode &&stmt)
+    : type(stmt.type), _parent(stmt._parent), children(move(stmt.children)) {
     stmt.type = nullptr;
     stmt._parent = nullptr;
     stmt.children.clear();
 }
 
 ASTNode::~ASTNode() {
-    for(auto ptr : children)
-        delete ptr;
+    for (auto ptr : children) delete ptr;
 
     delete type;
 }
@@ -106,17 +102,14 @@ ASTNode &ASTNode::operator=(ASTNode &&stmt) {
     return *this;
 }
 
-ValueBox ASTNode::apply() const {
-    return type->value(this);
-}
+ValueBox ASTNode::apply() const { return type->value(this); }
 
-AST::AST(AST &&ast) :
-    statements(move(ast.statements)) {
+AST::AST(AST &&ast) : statements(move(ast.statements)) {
     ast.statements.clear();
 }
 
 AST::~AST() {
-    for(auto s : statements) delete s;
+    for (auto s : statements) delete s;
 }
 
 AST &AST::operator=(AST &&ast) {
@@ -126,9 +119,9 @@ AST &AST::operator=(AST &&ast) {
 }
 
 void AST::apply() const {
-    for(auto s : statements) {
+    for (auto s : statements) {
         auto v = s->apply();
-        if(!v.empty()) {
+        if (!v.empty()) {
             throw logic_error("You don't say what to do with " + v.toString());
         }
     }

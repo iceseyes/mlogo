@@ -5,12 +5,11 @@
  *      author: Massimo Bianchi <bianchi.massimo@gmail.com>
  */
 
-
 #include "graphics.hpp"
 
-#include <string>
 #include <sstream>
 #include <stdexcept>
+#include <string>
 
 #include "graphics_impl.hpp"
 
@@ -20,24 +19,23 @@ namespace mlogo {
 
 namespace graphics {
 
-Context::Context() :
-    _window(nullptr) {
-    if(SDL_Init(SDL_INIT_VIDEO) < 0) {
+Context::Context() : _window(nullptr) {
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         stringstream ss;
         ss << "SDL could not initialize! SDL_Error: " << SDL_GetError();
         throw logic_error(ss.str());
-		return;
+        return;
     }
 }
 
 Context::~Context() {
-    if(_window) delete _window;
+    if (_window) delete _window;
 
     SDL_Quit();
 }
 
 Window *Context::window() {
-    if(!_window) {
+    if (!_window) {
         _window = new SDLWindow("mlogo", SCREEN_WIDTH, SCREEN_HEIGHT);
     }
     return _window;

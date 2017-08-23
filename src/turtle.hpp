@@ -5,32 +5,25 @@
  *      author: Massimo Bianchi <bianchi.massimo@gmail.com>
  */
 
-
 #ifndef __TURTLE_HPP__
 #define __TURTLE_HPP__
 
-#include <tuple>
 #include <iostream>
+#include <tuple>
 
 namespace mlogo {
 
 namespace turtle {
 
-enum class Mode {
-    WRAP, WINDOW, FENCE
-};
+enum class Mode { WRAP, WINDOW, FENCE };
 
 struct Pen {
-    enum class State {
-        DOWN, UP
-    };
+    enum class State { DOWN, UP };
 
-    enum class Mode {
-        PAINT, ERASE, REVERSE
-    };
+    enum class Mode { PAINT, ERASE, REVERSE };
 
-    State state { State::DOWN };
-    Mode mode { Mode::PAINT };
+    State state{State::DOWN};
+    Mode mode{Mode::PAINT};
 };
 
 class Turtle {
@@ -89,13 +82,10 @@ private:
     _pImpl *impl;
 };
 
-
 std::ostream &operator<<(std::ostream &s, const Mode &value);
 
 } /* ns: turtle */
 
 } /* ns: mlogo */
-
-
 
 #endif /* __TURTLE_HPP__ */
