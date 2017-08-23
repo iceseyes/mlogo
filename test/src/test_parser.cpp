@@ -15,6 +15,7 @@ TEST(Parser, parseNumber) {
     auto f = [](const std::string &v) {
         return parse<NumberParser, Number>(v);
     };
+
     ASSERT_EQ(Number("3"), f("3"));
     ASSERT_EQ(Number("12345"), f("12345"));
     ASSERT_EQ(Number("12.345"), f("12.345"));
@@ -28,6 +29,7 @@ TEST(Parser, parseNumber) {
 
 TEST(Parser, parseWord) {
     auto f = [](const std::string &v) { return parse<WordParser, Word>(v); };
+
     ASSERT_EQ(Word("3"), f("\"3"));
     ASSERT_EQ(Word("3.14"), f("\"3.14"));
     ASSERT_EQ(Word("1c"), f("\"1c"));
@@ -50,6 +52,7 @@ TEST(Parser, parseVariable) {
     auto f = [](const std::string &v) {
         return parse<VariableParser, Variable>(v);
     };
+
     ASSERT_EQ(Variable("3"), f(":3"));
     ASSERT_EQ(Variable("3.14"), f(":3.14"));
     ASSERT_EQ(Variable("1c"), f(":1c"));
