@@ -21,6 +21,8 @@ using namespace boost;
 extern "C" void initBuiltInProcedures();
 
 int main(int argc, char **argv) {
+    mlogo::parser::Procedure *currentProc{nullptr};
+    mlogo::parser::Statement stmt;
     initBuiltInProcedures();
 
     string str;
@@ -32,10 +34,26 @@ int main(int argc, char **argv) {
 
         mlogo::eval::AST ast;
         try {
-            auto stmt = mlogo::parser::parse(str);
-            ast = mlogo::eval::make_ast(stmt);
+            if (currentProc) {
+                if (currentProc->addLine(str)) {
+                    delete currentProc;
+                    currentProc = nullptr;
+                    std::cout << "Procedure recorded." << std::endl;
+                    cerr << "? ";
+                    continue;
+                }
+            } else
+                stmt = mlogo::parser::parse(str);
 
-            ast();
+            if (stmt.isStartProcedure()) {
+                currentProc = new mlogo::parser::Procedure(stmt);
+                continue;
+            }
+
+            if (!currentProc) {
+                ast = mlogo::eval::make_ast(stmt);
+                ast();
+            }
         } catch (std::logic_error &e) {
             cerr << "I don't know how to " << str << " (" << e.what() << ")"
                  << endl;

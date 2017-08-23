@@ -173,6 +173,25 @@ bool Statement::isEndProcedure() const {
     return boost::to_upper_copy(name.name) == END_PROCEDURE_KEYWORD;
 }
 
+Procedure::Procedure(const Statement &prototype) {
+    if (prototype.isStartProcedure())
+        this->prototype = prototype;
+    else
+        throw std::logic_error("Statement is not a procedure definition.");
+}
+
+bool Procedure::addLine(const std::string &line) {
+    auto stmt = parse(line);
+    if (stmt.isStartProcedure()) {
+        throw std::logic_error("Nested procedures are not supported.");
+    } else if (stmt.isEndProcedure()) {
+        return true;
+    }
+
+    lines.push_back(std::move(stmt));
+    return false;
+}
+
 Statement parse(const std::string &line) {
     auto stmt = parse<StatementParser, Statement>(line);
 

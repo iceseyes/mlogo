@@ -136,6 +136,14 @@ struct Statement {
     bool isEndProcedure() const;
 };
 
+struct Procedure {
+    Statement prototype;
+    std::vector<Statement> lines;
+
+    Procedure(const Statement &prototype);
+    bool addLine(const std::string &line);
+};
+
 Statement parse(const std::string &line);
 
 ::std::ostream &operator<<(::std::ostream &s, const Word &n);
