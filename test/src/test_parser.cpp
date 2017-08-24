@@ -409,3 +409,29 @@ TEST(Parser, parseProcedureDef) {
     ASSERT_ANY_THROW(parse("TO 12 :VAR"));
     ASSERT_ANY_THROW(parse("TO SUM 2+2 :VAR"));
 }
+
+TEST(Parser, parseUserProcedure) {
+    auto udp = Procedure(parse("TO SQUARE :side"));
+    ASSERT_FALSE(udp.addLine("repeat 4 [fd :side RT 90]"));
+    ASSERT_TRUE(udp.addLine("end"));
+
+    ASSERT_EQ("SQUARE", udp.name());
+    ASSERT_EQ(1u, udp.nParams());
+    ASSERT_EQ(1u, udp.lines.size());
+
+    udp = Procedure(parse("TO RECTANGLE :side1 :side2"));
+    ASSERT_ANY_THROW(udp.addLine("fd :side1 RT 90]"));
+
+    udp = Procedure(parse("TO RECTANGLE :side1 :side2"));
+    ASSERT_FALSE(udp.addLine("fd :side1 RT 90"));
+    ASSERT_FALSE(udp.addLine("fd :side2 RT 90"));
+    ASSERT_FALSE(udp.addLine("fd :side1 RT 90"));
+    ASSERT_FALSE(udp.addLine("fd :side2 RT 90"));
+    ASSERT_TRUE(udp.addLine("end"));
+
+    ASSERT_EQ("RECTANGLE", udp.name());
+    ASSERT_EQ(2u, udp.nParams());
+    ASSERT_EQ(4u, udp.lines.size());
+
+    ASSERT_ANY_THROW(udp.addLine("fd 100"));
+}
