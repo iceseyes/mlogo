@@ -36,6 +36,7 @@ int main(int argc, char **argv) {
         try {
             if (currentProc) {
                 if (currentProc->addLine(str)) {
+                    mlogo::memory::Stack::instance().setProcedure(*currentProc);
                     delete currentProc;
                     currentProc = nullptr;
                     std::cout << "Procedure recorded." << std::endl;

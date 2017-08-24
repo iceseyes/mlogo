@@ -180,6 +180,14 @@ Stack &Stack::setProcedure(const std::string &name, ProcedurePtr v,
     return *this;
 }
 
+Stack &Stack::setProcedure(const parser::Procedure &definition) {
+    setProcedure(definition.name(),
+                 std::make_shared<types::UserDefinedProcedure>(definition),
+                 true);
+
+    return *this;
+}
+
 Stack &Stack::openFrame() {
     frames.push_back(Frame());
     return *this;

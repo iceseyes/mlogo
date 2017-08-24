@@ -15,6 +15,7 @@
 #include <utility>
 #include <vector>
 
+#include "parser.hpp"
 #include "types.hpp"
 
 namespace mlogo {
@@ -87,6 +88,8 @@ public:
         return setProcedure(
             name, std::make_shared<Proc>(std::forward<Args>(args)...));
     }
+    Stack &setProcedure(const parser::Procedure &definition);
+
     template <typename Proc, typename... Args>
     Stack &setLocalProcedure(const std::string &name, Args &&... args) {
         return setProcedure(

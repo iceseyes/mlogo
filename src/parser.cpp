@@ -192,6 +192,10 @@ bool Procedure::addLine(const std::string &line) {
     return false;
 }
 
+std::string Procedure::name() const {
+    return boost::get<ProcName>(prototype.arguments[0]).name;
+}
+
 std::size_t Procedure::nParams() const {
     return prototype.arguments.size() - 1;
 }
