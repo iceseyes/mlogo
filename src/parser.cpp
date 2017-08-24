@@ -157,6 +157,26 @@ ProcName Expression::functor() const {
     throw std::logic_error("This expression is not a function.");
 }
 
+Statement::Statement(const Statement &stmt)
+    : name(stmt.name), arguments(stmt.arguments) {}
+
+Statement::Statement(Statement &&stmt)
+    : name(stmt.name), arguments(std::move(stmt.arguments)) {}
+
+Statement &Statement::operator=(const Statement &stmt) {
+    name = stmt.name;
+    arguments = stmt.arguments;
+
+    return *this;
+}
+
+Statement &Statement::operator=(Statement &&stmt) {
+    name = std::move(stmt.name);
+    arguments = std::move(stmt.arguments);
+
+    return *this;
+}
+
 bool Statement::operator==(const Statement &b) const {
     std::stringstream ss, ss1;
     ss << *this;
@@ -188,7 +208,7 @@ bool Procedure::addLine(const std::string &line) {
         return true;
     }
 
-    lines.push_back(std::move(stmt));
+    lines.push_back(stmt);
     return false;
 }
 
@@ -303,5 +323,18 @@ Statement parse(const std::string &line) {
 
     return s;
 }
+
+::std::ostream &operator<<(::std::ostream &s, const Procedure &p) {
+    s << p.name();
+    for (auto &p : p.parameters()) s << " " << p;
+    s << std::endl;
+
+    for (auto &stmt : p.lines) s << stmt << std::endl;
+    s << END_PROCEDURE_KEYWORD << std::endl;
+
+    return s;
 }
-}
+
+} /* ns: parser */
+
+} /* ns: mlogo */

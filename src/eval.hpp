@@ -120,6 +120,8 @@ public:
 
     std::size_t size() const { return statements.size(); }
 
+    AST& include(AST&& ast);
+
 private:
     AST(const AST&) = delete;
     AST& operator=(const AST&) = delete;

@@ -134,6 +134,14 @@ ASTNode *AST::createNode(const string &name) {
     return s;
 }
 
+AST &AST::include(AST &&ast) {
+    statements.insert(statements.end(), ast.statements.begin(),
+                      ast.statements.end());
+    ast.statements.clear();
+
+    return *this;
+}
+
 } /* ns: eval */
 
 } /* ns: mlogo */

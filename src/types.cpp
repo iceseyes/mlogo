@@ -8,6 +8,7 @@
 #include "types.hpp"
 
 #include <algorithm>
+#include <iostream>
 #include <sstream>
 
 #include "eval.hpp"
@@ -63,8 +64,11 @@ void BasicProcedure::setReturnValue(bool output) const {
 }
 
 UserDefinedProcedure::UserDefinedProcedure(const parser::Procedure &definition)
-    : BasicProcedure(definition.nParams(), false) {
+    : BasicProcedure(definition.nParams(), false), ast(new AST()) {
     for (auto &var : definition.parameters()) paramNames.push_back(var.name);
+    for (auto &stmt : definition.lines) {
+        ast->include(eval::make_ast(stmt));
+    }
 }
 
 UserDefinedProcedure::~UserDefinedProcedure() { delete ast; }

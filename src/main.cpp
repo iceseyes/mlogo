@@ -41,8 +41,9 @@ int main(int argc, char **argv) {
                     currentProc = nullptr;
                     std::cout << "Procedure recorded." << std::endl;
                     cerr << "? ";
-                    continue;
                 }
+
+                continue;
             } else
                 stmt = mlogo::parser::parse(str);
 

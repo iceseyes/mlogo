@@ -61,9 +61,19 @@ struct ProcName {
     std::string name;
 
     ProcName() {}
-
+    ProcName(const ProcName &proc) : name(proc.name) {}
+    ProcName(ProcName &&proc) : name(std::move(proc.name)) {}
     ProcName(const std::string &name) : name(name) {}
 
+    ProcName &operator=(const ProcName &proc) {
+        name = proc.name;
+        return *this;
+    }
+
+    ProcName &operator=(ProcName &&proc) {
+        name = std::move(proc.name);
+        return *this;
+    }
     bool operator!=(const ProcName &b) const { return !(*this == b); }
     bool operator==(const ProcName &b) const { return name == b.name; }
     operator bool() const { return !name.empty(); }
@@ -125,8 +135,12 @@ struct Statement {
     std::vector<Argument> arguments;
 
     Statement() {}
-
+    Statement(const Statement &stmt);
+    Statement(Statement &&stmt);
     Statement(const std::string &name) { this->name = name; }
+
+    Statement &operator=(const Statement &stmt);
+    Statement &operator=(Statement &&stmt);
 
     bool operator!=(const Statement &b) const { return !(*this == b); };
     bool operator==(const Statement &b) const;
@@ -159,6 +173,7 @@ Statement parse(const std::string &line);
 ::std::ostream &operator<<(::std::ostream &s, const ProcName &n);
 ::std::ostream &operator<<(::std::ostream &s, const List &n);
 ::std::ostream &operator<<(::std::ostream &s, const Statement &n);
+::std::ostream &operator<<(::std::ostream &s, const Procedure &n);
 
 struct DisplayArgumentVisitor : boost::static_visitor<std::string> {
     template <typename Value>
