@@ -142,6 +142,8 @@ struct Procedure {
 
     Procedure(const Statement &prototype);
     bool addLine(const std::string &line);
+    std::size_t nParams() const;
+    std::vector<Variable> parameters() const;
 };
 
 Statement parse(const std::string &line);

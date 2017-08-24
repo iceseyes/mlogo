@@ -192,6 +192,21 @@ bool Procedure::addLine(const std::string &line) {
     return false;
 }
 
+std::size_t Procedure::nParams() const {
+    return prototype.arguments.size() - 1;
+}
+
+std::vector<Variable> Procedure::parameters() const {
+    std::vector<Variable> parameters;
+    std::for_each(
+        prototype.arguments.begin() + 1, prototype.arguments.end(),
+        [&parameters](const Argument &a) {
+            parameters.push_back(boost::get<Expression>(a).variable());
+        });
+
+    return parameters;
+}
+
 Statement parse(const std::string &line) {
     auto stmt = parse<StatementParser, Statement>(line);
 
@@ -203,7 +218,7 @@ Statement parse(const std::string &line) {
                 throw std::logic_error("Procedure name must be a valid word.");
             }
 
-            int i{-1};
+            uint16_t i{0};
             try {
                 for (i = 1; i < stmt.arguments.size(); ++i)
                     boost::get<Expression>(stmt.arguments[i]).variable();

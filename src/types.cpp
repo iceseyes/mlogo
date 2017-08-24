@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <sstream>
 
+#include "eval.hpp"
 #include "memory.hpp"
 
 namespace mlogo {
@@ -59,6 +60,22 @@ void BasicProcedure::setReturnValue(bool output) const {
     }
 
     memory::Stack::instance().storeResult(output ? "TRUE" : "FALSE");
+}
+
+UserDefinedProcedure::UserDefinedProcedure(const parser::Procedure &definition)
+    : BasicProcedure(definition.nParams(), false) {
+    for (auto &var : definition.parameters()) paramNames.push_back(var.name);
+}
+
+UserDefinedProcedure::~UserDefinedProcedure() { delete ast; }
+
+void UserDefinedProcedure::operator()() const {
+    int i{0};
+    for (auto &param : paramNames) {
+        memory::Stack::instance().setVariable(param, fetchArg(i++));
+    }
+
+    (*ast)();
 }
 
 } /* ns: types */

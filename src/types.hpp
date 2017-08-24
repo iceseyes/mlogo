@@ -11,9 +11,16 @@
 #include <cinttypes>
 #include <vector>
 
+#include "parser.hpp"
 #include "value.hpp"
 
 namespace mlogo {
+
+namespace eval {
+
+class AST;
+
+} /* ns: eval */
 
 namespace types {
 
@@ -48,6 +55,21 @@ protected:
 private:
     uint8_t _nArgs;
     bool _funct;
+};
+
+class UserDefinedProcedure : public BasicProcedure {
+    using AST = eval::AST;
+    using Parameters = std::vector<std::string>;
+
+public:
+    UserDefinedProcedure(const parser::Procedure &definition);
+    virtual ~UserDefinedProcedure();
+
+    void operator()() const override;
+
+private:
+    AST *ast;
+    Parameters paramNames;
 };
 
 } /* ns types */
