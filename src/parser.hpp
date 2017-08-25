@@ -162,6 +162,9 @@ struct Procedure {
 
     std::size_t nParams() const;
     std::vector<Variable> parameters() const;
+
+private:
+    bool completed{false};
 };
 
 Statement parse(const std::string &line);

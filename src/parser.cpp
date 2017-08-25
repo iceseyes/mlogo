@@ -201,10 +201,13 @@ Procedure::Procedure(const Statement &prototype) {
 }
 
 bool Procedure::addLine(const std::string &line) {
+    if (completed) throw std::logic_error("Procedure is already closed.");
+
     auto stmt = parse(line);
     if (stmt.isStartProcedure()) {
         throw std::logic_error("Nested procedures are not supported.");
     } else if (stmt.isEndProcedure()) {
+        completed = true;
         return true;
     }
 
