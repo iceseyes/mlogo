@@ -435,3 +435,30 @@ TEST(Parser, parseUserProcedure) {
 
     ASSERT_ANY_THROW(udp.addLine("fd 100"));
 }
+
+TEST(Parser, streamList) {
+    std::stringstream ss;
+    List l;
+
+    ss << l;
+    ASSERT_EQ("[]", ss.str());
+
+    l.push_back(Word("2+3"));
+
+    ss = std::stringstream();
+    ss << l;
+    ASSERT_EQ("[2+3]", ss.str());
+
+    l.push_back(Word("hello"));
+
+    ss = std::stringstream();
+    ss << l;
+    ASSERT_EQ("[2+3 hello]", ss.str());
+
+    l.push_back(Word("AlOhA"));
+
+    ss = std::stringstream();
+    ss << l;
+    ASSERT_EQ("[2+3 hello AlOhA]", ss.str());
+    ss.flush();
+}

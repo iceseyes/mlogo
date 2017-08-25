@@ -310,11 +310,14 @@ Statement parse(const std::string &line) {
 
 ::std::ostream &operator<<(::std::ostream &s, const List &n) {
     char space = 0;
+
+    s << "[";
     for (auto &v : n.items) {
         if (space) s << space;
         space = ' ';
         s << v;
     }
+    s << "]";
 
     return s;
 }
