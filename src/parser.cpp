@@ -59,6 +59,13 @@ std::string operator2proc_name(char op) {
     ss << "Unknown infix operator: " << op;
     throw std::logic_error(ss.str());
 }
+
+} /* ns: - */
+
+Number::Number(long l) {
+    std::stringstream ss;
+    ss << l;
+    value = ss.str();
 }
 
 Expression::Expression() {}
@@ -275,13 +282,11 @@ Statement parse(const std::string &line) {
 }
 
 ::std::ostream &operator<<(::std::ostream &s, const Variable &n) {
-    s << n.name;
+    s << ":" << n.name;
     return s;
 }
 
 ::std::ostream &operator<<(::std::ostream &s, const Expression &n) {
-    s << "(";
-
     switch (n.node) {
     case Expression::Node::NUMBER:
     case Expression::Node::VARIABLE:
@@ -294,11 +299,9 @@ Statement parse(const std::string &line) {
         else
             throw std::logic_error(
                 "Node Statement does not define any statement");
-        break;
     }
 
     for (auto &child : n.children) s << " " << child;
-    s << ")";
 
     return s;
 }
@@ -323,20 +326,19 @@ Statement parse(const std::string &line) {
 }
 
 ::std::ostream &operator<<(::std::ostream &s, const Statement &n) {
-    s << n.name << " ( ";
-    for (auto &a : n.arguments) s << "[" << a << "] ";
-    s << ")";
+    s << n.name;
+    for (auto &a : n.arguments) s << " " << a;
 
     return s;
 }
 
 ::std::ostream &operator<<(::std::ostream &s, const Procedure &p) {
-    s << p.name();
+    s << START_PROCEDURE_KEYWORD << " " << p.name();
     for (auto &p : p.parameters()) s << " " << p;
     s << std::endl;
 
     for (auto &stmt : p.lines) s << stmt << std::endl;
-    s << END_PROCEDURE_KEYWORD << std::endl;
+    s << END_PROCEDURE_KEYWORD;
 
     return s;
 }

@@ -39,7 +39,7 @@ struct Number {
     std::string value;
 
     Number() {}
-
+    Number(long l);
     Number(const std::string &value) : value(value) {}
 
     bool operator!=(const Number &b) const { return !(*this == b); }

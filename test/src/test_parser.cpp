@@ -408,6 +408,7 @@ TEST(Parser, parseProcedureDef) {
     ASSERT_ANY_THROW(parse("TO 12+2"));
     ASSERT_ANY_THROW(parse("TO 12 :VAR"));
     ASSERT_ANY_THROW(parse("TO SUM 2+2 :VAR"));
+    ASSERT_ANY_THROW(parse("END SUM"));
 }
 
 TEST(Parser, parseUserProcedure) {
@@ -421,6 +422,10 @@ TEST(Parser, parseUserProcedure) {
 
     udp = Procedure(parse("TO RECTANGLE :side1 :side2"));
     ASSERT_ANY_THROW(udp.addLine("fd :side1 RT 90]"));
+
+    udp = Procedure(parse("TO RECTANGLE :side1 :side2"));
+    ASSERT_ANY_THROW(udp.addLine("TO side1 :RT]"));
+    ASSERT_ANY_THROW(Procedure(parse("fd :side1 RT 90]")));
 
     udp = Procedure(parse("TO RECTANGLE :side1 :side2"));
     ASSERT_FALSE(udp.addLine("fd :side1 RT 90"));
@@ -461,4 +466,50 @@ TEST(Parser, streamList) {
     ss << l;
     ASSERT_EQ("[2+3 hello AlOhA]", ss.str());
     ss.flush();
+}
+
+TEST(Parser, streamProcedure) {
+    std::stringstream ss;
+    auto udp = Procedure(parse("TO SQUARE :side"));
+    udp.addLine("repeat 4 [fd :side RT 90]");
+    udp.addLine("end");
+
+    ss << udp;
+    ASSERT_EQ("TO SQUARE :side\nrepeat 4 [fd :side RT 90]\nEND", ss.str());
+}
+
+TEST(Parser, statementMove) {
+    Statement stmt{parse("FD 100")};
+    ASSERT_EQ(1u, stmt.arguments.size());
+    ASSERT_EQ(Expression(Number(100)),
+              boost::get<Expression>(stmt.arguments[0]));
+
+    Statement s1{std::move(stmt)};
+
+    ASSERT_EQ(1u, s1.arguments.size());
+    ASSERT_TRUE(stmt.arguments.empty());
+    ASSERT_EQ(Expression(Number(100)), boost::get<Expression>(s1.arguments[0]));
+}
+
+TEST(Parser, streamNumber) {
+    std::stringstream ss;
+
+    ss << Number("3.14");
+    ASSERT_EQ("3.14", ss.str());
+
+    ss = std::stringstream();
+    ss << Number(100);
+    ASSERT_EQ("100", ss.str());
+}
+
+TEST(Parser, streamStatementInExpression) {
+    std::stringstream ss;
+    Expression e;
+    e.node = Expression::Node::STATEMENT;
+    ASSERT_ANY_THROW(ss << e);
+
+    Statement stmt = parse("fd 100");
+    e = stmt;
+    ss << e;
+    ASSERT_EQ("fd 100", ss.str());
 }
