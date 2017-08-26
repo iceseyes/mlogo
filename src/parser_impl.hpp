@@ -20,7 +20,10 @@
 #include <boost/spirit/include/qi_grammar.hpp>
 #include <boost/spirit/include/qi_rule.hpp>
 
+#include "exceptions.hpp"
+
 namespace mlogo {
+
 namespace parser {
 
 namespace qi = boost::spirit::qi;
@@ -276,7 +279,9 @@ struct StatementParser : qi::grammar<Iterator, Statement(), ascii::space_type> {
 
 template <template <class> class Parser, typename Result = std::string>
 Result parse(const std::string &line) {
+    using SyntaxError = exceptions::SyntaxError;
     using iterator_type = std::string::const_iterator;
+
     Result stmt;
     Parser<iterator_type> parser;
     iterator_type iter = line.begin();
@@ -284,10 +289,7 @@ Result parse(const std::string &line) {
 
     bool r = phrase_parse(iter, end, parser, ascii::space, stmt);
 
-    if (!r || iter != end) {
-        std::string rest(iter, end);
-        throw std::logic_error("Syntax Error at input line from: " + rest);
-    }
+    if (!r || iter != end) throw SyntaxError(line, iter - line.begin());
 
     return stmt;
 }

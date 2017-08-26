@@ -10,6 +10,7 @@
 #include "parser_impl.hpp"
 
 using namespace mlogo::parser;
+using namespace mlogo::exceptions;
 
 TEST(Parser, parseNumber) {
     auto f = [](const std::string &v) {
@@ -593,4 +594,12 @@ TEST(Parser, procNameEquality) {
     ASSERT_NE(c, d);
     ASSERT_EQ(c, c);
     ASSERT_EQ(d, d);
+}
+
+TEST(Parser, syntaxError) {
+    ASSERT_THROW(parse("TO SUM 2+2 :a"), SyntaxError);
+    ASSERT_THROW(parse("TO X :a :b :c 7"), SyntaxError);
+    ASSERT_THROW(parse("END X :a :b :c 7"), SyntaxError);
+    ASSERT_THROW(parse("END X"), SyntaxError);
+    ASSERT_THROW(parse("print 7 + + 3"), SyntaxError);
 }
