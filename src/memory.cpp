@@ -15,11 +15,15 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "exceptions.hpp"
+
 using namespace std;
+using namespace mlogo::exceptions;
 
 using boost::to_lower_copy;
 
 namespace mlogo {
+
 namespace memory {
 
 const char Stack::__ARGUMENT_PREFIX[]{"_p"};
@@ -58,7 +62,7 @@ Frame &Frame::setProcedure(const std::string &name, ProcedurePtr ptr) {
         return *this;
     }
 
-    throw invalid_argument("Function Pointer Must be a not null.");
+    throw InvalidProcedureBody(name, InvalidProcedureBody::NULL_PTR);
 }
 
 ProcedurePtr Frame::getProcedure(const std::string &name) {
@@ -77,9 +81,7 @@ Frame &Frame::storeResult(const ValueBox &result) {
 
 Frame &Frame::setResultVariable(const Frame &child) {
     if (!_lastResultVariable.empty()) {
-        if (!child.hasResultSetted)
-            throw std::logic_error(
-                "Current Frame does not mantain a return value.");
+        if (!child.hasResultSetted) throw NoReturnValueException();
         setVariable(_lastResultVariable, child._lastResult);
         child.hasResultSetted = false;
         _lastResultVariable = "";
@@ -116,7 +118,7 @@ void Stack::callProcedure(const std::string &name, ActualArguments args,
         // destroy function frame
         closeFrame();
     } else
-        throw std::logic_error("Procedure Undefined or invalid arguments");
+        throw UndefinedProcedure(name);
 }
 
 ProcedurePtr Stack::getProcedure(const std::string &name) {
@@ -127,7 +129,7 @@ ProcedurePtr Stack::getProcedure(const std::string &name) {
     if (iter != frames.rend()) {
         return iter->getProcedure(name);
     } else
-        throw std::logic_error("Procedure Undefined");
+        throw UndefinedProcedure(name);
 }
 
 std::size_t Stack::getProcedureNArgs(const std::string &name) {
@@ -139,7 +141,7 @@ std::size_t Stack::getProcedureNArgs(const std::string &name) {
         auto &func = *iter->getProcedure(name);
         return func.nArgs();
     } else
-        throw std::logic_error("Procedure Undefined");
+        throw UndefinedProcedure(name);
 }
 
 ValueBox &Stack::getVariable(const std::string &name) {
@@ -195,7 +197,7 @@ Stack &Stack::openFrame() {
 
 Stack &Stack::closeFrame() {
     if (nFrames() <= 1) {  // current frame is global frame or no frames at all!
-        throw std::logic_error("Global Frame cannot be closed.");
+        throw UnclosableFrameException();
     }
 
     auto &current = frames[frames.size() - 1];
@@ -204,9 +206,9 @@ Stack &Stack::closeFrame() {
     if (current.hasResult() && parent.waitForValue()) {
         parent.setResultVariable(current);
     } else if (current.hasResult()) {
-        throw std::logic_error("Procedure can not return a value to none.");
+        throw InvalidReturnValue();
     } else if (parent.waitForValue()) {
-        throw std::logic_error("Expected a function, found procedure instead.");
+        throw ExpectedReturnValue();
     }
 
     frames.pop_back();

@@ -347,7 +347,7 @@ bool operator!=(const ProcName &a, const ProcName &b) { return !(a == b); }
 
 bool operator==(const ProcName &a, const ProcName &b) {
     return a.name == b.name;
-};
+}
 
 bool operator==(const std::string &a, const ProcName &b) { return a == b.name; }
 

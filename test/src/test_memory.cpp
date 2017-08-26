@@ -9,9 +9,20 @@
 
 #include <sstream>
 
+#include "exceptions.hpp"
 #include "memory.hpp"
 
 namespace mem = mlogo::memory;
+
+namespace {
+
+struct Nop : mlogo::types::BasicProcedure {
+    Nop() : mlogo::types::BasicProcedure(0) {}
+    void operator()() const override { /* empty procedure */
+    }
+};
+
+} /* ns */
 
 TEST(Memory, globalFrameVariables) {
     auto &frame = mem::Stack::instance().globalFrame();
@@ -121,7 +132,22 @@ TEST(Memory, nonGlobalFrameVariables) {
         << "Stack has opened e new stack causing a realloc for the stack "
            "itself";
 
+    mem::Stack::instance().setVariable("test101", "abc", true);
+    mem::Stack::instance().setVariable("test102", "cba", false);
+
+    ASSERT_TRUE(mem::Stack::instance().globalFrame().hasVariable("test101"));
+    ASSERT_FALSE(mem::Stack::instance().globalFrame().hasVariable("test102"));
+    ASSERT_FALSE(mem::Stack::instance().currentFrame().hasVariable("test101"));
+    ASSERT_TRUE(mem::Stack::instance().currentFrame().hasVariable("test102"));
+
+    mem::Stack::instance().setVariable("test101", "123", false);
+
+    ASSERT_EQ("123", mem::Stack::instance().getVariable("test101"));
+
     mem::Stack::instance().closeFrame();
+
+    ASSERT_EQ("abc", mem::Stack::instance().getVariable("test101"));
+
     mem::Stack::instance().closeFrame();
 }
 
@@ -134,12 +160,6 @@ TEST(Memory, globalFrameProcedureNoArgs) {
                  std::logic_error);
     ASSERT_THROW(mem::Stack::instance().callProcedure("f_test2", {}),
                  std::logic_error);
-
-    struct Nop : mlogo::types::BasicProcedure {
-        Nop() : mlogo::types::BasicProcedure(0) {}
-        void operator()() const override { /* empty procedure */
-        }
-    };
 
     ASSERT_EQ(1u, mem::Stack::instance().nFrames());
     mem::Stack::instance().setProcedure<Nop>("nop");
@@ -285,4 +305,66 @@ TEST(Memory, ignoreCase) {
     ASSERT_EQ(ptr, mem::Stack::instance().getProcedure("UPPERCASEsUM"));
     ASSERT_EQ(ptr, mem::Stack::instance().getProcedure("UPPERCaSESUm"));
     ASSERT_EQ(ptr, mem::Stack::instance().getProcedure("UPPERcaseSuM"));
+}
+
+TEST(Memory, frameGetVariable) {
+    mem::Frame f;
+
+    f.setVariable("test", "123");
+    ASSERT_EQ("123", f.getVariable("test"));
+
+    const mem::Frame &ref = f;
+    ASSERT_EQ("123", ref.getVariable("test"));
+}
+
+TEST(Memory, frameGetProcedure) {
+    using InvalidProcedureError = mlogo::exceptions::InvalidProcedureBody;
+    mem::Frame f;
+
+    ASSERT_THROW(f.setProcedure("exception", nullptr), InvalidProcedureError);
+
+    f.setProcedure<Nop>("noexcept");
+    ASSERT_TRUE(f.getProcedure("noexcept"));
+
+    const mem::Frame &ref = f;
+    ASSERT_TRUE(ref.getProcedure("noexcept"));
+}
+
+TEST(Memory, noReturnedValue) {
+    using NoReturnValueException = mlogo::exceptions::NoReturnValueException;
+
+    mem::Frame f, one;
+    one.waitForValueIn("test");
+    ASSERT_THROW(one.setResultVariable(f), NoReturnValueException);
+}
+
+TEST(Memory, undefinedProcedure) {
+    using UndefinedProcedure = mlogo::exceptions::UndefinedProcedure;
+
+    auto &stack = mem::Stack::instance();
+    ASSERT_THROW(stack.getProcedure("undefined"), UndefinedProcedure);
+    ASSERT_THROW(stack.getProcedureNArgs("undefined"), UndefinedProcedure);
+}
+
+TEST(Memory, closingFrameException) {
+    using UnclosableFrameException =
+        mlogo::exceptions::UnclosableFrameException;
+    using InvalidReturnValue = mlogo::exceptions::InvalidReturnValue;
+    using ExpectedReturnValue = mlogo::exceptions::ExpectedReturnValue;
+
+    mem::Stack::instance().closeFrame();  // close working frame
+    ASSERT_THROW(mem::Stack::instance().closeFrame(), UnclosableFrameException);
+
+    auto &f = mem::Stack::instance().openFrame().currentFrame();
+    mem::Stack::instance().openFrame();
+    mem::Stack::instance().storeResult("byebye");
+    ASSERT_THROW(mem::Stack::instance().closeFrame(), InvalidReturnValue);
+    f.waitForValueIn("test");
+    mem::Stack::instance().closeFrame();
+
+    mem::Stack::instance().openFrame();
+    f.waitForValueIn("test");
+    ASSERT_THROW(mem::Stack::instance().closeFrame(), ExpectedReturnValue);
+    mem::Stack::instance().storeResult("byebye");
+    mem::Stack::instance().closeFrame();
 }

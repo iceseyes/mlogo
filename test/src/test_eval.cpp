@@ -23,12 +23,16 @@ namespace types = mlogo::types;
 
 using Stack = memory::Stack;
 
+namespace {
+
 struct Nop : types::BasicProcedure {
     Nop() : BasicProcedure(1) {}
     void operator()() const {
         Stack::instance().globalFrame().setVariable("__test__", fetchArg(0));
     }
 };
+
+} /* ns */
 
 struct SimpleOp : types::BasicProcedure {
     SimpleOp() : BasicProcedure(2, true) {}
