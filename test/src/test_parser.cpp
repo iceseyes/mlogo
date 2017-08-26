@@ -323,6 +323,68 @@ TEST(Parser, parseExprStatement) {
               boost::get<Expression>(stmt.arguments[4]));
 }
 
+TEST(Parser, expressionPushedOnlyForFunctions) {
+    Expression e;
+    ASSERT_THROW(e << Expression(Number(5)), std::logic_error);
+}
+
+TEST(Parser, expression2statement) {
+    Expression e;
+    ASSERT_THROW(e.statement(), std::logic_error);
+
+    e = Expression(parse("sum 99 1"));
+    ASSERT_ANY_THROW(e.number());
+    ASSERT_ANY_THROW(e.variable());
+    ASSERT_ANY_THROW(e.functor());
+
+    Statement stmt{e.statement()};
+
+    ASSERT_EQ("sum", stmt.name);
+    ASSERT_EQ(2u, stmt.arguments.size());
+}
+
+TEST(Parser, expression2number) {
+    Expression e;
+    Number n{e.number()};
+    ASSERT_EQ("0", n.value);
+
+    e = Expression(parse("sum 99 1"));
+    ASSERT_THROW(e.number(), std::logic_error);
+
+    e = Expression(Variable("var"));
+    ASSERT_THROW(e.number(), std::logic_error);
+
+    e = Expression(Number(99));
+    ASSERT_ANY_THROW(e.statement());
+    ASSERT_ANY_THROW(e.variable());
+    ASSERT_ANY_THROW(e.functor());
+
+    n = e.number();
+    ASSERT_EQ("99", n.value);
+}
+
+TEST(Parser, expressionMoveCtor) {
+    Expression e{Number(100)};
+    ASSERT_EQ("100", e.number().value);
+
+    Expression e1{std::move(e)};
+    ASSERT_EQ("100", e1.number().value);
+
+    e = Expression(parse("sum 1 1"));
+    ASSERT_EQ("sum", e.statement().name);
+
+    Expression e2{std::move(e)};
+    ASSERT_EQ("sum", e2.statement().name);
+    ASSERT_THROW(e.statement(), std::logic_error);
+}
+
+TEST(Parser, expressionUnsupportedInfixOperator) {
+    ASSERT_THROW(Expression('~'), std::logic_error);
+    ASSERT_THROW(Expression('!'), std::logic_error);
+    ASSERT_THROW(Expression('%'), std::logic_error);
+    ASSERT_THROW(Expression('='), std::logic_error);
+}
+
 TEST(Parser, parseComments) {
     auto stmt = parse("; This is a comment line");
     ASSERT_TRUE(stmt.name.name.empty());
@@ -408,7 +470,7 @@ TEST(Parser, parseProcedureDef) {
     ASSERT_ANY_THROW(parse("TO 12+2"));
     ASSERT_ANY_THROW(parse("TO 12 :VAR"));
     ASSERT_ANY_THROW(parse("TO SUM 2+2 :VAR"));
-    ASSERT_ANY_THROW(parse("END SUM"));
+    ASSERT_ANY_THROW(parse("END 2+2"));
 }
 
 TEST(Parser, parseUserProcedure) {
@@ -422,6 +484,7 @@ TEST(Parser, parseUserProcedure) {
 
     udp = Procedure(parse("TO RECTANGLE :side1 :side2"));
     ASSERT_ANY_THROW(udp.addLine("fd :side1 RT 90]"));
+    ASSERT_THROW(udp.addLine("TO fd :side1"), std::logic_error);
 
     udp = Procedure(parse("TO RECTANGLE :side1 :side2"));
     ASSERT_ANY_THROW(udp.addLine("TO side1 :RT]"));
@@ -439,6 +502,7 @@ TEST(Parser, parseUserProcedure) {
     ASSERT_EQ(4u, udp.lines.size());
 
     ASSERT_ANY_THROW(udp.addLine("fd 100"));
+    ASSERT_THROW(Procedure(parse("fd 100")), std::logic_error);
 }
 
 TEST(Parser, streamList) {
@@ -512,4 +576,21 @@ TEST(Parser, streamStatementInExpression) {
     e = stmt;
     ss << e;
     ASSERT_EQ("fd 100", ss.str());
+}
+
+TEST(Parser, procNameEquality) {
+    ProcName a{"hi"};
+    ProcName b("hi");
+    ProcName c("Hi");
+    ProcName d("sum");
+
+    ASSERT_EQ(a, b);
+    ASSERT_NE(a, c);
+    ASSERT_NE(a, d);
+    ASSERT_EQ(b, a);
+    ASSERT_NE(b, c);
+    ASSERT_NE(b, d);
+    ASSERT_NE(c, d);
+    ASSERT_EQ(c, c);
+    ASSERT_EQ(d, d);
 }

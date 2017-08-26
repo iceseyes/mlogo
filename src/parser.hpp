@@ -74,8 +74,7 @@ struct ProcName {
         name = std::move(proc.name);
         return *this;
     }
-    bool operator!=(const ProcName &b) const { return !(*this == b); }
-    bool operator==(const ProcName &b) const { return name == b.name; }
+
     operator bool() const { return !name.empty(); }
 };
 
@@ -94,7 +93,7 @@ struct List {
 struct Expression {
     enum class Node { NUMBER, VARIABLE, FUNCTION, STATEMENT };
 
-    std::string name{0};
+    std::string name{"0"};
     Node node{Node::NUMBER};
     std::vector<Expression> children;
 
@@ -177,6 +176,10 @@ Statement parse(const std::string &line);
 ::std::ostream &operator<<(::std::ostream &s, const List &n);
 ::std::ostream &operator<<(::std::ostream &s, const Statement &n);
 ::std::ostream &operator<<(::std::ostream &s, const Procedure &n);
+
+bool operator!=(const ProcName &a, const ProcName &b);
+bool operator==(const ProcName &a, const ProcName &b);
+bool operator==(const std::string &a, const ProcName &b);
 
 struct DisplayArgumentVisitor : boost::static_visitor<std::string> {
     template <typename Value>

@@ -105,6 +105,9 @@ Expression &Expression::operator=(const Expression &e) {
     node = e.node;
     children = e.children;
 
+    delete stmt;
+    stmt = nullptr;
+
     if (e.stmt) stmt = new Statement(*e.stmt);
 
     return *this;
@@ -114,6 +117,9 @@ Expression &Expression::operator=(Expression &&e) {
     name = std::move(e.name);
     node = e.node;
     children = std::move(e.children);
+
+    delete stmt;
+    stmt = nullptr;
 
     if (e.stmt) {
         stmt = e.stmt;
@@ -257,6 +263,8 @@ Statement parse(const std::string &line) {
                 for (i = 1; i < stmt.arguments.size(); ++i)
                     boost::get<Expression>(stmt.arguments[i]).variable();
             } catch (std::exception &e) {
+                // This should never happen, 'cause parser does not accept any
+                // other token but the variables, after a TO keyword
                 std::stringstream ss;
                 ss << "Argument " << i << "-th should be a valid variable";
                 throw std::logic_error(ss.str());
@@ -265,6 +273,8 @@ Statement parse(const std::string &line) {
             throw std::logic_error("Procedure must have a name!");
         }
     } else if (stmt.isEndProcedure() && stmt.arguments.size() > 0) {
+        // This should never happen, 'cause parser does not accept any
+        // other token after the END keyword
         throw std::logic_error(END_PROCEDURE_KEYWORD +
                                " cannot have arguments.");
     }
@@ -342,6 +352,14 @@ Statement parse(const std::string &line) {
 
     return s;
 }
+
+bool operator!=(const ProcName &a, const ProcName &b) { return !(a == b); }
+
+bool operator==(const ProcName &a, const ProcName &b) {
+    return a.name == b.name;
+};
+
+bool operator==(const std::string &a, const ProcName &b) { return a == b.name; }
 
 } /* ns: parser */
 
