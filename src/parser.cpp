@@ -334,7 +334,7 @@ Statement parse(const std::string &line) {
 
 ::std::ostream &operator<<(::std::ostream &s, const Procedure &p) {
     s << START_PROCEDURE_KEYWORD << " " << p.name();
-    for (auto &p : p.parameters()) s << " " << p;
+    for (auto &param : p.parameters()) s << " " << param;
     s << std::endl;
 
     for (auto &stmt : p.lines) s << stmt << std::endl;

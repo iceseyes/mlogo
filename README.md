@@ -9,10 +9,11 @@ How to compile
 mLogo can be compiled under Linux. It requires libboost >= 1.58, libSDL2 and a version of g++ or clang which support C++14 standard. For example, on ubuntu Xenial or later you can install this packages:
 
 ```bash
-sudo apt install cmake libboost-all-dev libsdl2-dev build-essential
+sudo apt install git cmake libboost-all-dev libsdl2-dev build-essential
 ```
 
-When you have collected every dependency, you can compile mlogo using Cmake. For example, if you want to use `build/Debug` subdirectory to keep mlogo debug compilation you can
+When you have collected every dependency and cloned the project, you can compile mlogo using Cmake. 
+For example, if you want to use `build/Debug` subdirectory to keep mlogo debug compilation you can
 write something like that:
 
 
