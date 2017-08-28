@@ -9,11 +9,12 @@ before_install:
   - sudo apt-get update -qq
 
 install:
-  - sudo apt-get install -qq g++-6 gcc-6 cmake libboost-all-dev libsdl2
+  - sudo apt-get install -qq g++-6 gcc-6 cmake libboost-all-dev libsdl2-dev
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90
   - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 90
   - gcc --version
   - g++ --version
+  - cmake --version
 
 before_script:  
   - mkdir build
