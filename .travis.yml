@@ -21,6 +21,7 @@ matrix:
           sources:
             - llvm-toolchain-trusty-4.0
           packages:
+            - g++-6  # required for updated STL
             - clang-4.0
             - cmake
             - libsdl2-dev
