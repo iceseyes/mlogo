@@ -13,7 +13,7 @@ matrix:
             - cmake
             - libsdl2-dev
       env:
-        - CC=gcc-6 CXX=g++-6 BOOST_VER=64
+        - CC=gcc-6 CXX=g++-6
 
     - os: linux
       addons:
@@ -26,16 +26,16 @@ matrix:
             - libsdl2-dev
             - llvm
       env:
-        - CC=clang-4.0 CXX=clang++-4.0 BOOST_VER=64
+        - CC=clang-4.0 CXX=clang++-4.0
 
 install:
   - wget http://ftp.de.debian.org/debian/pool/main/l/lcov/lcov_1.13.orig.tar.gz
   - tar xf lcov_1.13.orig.tar.gz
   - sudo make -C lcov-1.13/ install
   - sudo pip install codecov
-  - wget -O "boost_1_$BOOST_VER_0.tar.gz" "http://sourceforge.net/projects/boost/files/boost/1.$BOOST_VER.0/boost_1_$BOOST_VER_0.tar.gz/download"
-  - tar xzf "boost_1_$BOOST_VER_0.tar.gz"
-  - cd "boost_1_$BOOST_VER_0"
+  - wget -O "boost_1_64_0.tar.gz" "http://sourceforge.net/projects/boost/files/boost/1.64.0/boost_1_64_0.tar.gz/download"
+  - tar xzf "boost_1_64_0.tar.gz"
+  - cd "boost_1_64_0"
   - ./bootstrap.sh --with-libraries=program_options,filesystem,system
   - sudo ./b2 link=shared threading=multi variant=release install > boost.compile.log
   - cd ..
