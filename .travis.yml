@@ -13,7 +13,7 @@ matrix:
             - cmake
             - libsdl2-dev
       env:
-        - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
+        - MATRIX_CC=gcc-6 MATRIX_CXX=g++-6
 
     - os: linux
       addons:
@@ -26,10 +26,11 @@ matrix:
             - libsdl2-dev
             - llvm
       env:
-        - MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0"
+        - MATRIX_CC=clang-4.0 MATRIX_CXX=clang++-4.0
 
 before_install:
-  - exec "${MATRIX_EVAL}"
+  - export CC=${MATRIX_CC}
+  - export CXX=${MATRIX_CXX}
   - $CC -v
   - $CXX -v
 
