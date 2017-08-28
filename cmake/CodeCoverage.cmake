@@ -41,6 +41,9 @@
 # 2017-06-02, Lars Bilke
 # - Merged with modified version from github.com/ufz/ogs
 #
+# 2017-08-28, Massimo Bianchi
+# - Adding CLang Support
+#
 #
 # USAGE:
 #
@@ -79,16 +82,37 @@ if(NOT GCOV_PATH)
     message(FATAL_ERROR "gcov not found! Aborting...")
 endif() # NOT GCOV_PATH
 
+set(COVERAGE_COMPILER_FLAGS "-g -O0 --coverage -fprofile-arcs -ftest-coverage"
+    CACHE INTERNAL "")
+
+set(COVERAGE_TOOL "gcov")
+
+
 if("${CMAKE_CXX_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang")
     if("${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS 3)
-        message(FATAL_ERROR "Clang version must be 3.0.0 or greater! Aborting...")
+      message(FATAL_ERROR "Clang version must be 3.0.0 or greater! Aborting...")
     endif()
+
+    find_program(LLVM_GCOV_PATH llvm-cov)
+
+    if(NOT LLVM_GCOV_PATH)
+      message(FATAL_ERROR "llvm-cov not found! Aborting...")
+    endif() # NOT GCOV_PATH
+
+    set(COVERAGE_COMPILER_FLAGS "-g -O0 -fprofile-arcs -ftest-coverage"
+      CACHE INTERNAL "")
+
+    set(COVERAGE_TOOL "${CMAKE_CURRENT_BINARY_DIR}/llvm-cov.sh")
+    file(WRITE /tmp/llvm-cov.sh "#!/bin/sh\nexec ${LLVM_GCOV_PATH} gcov \"$@\"")
+    file(REMOVE ${CMAKE_CURRENT_BINARY_DIR}/llvm-cov.sh)
+    file(COPY /tmp/llvm-cov.sh
+      DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+      FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ
+      GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+    message(STATUS "Writing ${CMAKE_CURRENT_BINARY_DIR}/llvm-cov.sh")
 elseif(NOT CMAKE_COMPILER_IS_GNUCXX)
     message(FATAL_ERROR "Compiler is not GNU gcc! Aborting...")
 endif()
-
-set(COVERAGE_COMPILER_FLAGS "-g -O0 --coverage -fprofile-arcs -ftest-coverage"
-    CACHE INTERNAL "")
 
 set(CMAKE_CXX_FLAGS_COVERAGE
     ${COVERAGE_COMPILER_FLAGS}
@@ -157,7 +181,7 @@ function(SETUP_TARGET_FOR_COVERAGE)
         COMMAND ${Coverage_EXECUTABLE}
 
         # Capturing lcov counters and generating report
-        COMMAND ${LCOV_PATH} --directory . --capture --output-file ${Coverage_NAME}.info
+        COMMAND ${LCOV_PATH} --directory . --capture --gcov-tool ${COVERAGE_TOOL} --output-file ${Coverage_NAME}.info
         COMMAND ${LCOV_PATH} --remove ${Coverage_NAME}.info ${COVERAGE_EXCLUDES} --output-file ${Coverage_NAME}.info.cleaned
         COMMAND ${GENHTML_PATH} -o ${Coverage_NAME} ${Coverage_NAME}.info.cleaned
         COMMAND ${CMAKE_COMMAND} -E remove ${Coverage_NAME}.info ${Coverage_NAME}.info.cleaned

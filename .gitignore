@@ -8,3 +8,5 @@ GRTAGS
 GTAGS
 CMakeCache.txt
 CMakeFiles/
+
+llvm-cov.sh
