@@ -11,6 +11,7 @@
 
 #include "exceptions.hpp"
 #include "memory.hpp"
+#include "parser.hpp"
 
 namespace mem = mlogo::memory;
 
@@ -365,4 +366,23 @@ TEST(Memory, closingFrameException) {
     ASSERT_THROW(mem::Stack::instance().closeFrame(), ExpectedReturnValue);
     mem::Stack::instance().storeResult("byebye");
     mem::Stack::instance().closeFrame();
+}
+
+TEST(Memory, procedure2Stack) {
+    mlogo::parser::Procedure definition{
+        mlogo::parser::parse("TO SQUARE :side")};
+    definition.addLine("nop");
+    definition.addLine("end");
+
+    ASSERT_FALSE(mem::Stack::instance().globalFrame().hasProcedure("SQUARE"));
+    mem::Stack::instance().setProcedure(definition);
+    ASSERT_TRUE(mem::Stack::instance().globalFrame().hasProcedure("SQUARE"));
+
+    definition = mlogo::parser::parse("TO SQUARE2 :side");
+    definition.addLine("square :side");
+    definition.addLine("end");
+
+    ASSERT_FALSE(mem::Stack::instance().globalFrame().hasProcedure("SQUARE2"));
+    mem::Stack::instance().setProcedure(definition);
+    ASSERT_TRUE(mem::Stack::instance().globalFrame().hasProcedure("SQUARE2"));
 }
