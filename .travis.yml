@@ -1,41 +1,63 @@
 sudo: require
 language: cpp
-compiler: gcc
+matrix:
+  include:
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+            - gcc-6
+            - cmake
+            - libsdl2-dev
+        env:
+          - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6 && BOOST_VER=1.64.0"
 
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-6
-      - gcc-6
-      - cmake
-      - libsdl2-dev
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - llvm-toolchain-precise-4.0
+          packages:
+            - clang-4.0
+            - cmake
+            - libsdl2-dev
+            - llvm
+        env:
+          - MATRIX_EVAL="CC=clang-4.0 && CXX=clang++-4.0 && BOOST_VER=1.64.0"
+
+    - os: osx
+      osx_image: xcode8
+      env:
+        - MATRIX_EVAL="brew install gcc && brew install cmake && brew install libsdl2 && CC=gcc-6 && CXX=g++-6 && && BOOST_VER=1.64.0"
+
+    - os: osx
+      osx_image: xcode8.3
+      env:
+        - MATRIX_EVAL="brew install cmake && brew install libsdl2 && BOOST_VER=1.64.0"
+
+before_install:
+  - eval "${MATRIX_EVAL}"
 
 install:
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90
-  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 90
-  - sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-6 90
   - wget http://ftp.de.debian.org/debian/pool/main/l/lcov/lcov_1.13.orig.tar.gz
   - tar xf lcov_1.13.orig.tar.gz
   - sudo make -C lcov-1.13/ install
   - sudo pip install codecov
-  - gcc --version
-  - g++ --version
-  - cmake --version
-  - lcov --version
-  - wget -O boost_1_64_0.tar.gz http://sourceforge.net/projects/boost/files/boost/1.64.0/boost_1_64_0.tar.gz/download
-  - tar xzf boost_1_64_0.tar.gz
-  - cd boost_1_64_0/
+  - wget -O boost_${BOOST_VER}.tar.gz http://sourceforge.net/projects/boost/files/boost/1.64.0/boost_1_64_0.tar.gz/download
+  - tar xzf boost_${BOOST_VER}.tar.gz
+  - cd boost_${BOOST_VER}/
   - ./bootstrap.sh --with-libraries=program_options,filesystem,system
   - sudo ./b2 link=shared threading=multi variant=release install > boost.compile.log
   - cd ..
-  - sudo rm -rf boost_1_64* 
+  - sudo rm -rf boost_${BOOST_VER}* 
 
 before_script:  
   - mkdir build
   - cd build
-  - cmake -DCMAKE_BUILD_TYPE=Debug -DWITH_WINDOW_ALWAYS_ON_TOP=no -DWITH_COVERAGE=yes ..
+  - cmake -DCMAKE_BUILD_TYPE=Debug -DWITH_WINDOW_ALWAYS_ON_TOP=no -DWITH_COVERAGE=yes -DCMAKE_C_COMPILER=$CC -DCMAKE_CXX_COMPILER=$CXX ..
 
 script:
   - make mlogo_test_coverage
