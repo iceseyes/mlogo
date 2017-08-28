@@ -1,8 +1,6 @@
 language: cpp
 
-compiler:  
-  - gcc
-  - clang
+compiler:  gcc
 
 addons:
   apt:
@@ -11,12 +9,11 @@ addons:
     packages:
       - gcc-6
       - g++-6
-      - clang-4.0
       - cmake
 
 install: 
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90
-  - sudo update-alternatives --install /usr/bin/clan++ clang++ /usr/bin/clang++-4.0 90
+  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 90
 
 before_script:  
   - mkdir build
