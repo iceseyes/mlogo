@@ -10,14 +10,15 @@ addons:
       - g++-6
       - gcc-6
       - cmake
+      - libsdl2
 
 install:
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90
   - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 90
   - sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-6 90
-  - wget http://ftp.de.debian.org/debian/pool/main/l/lcov/lcov_1.11.orig.tar.gz
-  - tar xf lcov_1.11.orig.tar.gz
-  - sudo make -C lcov-1.11/ install
+  - wget http://ftp.de.debian.org/debian/pool/main/l/lcov/lcov_1.13.orig.tar.gz
+  - tar xf lcov_1.13.orig.tar.gz
+  - sudo make -C lcov-1.13/ install
   - sudo pip install codecov
   - gcc --version
   - g++ --version
