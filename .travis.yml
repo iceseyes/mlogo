@@ -12,8 +12,8 @@ matrix:
             - gcc-6
             - cmake
             - libsdl2-dev
-        env:
-          - MATRIX_EVAL="export CC=gcc-6; export CXX=g++-6; export BOOST_VER=1.64.0"
+      env:
+        - CC=gcc-6 CXX=g++-6 BOOST_VER=1.64.0
 
     - os: linux
       addons:
@@ -25,11 +25,8 @@ matrix:
             - cmake
             - libsdl2-dev
             - llvm
-        env:
-          - MATRIX_EVAL="export CC=clang-4.0;export CXX=clang++-4.0;export BOOST_VER=1.64.0"
-
-before_install:
-  - eval "${MATRIX_EVAL}"
+      env:
+        - CC=clang-4.0 CXX=clang++-4.0 BOOST_VER=1.64.0
 
 install:
   - wget http://ftp.de.debian.org/debian/pool/main/l/lcov/lcov_1.13.orig.tar.gz
