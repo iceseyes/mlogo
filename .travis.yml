@@ -9,13 +9,18 @@ before_install:
   - sudo apt-get update -qq
 
 install:
-  - sudo apt-get install -qq g++-6 gcc-6 cmake libboost1.55-dev libsdl2-dev
+  - sudo apt-get install -qq g++-6 gcc-6 cmake libsdl2-dev
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90
   - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-6 90
   - gcc --version
   - g++ --version
   - cmake --version
-
+  - sudo wget -O boost_1_64_0.tar.gz http://sourceforge.net/projects/boost/files/boost/1.64.0/boost_1_64_0.tar.gz/download
+  - sudo tar xzvf boost_1_64_0.tar.gz
+  - cd boost_1_64_0/
+  - sudo ./bootstrap.sh --with-libraries=program_options,filesystem,system
+  - ./b2 link=shared threading=multi variant=release
+  
 before_script:  
   - mkdir build
   - cd build
