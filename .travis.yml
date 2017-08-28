@@ -19,7 +19,7 @@ install:
 before_script:  
   - mkdir build
   - cd build
-  - cmake -DCMAKE_BUILD_TYPE=Release -DWITH_WINDOW_ALWAYS_ON_TOP=no ..
+  - cmake -DCMAKE_BUILD_TYPE=Debug -DWITH_WINDOW_ALWAYS_ON_TOP=no ..
 
 script:
   - make
