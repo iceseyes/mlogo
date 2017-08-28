@@ -19,7 +19,7 @@ matrix:
       addons:
         apt:
           sources:
-            - llvm-toolchain-precise-4.0
+            - llvm-toolchain-trusty-4.0
           packages:
             - clang-4.0
             - cmake
@@ -36,13 +36,12 @@ install:
   - tar xf lcov_1.13.orig.tar.gz
   - sudo make -C lcov-1.13/ install
   - sudo pip install codecov
-  - wget -O boost_$BOOST_VER.tar.gz http://sourceforge.net/projects/boost/files/boost/$BOOST_VER/boost_$BOOST_VER.tar.gz/download
-  - tar xzf boost_$BOOST_VER.tar.gz
-  - cd boost_$BOOST_VER
+  - wget -O "boost_$BOOST_VER.tar.gz" "http://sourceforge.net/projects/boost/files/boost/$BOOST_VER/boost_$BOOST_VER.tar.gz/download"
+  - tar xzf "boost_$BOOST_VER.tar.gz"
+  - cd "boost_$BOOST_VER"
   - ./bootstrap.sh --with-libraries=program_options,filesystem,system
   - sudo ./b2 link=shared threading=multi variant=release install > boost.compile.log
   - cd ..
-  - sudo rm -rf boost_$BOOST_VER
 
 before_script:  
   - mkdir build
