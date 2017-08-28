@@ -6,3 +6,5 @@
 GPATH
 GRTAGS
 GTAGS
+CMakeCache.txt
+CMakeFiles/
