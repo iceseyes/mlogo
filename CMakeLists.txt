@@ -1,4 +1,4 @@
-project(mLogo CXX)
+project(mLogo C CXX)
 cmake_minimum_required(VERSION 3.0.2)
 
 include (CheckFunctionExists)
