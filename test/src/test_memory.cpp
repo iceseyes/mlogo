@@ -74,7 +74,7 @@ TEST(Memory, globalFrameVariables) {
     // a new frame was opened, so reference to global frame is changed.
     ASSERT_TRUE(&frame != &mem::Stack::instance().globalFrame())
         << "Stack has opened e new stack causing a realloc for the stack "
-           "itself";
+        << "itself";
 
     mem::Stack::instance().closeFrame();
 }
@@ -130,7 +130,7 @@ TEST(Memory, nonGlobalFrameVariables) {
 
     ASSERT_TRUE(&frame != &mem::Stack::instance().currentFrame())
         << "Stack has opened e new stack causing a realloc for the stack "
-           "itself";
+        << "itself";
 
     mem::Stack::instance().setVariable("test101", "abc", true);
     mem::Stack::instance().setVariable("test102", "cba", false);
@@ -286,9 +286,7 @@ TEST(Memory, ProcedureWithArgsAndReturnValue) {
 TEST(Memory, ignoreCase) {
     struct Sum : mlogo::types::BasicProcedure {
         Sum() : mlogo::types::BasicProcedure(0, true) {}
-        void operator()() const override {
-            mem::Stack::instance().storeResult("SUM");
-        }
+        void operator()() const override {}
     };
 
     mem::Stack::instance().setVariable("UPPERcase", "123");

@@ -44,10 +44,7 @@ struct SimpleOp : types::BasicProcedure {
         double result = op(arg0, arg1);
         long rlong = static_cast<long>(result);
 
-        if (result - rlong < 1e-5)
-            ss << rlong;
-        else
-            ss << result;
+        if (result - rlong < 1e-5) ss << rlong;
 
         setReturnValue(ss.str());
     }
@@ -251,6 +248,11 @@ TEST(Eval, makeASTFromParserExpression) {
     clearValue();
     ast();
     ASSERT_EQ(13, readValue());
+
+    ast = make_ast(parse("eNop 2*5+(3-1)/2-1"));
+    clearValue();
+    ast();
+    ASSERT_EQ(10, readValue());
 
     ast = make_ast(parse("eNop max 5 9"));
     clearValue();
