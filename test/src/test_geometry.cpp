@@ -592,6 +592,14 @@ TEST(Path, turtleRotateAndTranslate) {
     ASSERT_EQ(i, turtle.end());
 }
 
+TEST(Path, fromPoint) {
+    Point p{123, 432};
+    Path path{p};
+
+    ASSERT_EQ(1u, path.size());
+    ASSERT_EQ(p, *(path.begin()));
+}
+
 TEST(StraightLine, basicLine) {
     StraightLine line{1, 0};  // from m and q
 
