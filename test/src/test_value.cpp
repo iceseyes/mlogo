@@ -150,3 +150,13 @@ TEST(ValueBox, empty) {
     list = ListValue({word.word()});
     ASSERT_FALSE(list.empty());
 }
+
+TEST(ValueBox, streamList) {
+    std::stringstream ss;
+    ListValue list;
+    list.push_back("test");
+    list.push_back("stream");
+
+    ss << list;
+    ASSERT_EQ("[test stream]", ss.str());
+}
