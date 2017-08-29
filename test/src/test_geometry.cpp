@@ -198,6 +198,12 @@ TEST(Angle, basicTrigonometry) {
     ASSERT_NEAR(1, tan(anAngle), 0.001);
 }
 
+TEST(Angle, inv) {
+    Angle anAngle{Angle::Rad(3.14)};
+
+    ASSERT_FLOAT_EQ(1 / 3.14, anAngle.inv().radians().value());
+}
+
 TEST(Reference, globalReference) {
     Reference global;
 
