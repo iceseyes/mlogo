@@ -400,6 +400,18 @@ TEST(Point, localPosition) {
     ASSERT_EQ(system, p2.system);
 }
 
+TEST(Point, distance) {
+    Point p1{1, 0};
+    Point p2{0, 1};
+    Point p3{1, 1};
+    Point p4{-1, 0};
+
+    ASSERT_FLOAT_EQ(std::sqrt(2), p1.distance(p2));
+    ASSERT_FLOAT_EQ(std::sqrt(2), p2.distance(p1));
+    ASSERT_FLOAT_EQ(1, p3.distance(p2));
+    ASSERT_FLOAT_EQ(2, p1.distance(p4));
+}
+
 TEST(Path, turtle) {
     Reference ref{1, 320, -1, 240};
     Path turtle{ref, 8, 0};
