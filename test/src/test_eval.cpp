@@ -289,3 +289,24 @@ TEST(Eval, makeASTFromParserExpression) {
     ast();
     ASSERT_EQ(124, readValue());
 }
+
+TEST(Eval, astVariableTest) {
+    mlogo::eval::ASTNode::Variable v("test_eval123");
+
+    ASSERT_EQ(0u, v.nArgs());
+
+    Stack::instance().setVariable("test_eval123", "abc");
+    ASSERT_EQ("abc", v.value(nullptr).toString());
+}
+
+TEST(Eval, astListTest) {
+    mlogo::types::ListValue list;
+    list.push_back("123");
+    list.push_back("654");
+    mlogo::eval::ASTNode::List l(list);
+
+    ASSERT_EQ(0u, l.nArgs());
+
+    Stack::instance().setVariable("test_eval123", "abc");
+    ASSERT_EQ(list, l.value(nullptr).list());
+}
