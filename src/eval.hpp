@@ -124,6 +124,7 @@ private:
     std::vector<ASTNode*> statements;
 
     friend AST make_ast(const mlogo::parser::Statement& stmt);
+    FRIEND_TEST(Eval, moveAST);
 };
 
 ASTNode make_statement(const mlogo::parser::Statement& stmt);

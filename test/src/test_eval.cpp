@@ -301,6 +301,7 @@ TEST(Eval, astVariableTest) {
 }
 
 TEST(Eval, astListTest) {
+    using mlogo::parser::parse;
     types::ListValue list;
     list.push_back("123");
     list.push_back("654");
@@ -310,6 +311,12 @@ TEST(Eval, astListTest) {
 
     Stack::instance().setVariable("test_eval123", "abc");
     ASSERT_EQ(list, l.value(nullptr).list());
+
+    auto ast = eval::make_ast(parse("eNop [123 654]"));
+    clearValue();
+    ast();
+    ASSERT_EQ(list,
+              Stack::instance().globalFrame().getVariable("__test__").list());
 }
 
 namespace mlogo {
@@ -341,6 +348,30 @@ TEST(Eval, reParentASTNode) {
     ASSERT_THROW(
         n.setParent(new eval::ASTNode(new eval::ASTNode::Procedure("eSum"))),
         exceptions::ASTNodeAlreadyConnected);
+}
+
+TEST(Eval, moveAST) {
+    eval::AST one;
+
+    auto *n1 = one.createNode("eNop");
+    auto *n2 = one.createNode("eNop");
+    auto *n3 = one.createNode("eNop");
+    auto *n4 = one.createNode("eNop");
+
+    ASSERT_EQ(n1, one.statements[0]);
+    ASSERT_EQ(n2, one.statements[1]);
+    ASSERT_EQ(n3, one.statements[2]);
+    ASSERT_EQ(n4, one.statements[3]);
+
+    eval::AST two{std::move(one)};
+
+    ASSERT_EQ(0u, one.statements.size());
+    ASSERT_EQ(4u, two.statements.size());
+
+    ASSERT_EQ(n1, two.statements[0]);
+    ASSERT_EQ(n2, two.statements[1]);
+    ASSERT_EQ(n3, two.statements[2]);
+    ASSERT_EQ(n4, two.statements[3]);
 }
 
 } /* ns: eval */
