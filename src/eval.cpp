@@ -13,6 +13,7 @@
 
 #include <boost/variant.hpp>
 
+#include "exceptions.hpp"
 #include "memory.hpp"
 
 #include "eval_impl.hpp"
@@ -24,6 +25,7 @@ namespace mlogo {
 namespace eval {
 
 using Stack = memory::Stack;
+using ASTNodeAlreadyConnected = exceptions::ASTNodeAlreadyConnected;
 
 ASTNode make_statement(const mlogo::parser::Statement &stmt) {
     ASTNode s{new ASTNode::Procedure(stmt.name.name)};
@@ -103,6 +105,17 @@ ASTNode &ASTNode::operator=(ASTNode &&stmt) {
 }
 
 ValueBox ASTNode::apply() const { return type->value(this); }
+
+ASTNode *ASTNode::setParent(ASTNode *node) {
+    if (!_parent) {
+        _parent = node;
+        _parent->children.push_back(this);
+    } else {
+        throw ASTNodeAlreadyConnected();
+    }
+
+    return this;
+}
 
 AST::AST(AST &&ast) : statements(move(ast.statements)) {
     ast.statements.clear();

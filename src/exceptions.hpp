@@ -148,6 +148,16 @@ struct ExpectedReturnValue : std::logic_error {
         : std::logic_error("Expected a function, found procedure instead.") {}
 };
 
+/**
+ * ASTNodeAlreadyConnected is used when you try to re-parent an AST node
+ * which is already connected to a AST.
+ */
+struct ASTNodeAlreadyConnected : std::logic_error {
+    /// Build a new Exception.
+    ASTNodeAlreadyConnected()
+        : std::logic_error("This ASTNode belongs to another parent.") {}
+};
+
 } /* ns: exceptions */
 
 } /* ns: mlogo */
