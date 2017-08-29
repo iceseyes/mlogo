@@ -412,6 +412,20 @@ TEST(Point, distance) {
     ASSERT_FLOAT_EQ(2, p1.distance(p4));
 }
 
+TEST(Point, scale) {
+    Point p1{1, 0};
+    Point p2{0, 1};
+    Point p3{1, 1};
+
+    ASSERT_EQ(Point(5, 0), p1.scale(5, 5));
+    ASSERT_EQ(Point(10, 0), p1.scale(2, 1));
+    ASSERT_EQ(Point(50, 0), p1.scale(5, 3));
+    ASSERT_EQ(Point(0, 3), p2.scale(5, 3));
+    ASSERT_EQ(Point(0, 9), p2.scale(1, 3));
+    ASSERT_EQ(Point(1, 3), p3.scale(1, 3));
+    ASSERT_EQ(Point(2, 9), p3.scale(2, 3));
+}
+
 TEST(Path, turtle) {
     Reference ref{1, 320, -1, 240};
     Path turtle{ref, 8, 0};
