@@ -13,6 +13,8 @@
 #include <string>
 #include <vector>
 
+#include "defines.hpp"
+
 namespace mlogo {
 
 namespace parser {
@@ -94,6 +96,8 @@ private:
     std::vector<ASTNode*> children;
 
     friend struct ASTNode::Procedure;
+    FRIEND_TEST(Eval, moveASTNode);
+    FRIEND_TEST(Eval, reParentASTNode);
 };
 
 class AST {

@@ -10,6 +10,7 @@
 #include <sstream>
 
 #include "eval.hpp"
+#include "exceptions.hpp"
 #include "memory.hpp"
 #include "parser.hpp"
 #include "types.hpp"
@@ -291,7 +292,7 @@ TEST(Eval, makeASTFromParserExpression) {
 }
 
 TEST(Eval, astVariableTest) {
-    mlogo::eval::ASTNode::Variable v("test_eval123");
+    eval::ASTNode::Variable v("test_eval123");
 
     ASSERT_EQ(0u, v.nArgs());
 
@@ -300,13 +301,48 @@ TEST(Eval, astVariableTest) {
 }
 
 TEST(Eval, astListTest) {
-    mlogo::types::ListValue list;
+    types::ListValue list;
     list.push_back("123");
     list.push_back("654");
-    mlogo::eval::ASTNode::List l(list);
+    eval::ASTNode::List l(list);
 
     ASSERT_EQ(0u, l.nArgs());
 
     Stack::instance().setVariable("test_eval123", "abc");
     ASSERT_EQ(list, l.value(nullptr).list());
 }
+
+namespace mlogo {
+
+namespace eval {
+
+TEST(Eval, moveASTNode) {
+    auto *ptr{new eval::ASTNode::Variable("x")};
+    eval::ASTNode n{ptr};
+
+    ASSERT_EQ(nullptr, n.parent());
+    ASSERT_EQ(ptr, n.type);
+
+    eval::ASTNode n1{std::move(n)};
+
+    ASSERT_EQ(nullptr, n.parent());
+    ASSERT_EQ(nullptr, n.type);
+
+    ASSERT_EQ(nullptr, n1.parent());
+    ASSERT_EQ(ptr, n1.type);
+}
+
+TEST(Eval, reParentASTNode) {
+    eval::ASTNode n{new eval::ASTNode::Variable("x")};
+
+    ASSERT_EQ(nullptr, n.parent());
+
+    n.setParent(new eval::ASTNode(new eval::ASTNode::Procedure("eNop")));
+    ASSERT_THROW(
+        n.setParent(new eval::ASTNode(new eval::ASTNode::Procedure("eSum"))),
+        exceptions::ASTNodeAlreadyConnected);
+}
+
+} /* ns: eval */
+
+} /* ns: mlogo */
