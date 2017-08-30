@@ -118,7 +118,7 @@ public:
     Path &push_back(int x, int y);
     Path &push_back(const Point &p);
     Path &push_back(Point &&p);
-    Path &push_from_last(int offsetX, int offsetY);
+    Path &pushFromLast(int offsetX, int offsetY);
 
     Path translate(const Point &p) const;
     Path translate(int offsetX, int offsetY) const;

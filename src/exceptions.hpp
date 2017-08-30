@@ -158,6 +158,16 @@ struct ASTNodeAlreadyConnected : std::logic_error {
         : std::logic_error("This ASTNode belongs to another parent.") {}
 };
 
+/**
+ * You are using differente reference system without specify
+ * which is to use.
+ */
+struct UndefinedReferenceSystem : std::logic_error {
+    /// Build a new Exception.
+    UndefinedReferenceSystem()
+        : std::logic_error("Ambiguous Reference System.") {}
+};
+
 } /* ns: exceptions */
 
 } /* ns: mlogo */

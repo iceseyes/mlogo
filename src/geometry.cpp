@@ -4,6 +4,8 @@
 
 #include "geometry.hpp"
 
+#include "exceptions.hpp"
+
 using namespace std;
 
 namespace mlogo {
@@ -230,7 +232,7 @@ Path &Path::push_back(Point &&p) {
     return *this;
 }
 
-Path &Path::push_from_last(int offsetX, int offsetY) {
+Path &Path::pushFromLast(int offsetX, int offsetY) {
     Point p = last() + Point{offsetX, offsetY};
     push_back(move(p));
     return *this;
@@ -287,8 +289,7 @@ StraightLine::StraightLine(const Angle &a, double q, const Reference &system) {
 }
 
 StraightLine::StraightLine(const Point &a, const Point &b) {
-    if (a.system != b.system)
-        throw std::logic_error("Ambiguous Reference System.");
+    if (a.system != b.system) throw exceptions::UndefinedReferenceSystem();
 
     int dx = (b.x - a.x);
     if (dx == 0) {

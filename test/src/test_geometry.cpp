@@ -6,11 +6,15 @@
 
 #include "geometry.hpp"
 
+#include "exceptions.hpp"
+
 using Angle = mlogo::geometry::Angle;
 using Reference = mlogo::geometry::Reference;
 using Point = mlogo::geometry::Point;
 using Path = mlogo::geometry::Path;
 using StraightLine = mlogo::geometry::StraightLine;
+
+namespace exceptions = mlogo::exceptions;
 
 constexpr double MAX_RAD_ERROR{0.001};
 constexpr double MAX_DEG_ERROR{0.1};
@@ -613,6 +617,31 @@ TEST(Path, movePoint) {
     ASSERT_EQ(p1, *(path.begin() + 1));
 }
 
+TEST(Path, pushFromLastPoint) {
+    Point p{1, 5};
+    Path path{p};
+
+    ASSERT_EQ(1u, path.size());
+    ASSERT_EQ(p, *(path.begin()));
+
+    path.pushFromLast(9, 5);
+
+    ASSERT_EQ(2u, path.size());
+    ASSERT_EQ(Point(10, 10), *(path.begin() + 1));
+}
+
+TEST(Path, constBeginEnd) {
+    Point p{1, 5};
+    Path path{p};
+    path.pushFromLast(9, 5);
+
+    const Path &ref{path};
+    Path::const_iterator i{ref.begin()}, e{ref.end()};
+    ASSERT_EQ(p, *(i++));
+    i++;
+    ASSERT_EQ(e, i);
+}
+
 TEST(StraightLine, basicLine) {
     StraightLine line{1, 0};  // from m and q
 
@@ -773,6 +802,13 @@ TEST(StraightLine, othersLines) {
 
     ASSERT_FALSE(thirtyLine.isHorizontal());
     ASSERT_FALSE(thirtyLine.isVertical());
+}
+
+TEST(StraightLine, mixedSystems) {
+    Point a{1, 1, Reference(10, 10)};
+    Point b(1, 1);
+
+    ASSERT_THROW(StraightLine(a, b), exceptions::UndefinedReferenceSystem);
 }
 
 TEST(StraightLine, whereLines) {
