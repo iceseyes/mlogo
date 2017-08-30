@@ -327,8 +327,7 @@ Point StraightLine::whenY(int y) const {
 }
 
 Point StraightLine::where(const StraightLine &line) const {
-    if (line.system != system)
-        throw logic_error("Straight lines in different reference system");
+    if (line.system != system) throw exceptions::UndefinedReferenceSystem();
     if (parallel(line)) throw logic_error("Straight lines are parallels");
 
     if (isVertical()) {

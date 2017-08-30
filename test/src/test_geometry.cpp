@@ -206,6 +206,10 @@ TEST(Angle, inv) {
     Angle anAngle{Angle::Rad(3.14)};
 
     ASSERT_FLOAT_EQ(1 / 3.14, anAngle.inv().radians().value());
+
+    anAngle = Angle::Rad(3.14);
+
+    ASSERT_FLOAT_EQ(5 / 3.14, (5 / anAngle).radians().value());
 }
 
 TEST(Reference, globalReference) {
@@ -434,6 +438,18 @@ TEST(Point, scale) {
     ASSERT_EQ(Point(0, 9), p2.scale(1, 3));
     ASSERT_EQ(Point(1, 3), p3.scale(1, 3));
     ASSERT_EQ(Point(2, 9), p3.scale(2, 3));
+}
+
+TEST(Point, division) {
+    Point p1{10, 8};
+    Point p2{6, 12};
+    Point p3{20, 0};
+
+    ASSERT_EQ(Point(5, 4), p1 / 2);
+    ASSERT_EQ(Point(3, 6), p2 / 2);
+    ASSERT_EQ(Point(2, 8 / 5), p1 / 5);
+    ASSERT_EQ(Point(10, 0), p3 / 2);
+    ASSERT_EQ(Point(4, 0), p3 / 5);
 }
 
 TEST(Path, turtle) {
@@ -840,4 +856,21 @@ TEST(StraightLine, whereLines) {
 
     ASSERT_EQ(Point(15, 5),
               horizontalLine.parallel(5).where(halfLine.parallel(-10)));
+}
+
+TEST(StraightLine, whereLinesDifferentReference) {
+    StraightLine halfLine{1, 0, Reference(10, 5)};
+    StraightLine verticalLine{StraightLine::VERTICAL, 0};
+
+    ASSERT_THROW(verticalLine.where(halfLine),
+                 exceptions::UndefinedReferenceSystem);
+}
+
+TEST(StraightLine, parallels) {
+    StraightLine halfLine{1, 0};
+    auto p{parallel(halfLine, 5)};
+
+    ASSERT_TRUE(p.parallel(halfLine));
+    ASSERT_TRUE(halfLine.parallel(p));
+    ASSERT_TRUE(halfLine.parallel(parallel(halfLine, 10)));
 }
