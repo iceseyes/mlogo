@@ -874,3 +874,48 @@ TEST(StraightLine, parallels) {
     ASSERT_TRUE(halfLine.parallel(p));
     ASSERT_TRUE(halfLine.parallel(parallel(halfLine, 10)));
 }
+
+TEST(Geometry, streamAngle) {
+    std::stringstream ss;
+
+    ss << Angle::Rad(3.14);
+    ASSERT_EQ("3.14 rad", ss.str());
+
+    ss.str(std::string());
+    ss.clear();
+
+    ss << Angle::Degrees(180);
+    ASSERT_EQ("180 degrees", ss.str());
+
+    ss.str(std::string());
+    ss.clear();
+
+    ss << Angle(Angle::Degrees(180));
+    ASSERT_EQ("3.14159 rad", ss.str());
+}
+
+TEST(Geometry, streamPoint) {
+    std::stringstream ss;
+
+    ss << Point(5, 4);
+    ASSERT_EQ("(5,4)", ss.str());
+}
+
+TEST(Geometry, streamLine) {
+    std::stringstream ss;
+
+    ss << StraightLine(5, 4);
+    ASSERT_EQ("y = 5x + 4", ss.str());
+
+    ss.str(std::string());
+    ss.clear();
+
+    ss << StraightLine(0, 4);
+    ASSERT_EQ("y = 0x + 4", ss.str());
+
+    ss.str(std::string());
+    ss.clear();
+
+    ss << StraightLine(Angle::Degrees(90), 0);
+    ASSERT_EQ("x = 0", ss.str());
+}
