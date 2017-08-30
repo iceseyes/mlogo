@@ -10,3 +10,7 @@ CMakeCache.txt
 CMakeFiles/
 
 llvm-cov.sh
+.#eval.hpp
+.#memory.hpp
+.#common.hpp
+.#test_eval.cpp

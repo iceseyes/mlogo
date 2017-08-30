@@ -11,7 +11,7 @@
 
 #include <boost/variant.hpp>
 
-#include "value.hpp"
+#include "types.hpp"
 
 using namespace mlogo::types;
 

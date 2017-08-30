@@ -70,7 +70,7 @@ set(SRCS
     
 set(LIBLOGO_SRCS
   src/parser.cpp src/memory.cpp
-  src/types.cpp src/value.cpp src/eval.cpp
+  src/types.cpp src/eval.cpp
   src/geometry.cpp src/graphics.cpp src/turtle.cpp)
 
 set(LIBLOGO_BUILTIN_SRCS

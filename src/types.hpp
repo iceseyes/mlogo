@@ -9,10 +9,12 @@
 #define TYPES_HPP_
 
 #include <cinttypes>
+#include <string>
 #include <vector>
 
+#include <boost/variant.hpp>
+
 #include "parser.hpp"
-#include "value.hpp"
 
 namespace mlogo {
 
@@ -23,6 +25,66 @@ class AST;
 } /* ns: eval */
 
 namespace types {
+
+using WordValue = std::string;
+
+using Value =
+    boost::make_recursive_variant<WordValue,
+                                  std::vector<boost::recursive_variant_>>::type;
+
+using ListValue = std::vector<Value>;
+
+std::string toString(const Value &v);
+
+class ValueBox {
+public:
+    ValueBox();
+    ValueBox(const char v[]);
+    ValueBox(const std::string &v);
+    ValueBox(const ListValue &v);
+    ValueBox(const Value &v);
+
+    ValueBox &operator=(const ValueBox &v);
+
+    bool isWord() const;
+    bool isList() const { return !isWord(); }
+
+    bool empty() const;
+
+    std::string toString() const;
+
+    double asDouble() const;
+    int32_t asInteger() const;
+    uint32_t asUnsigned() const;
+
+    WordValue &word();
+    const WordValue &word() const;
+
+    ListValue &list();
+    const ListValue &list() const;
+
+    Value &value() { return _value; }
+    const Value &value() const { return _value; }
+
+    ValueBox &push_front(const ValueBox &v);
+    ValueBox &push_back(const ValueBox &v);
+    ValueBox &push_all_back(const ValueBox &v);
+    ValueBox &set(uint32_t index, const ValueBox &v);
+
+    ValueBox front() const;
+    ValueBox back() const;
+
+    ValueBox butFirst() const;
+    ValueBox butLast() const;
+    ValueBox at(std::size_t index) const;
+
+    bool in(const ValueBox &v) const;
+
+private:
+    Value _value;
+
+    friend bool operator==(const ValueBox &v1, const ValueBox &v2);
+};
 
 class ActualArguments {
 public:
@@ -72,8 +134,35 @@ private:
     Parameters paramNames;
 };
 
+bool operator==(const ValueBox &v1, const ValueBox &v2);
+bool operator!=(const ValueBox &v1, const ValueBox &v2);
+bool operator<(const ValueBox &v1, const ValueBox &v2);
+bool in(const ValueBox &v1, const ValueBox &v2);
+
 } /* ns types */
 
 } /* ns mlogo */
+
+namespace std {
+
+template <typename S>
+S &operator<<(S &s, const mlogo::types::ListValue &v) {
+    bool first{true};
+
+    s << "[";
+
+    for (auto &i : v) {
+        if (!first) s << " ";
+        s << i;
+
+        first = false;
+    }
+
+    s << "]";
+
+    return s;
+}
+
+} /* ns: std */
 
 #endif /* TYPES_HPP_ */
