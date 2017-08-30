@@ -64,6 +64,16 @@ TEST(Value, equality) {
     ASSERT_EQ(list2, list);
 }
 
+TEST(Value, toString) {
+    Value w{"hello"};
+    Value n{"123"};
+    Value list(ListValue({w, n}));
+
+    ASSERT_EQ("hello", toString(w));
+    ASSERT_EQ("123", toString(n));
+    ASSERT_EQ("[hello 123]", toString(list));
+}
+
 TEST(ValueBox, equality) {
     Value word;
     Value word2;
