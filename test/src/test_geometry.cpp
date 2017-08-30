@@ -600,6 +600,19 @@ TEST(Path, fromPoint) {
     ASSERT_EQ(p, *(path.begin()));
 }
 
+TEST(Path, movePoint) {
+    Point p{100, 432}, p1{123, 432};
+    Path path{p};
+
+    ASSERT_EQ(1u, path.size());
+    ASSERT_EQ(p, *(path.begin()));
+
+    path.push_back(std::move(p1));
+
+    ASSERT_EQ(2u, path.size());
+    ASSERT_EQ(p1, *(path.begin() + 1));
+}
+
 TEST(StraightLine, basicLine) {
     StraightLine line{1, 0};  // from m and q
 
