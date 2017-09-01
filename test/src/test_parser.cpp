@@ -84,12 +84,19 @@ TEST(Parser, parseProcName) {
     ASSERT_EQ(ProcName("FD"), f("FD"));
     ASSERT_EQ(ProcName("repeat"), f("repeat"));
     ASSERT_EQ(ProcName("h264"), f("h264"));
+    ASSERT_EQ(ProcName("h45.32"), f("h45.32"));
+    ASSERT_EQ(ProcName("c1c"), f("c1c"));
+    ASSERT_EQ(ProcName("Ob.1c.2d"), f("Ob.1c.2d"));
+
     ASSERT_ANY_THROW(f("1c"));
     ASSERT_ANY_THROW(f(":hello"));
     ASSERT_ANY_THROW(f("\"h4532"));
-    ASSERT_ANY_THROW(f("h45.32"));
+    ASSERT_ANY_THROW(f("4532"));
     ASSERT_ANY_THROW(f("4532 test"));
     ASSERT_ANY_THROW(f("test test"));
+    ASSERT_ANY_THROW(f("33.a"));
+    ASSERT_ANY_THROW(f("33.a34"));
+    ASSERT_ANY_THROW(f("33.34a"));
 }
 
 TEST(Parser, parseExpr) {

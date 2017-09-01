@@ -104,8 +104,9 @@ struct ProcNameParser : qi::grammar<Iterator, ProcName()> {
     ProcNameParser() : ProcNameParser::base_type(start, "ProcName") {
         using ascii::alnum;
         using ascii::alpha;
+        using ascii::punct;
 
-        procname = alpha >> *alnum;
+        procname = alpha >> *((punct - ';' - '[' - ']' - '(' - ')') | alnum);
         start = procname;
     }
 
