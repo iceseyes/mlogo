@@ -7,7 +7,12 @@
 
 #include "common.hpp"
 
+#include "../memory.hpp"
+
+using namespace mlogo::memory;
+
 namespace mlogo {
+
 namespace builtin {
 
 namespace {
@@ -15,7 +20,6 @@ namespace {
 struct Repeat : BuiltinProcedure {
     Repeat() : BuiltinProcedure(2) {}
     void operator()() const override {
-        stringstream ss;
         int arg0 = fetchArg(0).asUnsigned();
         string arg1 = fetchArg(1).toString();
 
@@ -26,6 +30,9 @@ struct Repeat : BuiltinProcedure {
         // for parsing, so check if arg1.size() is at least 2 ([])
         if (arg1.size() > 2) {
             for (int i = 0; i < arg0; ++i) {
+                stringstream ss;
+                ss << i;
+                Stack::instance().setVariable("__REPCOUNT__", ss.str());
                 auto stmt = parser::parse(arg1.substr(1, arg1.size() - 2));
                 auto ast = eval::make_ast(stmt);
 
@@ -34,11 +41,22 @@ struct Repeat : BuiltinProcedure {
         }
     }
 };
-}
+
+struct Repcount : BuiltinProcedure {
+    Repcount() : BuiltinProcedure(0, true) {}
+    void operator()() const override {
+        setReturnValue(Stack::instance().getVariable("__REPCOUNT__"));
+    }
+};
+
+} /* ns */
 
 void initControlBuiltInProcedures() {
     // Control
     Stack::instance().setProcedure<Repeat>("repeat");
+    Stack::instance().setProcedure<Repcount>("repcount");
 }
-}
-}
+
+} /* ns: builtin */
+
+} /* ns: mlogo */

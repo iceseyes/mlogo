@@ -14,3 +14,4 @@ llvm-cov.sh
 .#memory.hpp
 .#common.hpp
 .#test_eval.cpp
+Makefile

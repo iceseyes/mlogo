@@ -251,8 +251,11 @@ struct StatementParser : qi::grammar<Iterator, Statement(), ascii::space_type> {
         definition_end =
             no_case[string(END_PROCEDURE_KEYWORD)][at_c<0>(_val) = _1];
 
-        statement = proc_name[at_c<0>(_val) = _1] >>
-                    *argument[push_back(at_c<1>(_val), _1)];
+        statement =
+            (proc_name -
+             no_case[string(START_PROCEDURE_KEYWORD)])[at_c<0>(_val) = _1] >>
+            *argument[push_back(at_c<1>(_val), _1)];
+
         start = -(definition_start | definition_end | statement)[_val = _1] >>
                 -comment;
 

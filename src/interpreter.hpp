@@ -24,8 +24,9 @@ template <typename InputStream, typename OutputStream,
           typename ErrorStream = OutputStream>
 class Interpreter {
 public:
-    Interpreter(InputStream &is, OutputStream &os, ErrorStream &es)
-        : _iStream(is), _oStream(os), _eStream(es) {}
+    Interpreter(InputStream &is, OutputStream &os, ErrorStream &es,
+                bool wPrompt)
+        : _iStream(is), _oStream(os), _eStream(es), _showPrompt(wPrompt) {}
 
     void run() {
         using namespace std;
@@ -39,7 +40,7 @@ public:
         Procedure *currentProc{nullptr};
         Statement stmt;
 
-        _eStream << endl << "? ";
+        showPrompt();
         while (getline(_iStream, str)) {
             if (to_lower_copy(str) == "bye") break;
 
@@ -51,7 +52,7 @@ public:
                         delete currentProc;
                         currentProc = nullptr;
                         _eStream << "Procedure recorded." << endl;
-                        _eStream << "? ";
+                        showPrompt();
                     }
 
                     continue;
@@ -72,21 +73,28 @@ public:
                          << ")" << endl;
             }
 
-            _eStream << "? ";
+            showPrompt();
         }
+    }
+
+protected:
+    void showPrompt() {
+        if (_showPrompt) _eStream << "? ";
     }
 
 private:
     InputStream &_iStream;
     OutputStream &_oStream;
     ErrorStream &_eStream;
+    bool _showPrompt;
 };
 
 template <typename InputStream, typename OutputStream,
           typename ErrorStream = OutputStream>
 Interpreter<InputStream, OutputStream, ErrorStream> getInterpreter(
-    InputStream &is, OutputStream &os, ErrorStream &es) {
-    return Interpreter<InputStream, OutputStream, ErrorStream>(is, os, es);
+    InputStream &is, OutputStream &os, ErrorStream &es, bool wPrompt = true) {
+    return Interpreter<InputStream, OutputStream, ErrorStream>(is, os, es,
+                                                               wPrompt);
 }
 
 } /* ns: mlogo */

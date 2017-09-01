@@ -504,6 +504,10 @@ TEST(Parser, parseUserProcedure) {
 
     ASSERT_ANY_THROW(udp.addLine("fd 100"));
     ASSERT_THROW(Procedure(parse("fd 100")), std::logic_error);
+
+    udp = Procedure(parse("TO MOVE"));
+    ASSERT_FALSE(udp.addLine("RT 90 FD 60 LT 90"));
+    ASSERT_TRUE(udp.addLine("END"));
 }
 
 TEST(Parser, streamList) {

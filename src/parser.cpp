@@ -251,7 +251,7 @@ Statement parse(const std::string &line) {
     auto stmt = parse<StatementParser, Statement>(line);
 
     if (stmt.isStartProcedure()) {
-        if (stmt.arguments.size() > 1) {
+        if (stmt.arguments.size() > 0) {
             try {
                 boost::get<ProcName>(stmt.arguments[0]);
             } catch (std::exception &e) {
