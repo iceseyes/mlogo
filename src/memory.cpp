@@ -90,6 +90,15 @@ Frame &Frame::setResultVariable(const Frame &child) {
     return *this;
 }
 
+Frame &Frame::clear() {
+    procedures.clear();
+    variables.clear();
+    _lastResultVariable.clear();
+    hasResultSetted = false;
+
+    return *this;
+}
+
 Stack::Stack() : frames(1) {
     // Populate global frame with internal symbols.
     // initInternalSymbols();

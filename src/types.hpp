@@ -130,8 +130,7 @@ public:
     void operator()() const override;
 
 private:
-    AST *ast;
-    Parameters paramNames;
+    const parser::Procedure definition;
 };
 
 bool operator==(const ValueBox &v1, const ValueBox &v2);

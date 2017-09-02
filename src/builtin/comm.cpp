@@ -8,6 +8,7 @@
 #include "common.hpp"
 
 namespace mlogo {
+
 namespace builtin {
 
 namespace {
@@ -34,6 +35,9 @@ struct Print : BuiltinProcedure {
 void initCommBuiltInProcedures() {
     // I/O
     Stack::instance().setProcedure<Print>("print");
+    Stack::instance().setProcedure<Print>("pr");
 }
-}
-}
+
+} /* ns: builtin */
+
+} /* ns: mlogo */

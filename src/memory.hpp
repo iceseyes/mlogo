@@ -15,6 +15,7 @@
 #include <utility>
 #include <vector>
 
+#include "defines.hpp"
 #include "parser.hpp"
 #include "types.hpp"
 
@@ -54,6 +55,12 @@ public:
 
     bool hasResult() const { return hasResultSetted; }
     bool waitForValue() const { return !_lastResultVariable.empty(); }
+
+    /**
+     * Delete every variable and procedure in this frame.
+     * Restore frame in its just-created state.
+     */
+    Frame &clear();
 
 private:
     std::map<std::string, ProcedurePtr> procedures;

@@ -16,6 +16,7 @@
 
 #include "defines.hpp"
 #include "eval.hpp"
+#include "exceptions.hpp"
 #include "memory.hpp"
 #include "parser.hpp"
 
@@ -79,6 +80,27 @@ public:
 
             showPrompt();
         }
+    }
+
+    /**
+     * Parse one string and if is a valid logo statement try to
+     * run it. It does not support procedure definition.
+     *
+     * @param[in] line a string to parse and execute.
+     * @throw mlogo::exceptions::Syntaxerror is string is not right
+     * @throw mlogo::exceptions::InvalidStatmentException if string is a
+     *          procedure definition.
+     */
+    void one(const std::string &line) const {
+        using namespace mlogo::parser;
+        using namespace mlogo::eval;
+
+        auto stmt = parse(line);
+        if (stmt.isStartProcedure())
+            throw exceptions::InvalidStatmentException(line);
+
+        auto ast = make_ast(stmt);
+        ast();
     }
 
 protected:

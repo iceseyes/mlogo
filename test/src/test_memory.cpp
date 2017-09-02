@@ -386,3 +386,27 @@ TEST(Memory, procedure2Stack) {
     mem::Stack::instance().setProcedure(definition);
     ASSERT_TRUE(mem::Stack::instance().globalFrame().hasProcedure("SQUARE2"));
 }
+
+TEST(Memory, frameClear) {
+    struct Sum : mlogo::types::BasicProcedure {
+        Sum() : mlogo::types::BasicProcedure(0, true) {}
+        void operator()() const override {}
+    };
+
+    mem::Frame testFrame;
+    testFrame.setVariable("one", "test1");
+    testFrame.setVariable("two", "test2");
+
+    auto ptr = std::make_shared<Sum>();
+    testFrame.setProcedure("oneProc", ptr);
+
+    ASSERT_TRUE(testFrame.hasVariable("one"));
+    ASSERT_TRUE(testFrame.hasVariable("two"));
+    ASSERT_TRUE(testFrame.hasProcedure("oneProc"));
+
+    testFrame.clear();
+
+    ASSERT_FALSE(testFrame.hasVariable("one"));
+    ASSERT_FALSE(testFrame.hasVariable("two"));
+    ASSERT_FALSE(testFrame.hasProcedure("oneProc"));
+}

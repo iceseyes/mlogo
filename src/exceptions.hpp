@@ -168,6 +168,16 @@ struct UndefinedReferenceSystem : std::logic_error {
         : std::logic_error("Ambiguous Reference System.") {}
 };
 
+/**
+ * You are trying to define a new procedure in a place
+ * where new procedures cannot be declared (like body of a repeat).
+ */
+struct InvalidStatmentException : std::logic_error {
+    /// Build a new Exception.
+    InvalidStatmentException(const std::string &line)
+        : std::logic_error("Invalid Statment: " + line) {}
+};
+
 } /* ns: exceptions */
 
 } /* ns: mlogo */
