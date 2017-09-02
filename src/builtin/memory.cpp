@@ -72,6 +72,8 @@ void initMemoryBuiltInProcedures() {
         .setProcedure<Name>("name")
         .setProcedure<Local>("local")
         .setProcedure<Thing>("thing");
+
+    Stack::instance().setVariable("startup", ListValue());
 }
 }
 }

@@ -26,6 +26,7 @@ int main(int argc, char **argv) {
     }
 
     cout << "Welcome to myLogo v0.0" << endl;
+    interpreter.startup();
     interpreter.run();
 
     return 0;
