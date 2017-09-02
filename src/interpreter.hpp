@@ -14,6 +14,7 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "defines.hpp"
 #include "eval.hpp"
 #include "memory.hpp"
 #include "parser.hpp"
@@ -26,7 +27,7 @@ class Interpreter {
 public:
     Interpreter(InputStream &is, OutputStream &os, ErrorStream &es,
                 bool wPrompt)
-        : _iStream(is), _oStream(os), _eStream(es), _showPrompt(wPrompt) {}
+        : _iStream(is), _oStream(os), _eStream(es), _interactive(wPrompt) {}
 
     void run() {
         using namespace std;
@@ -42,7 +43,7 @@ public:
 
         showPrompt();
         while (getline(_iStream, str)) {
-            if (to_lower_copy(str) == "bye") break;
+            if (to_upper_copy(str) == BYE_BYE_COMMAND) break;
 
             AST ast;
             try {
@@ -51,7 +52,10 @@ public:
                         Stack::instance().setProcedure(*currentProc);
                         delete currentProc;
                         currentProc = nullptr;
-                        _eStream << "Procedure recorded." << endl;
+
+                        if (_interactive)
+                            _eStream << "Procedure recorded." << endl;
+
                         showPrompt();
                     }
 
@@ -79,14 +83,14 @@ public:
 
 protected:
     void showPrompt() {
-        if (_showPrompt) _eStream << "? ";
+        if (_interactive) _eStream << "? ";
     }
 
 private:
     InputStream &_iStream;
     OutputStream &_oStream;
     ErrorStream &_eStream;
-    bool _showPrompt;
+    bool _interactive;
 };
 
 template <typename InputStream, typename OutputStream,

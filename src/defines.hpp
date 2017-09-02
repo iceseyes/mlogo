@@ -12,8 +12,18 @@
 
 namespace mlogo {
 
+/* KEYWORDS */
+
+/// Start new user defined procedure keyword
 const std::string START_PROCEDURE_KEYWORD{"TO"};
+
+/// Close an user defined procedure keyword
 const std::string END_PROCEDURE_KEYWORD{"END"};
+
+/* Interpreter commands */
+
+/// Leave interpreter
+const std::string BYE_BYE_COMMAND{"BYE"};
 
 }  // ns: mlogo
 
