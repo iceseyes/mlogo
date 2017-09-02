@@ -23,7 +23,7 @@ struct Print : BuiltinProcedure {
             str = str.substr(
                 1, str.size() - 2);  // remove first and last square bracket
 
-        cout << str << endl;
+        outputStream() << str << endl;
     }
 };
 }

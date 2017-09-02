@@ -22,6 +22,7 @@
 using namespace std;
 
 namespace mlogo {
+
 namespace builtin {
 
 using Value = types::Value;
@@ -40,7 +41,13 @@ void initCommBuiltInProcedures();
 void initMemoryBuiltInProcedures();
 void initControlBuiltInProcedures();
 void initGraphicsBuiltInProcedures();
-}
-}
+
+std::istream &inputStream();
+std::ostream &outputStream();
+std::ostream &errorStream();
+
+} /* ns: builtin */
+
+} /* ns: mlogo */
 
 #endif /* BUILTIN_COMMON_HPP_ */

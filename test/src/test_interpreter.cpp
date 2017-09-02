@@ -8,6 +8,7 @@
 #include <gtest/gtest.h>
 
 #include <iostream>
+#include <sstream>
 
 #include "exceptions.hpp"
 #include "interpreter.hpp"
@@ -18,6 +19,8 @@ using namespace mlogo::memory;
 using namespace mlogo::exceptions;
 
 extern "C" void initBuiltInProcedures();
+extern "C" void connectStreams(std::istream *is, std::ostream *os,
+                               std::ostream *es);
 
 TEST(Interpreter, oneMethod) {
     Stack::instance().clear(); /* clear memory state */
@@ -35,4 +38,15 @@ TEST(Interpreter, oneMethod) {
 
     ASSERT_NO_THROW(
         interpreter.one("PR [CHECK INFO FILE FOR MORE INFORMATIONS]"));
+}
+
+TEST(Interpreter, onePrintMethod) {
+    std::stringstream ss;
+    Stack::instance().clear(); /* clear memory state */
+    auto interpreter = getInterpreter(std::cin, std::cout, std::cerr, false);
+    initBuiltInProcedures();
+    connectStreams(nullptr, &ss, nullptr);
+
+    interpreter.one("PR [CHECK INFO FILE FOR MORE INFORMATIONS]");
+    ASSERT_EQ("CHECK INFO FILE FOR MORE INFORMATIONS\n", ss.str());
 }
