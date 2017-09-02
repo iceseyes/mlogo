@@ -59,6 +59,8 @@ public:
     /**
      * Delete every variable and procedure in this frame.
      * Restore frame in its just-created state.
+     *
+     * @return a reference to this Frame.
      */
     Frame &clear();
 
@@ -114,6 +116,14 @@ public:
     Stack &closeFrame();
 
     Stack &storeResult(const ValueBox &result);
+
+    /**
+     * Delete every frame but the global and clear global frame.
+     * This method restore as-just-created state the Stack.
+     *
+     * @return a reference to this Stack
+     */
+    Stack &clear();
 
 private:
     static const char __ARGUMENT_PREFIX[];

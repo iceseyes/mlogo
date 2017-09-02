@@ -236,5 +236,13 @@ Stack &Stack::storeResult(const ValueBox &result) {
     return *this;
 }
 
+Stack &Stack::clear() {
+    while (nFrames() > 1) frames.pop_back();
+    globalFrame().clear();
+
+    return *this;
+}
+
 } /* ns: memory */
+
 } /* ns: mlogo */

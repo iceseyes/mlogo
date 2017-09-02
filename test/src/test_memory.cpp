@@ -410,3 +410,41 @@ TEST(Memory, frameClear) {
     ASSERT_FALSE(testFrame.hasVariable("two"));
     ASSERT_FALSE(testFrame.hasProcedure("oneProc"));
 }
+
+TEST(Memory, clearStack) {
+    struct Sum : mlogo::types::BasicProcedure {
+        Sum() : mlogo::types::BasicProcedure(0, true) {}
+        void operator()() const override {}
+    };
+
+    mem::Stack::instance().openFrame();
+    ASSERT_TRUE(mem::Stack::instance().nFrames() > 1);
+
+    mem::Stack::instance().currentFrame().setVariable("one", "test1");
+    mem::Stack::instance().currentFrame().setVariable("two", "test2");
+
+    auto ptr = std::make_shared<Sum>();
+    mem::Stack::instance().currentFrame().setProcedure("oneProc", ptr);
+
+    mem::Stack::instance().globalFrame().setVariable("three", "test3");
+    mem::Stack::instance().globalFrame().setVariable("four", "test4");
+
+    ptr = std::make_shared<Sum>();
+    mem::Stack::instance().globalFrame().setProcedure("twoProc", ptr);
+
+    ASSERT_TRUE(mem::Stack::instance().currentFrame().hasVariable("one"));
+    ASSERT_TRUE(mem::Stack::instance().currentFrame().hasVariable("two"));
+    ASSERT_TRUE(mem::Stack::instance().currentFrame().hasProcedure("oneProc"));
+    ASSERT_TRUE(mem::Stack::instance().globalFrame().hasVariable("three"));
+    ASSERT_TRUE(mem::Stack::instance().globalFrame().hasVariable("four"));
+    ASSERT_TRUE(mem::Stack::instance().globalFrame().hasProcedure("twoProc"));
+
+    mem::Stack::instance().clear();
+
+    ASSERT_FALSE(mem::Stack::instance().currentFrame().hasVariable("one"));
+    ASSERT_FALSE(mem::Stack::instance().currentFrame().hasVariable("two"));
+    ASSERT_FALSE(mem::Stack::instance().currentFrame().hasProcedure("oneProc"));
+    ASSERT_FALSE(mem::Stack::instance().globalFrame().hasVariable("three"));
+    ASSERT_FALSE(mem::Stack::instance().globalFrame().hasVariable("four"));
+    ASSERT_FALSE(mem::Stack::instance().globalFrame().hasProcedure("twoProc"));
+}
