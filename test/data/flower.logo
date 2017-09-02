@@ -1,0 +1,10 @@
+TO POLY :n :side
+ REPEAT :n [FD :side RT 360/:n]
+END
+
+TO FLOWER :side
+ REPEAT 4 [POLY 10 :side RT 90]
+END
+
+FLOWER 25
+ 

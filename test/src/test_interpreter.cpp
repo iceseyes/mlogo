@@ -7,6 +7,7 @@
 
 #include <gtest/gtest.h>
 
+#include <fstream>
 #include <iostream>
 #include <sstream>
 
@@ -50,3 +51,14 @@ TEST(Interpreter, onePrintMethod) {
     interpreter.one("PR [CHECK INFO FILE FOR MORE INFORMATIONS]");
     ASSERT_EQ("CHECK INFO FILE FOR MORE INFORMATIONS\n", ss.str());
 }
+
+/** relative path may change
+TEST(Interpreter, interpretFileCastle) {
+    Stack::instance().clear();
+std::ifstream ifile("data/caste.logo");
+auto interpreter = getInterpreter(ifile, std::cout, std::cerr, false, true);
+initBuiltInProcedures();
+
+ASSERT_NO_THROW(interpreter.run());
+}
+*/

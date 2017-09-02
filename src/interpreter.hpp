@@ -27,8 +27,12 @@ template <typename InputStream, typename OutputStream,
 class Interpreter {
 public:
     Interpreter(InputStream &is, OutputStream &os, ErrorStream &es,
-                bool wPrompt)
-        : _iStream(is), _oStream(os), _eStream(es), _interactive(wPrompt) {}
+                bool wPrompt, bool rethrow)
+        : _iStream(is),
+          _oStream(os),
+          _eStream(es),
+          _interactive(wPrompt),
+          _rethrow(rethrow) {}
 
     void run() {
         using namespace std;
@@ -76,6 +80,8 @@ public:
             } catch (logic_error &e) {
                 _eStream << "I don't know how to " << str << " (" << e.what()
                          << ")" << endl;
+
+                if (_rethrow) throw e;
             }
 
             showPrompt();
@@ -113,14 +119,16 @@ private:
     OutputStream &_oStream;
     ErrorStream &_eStream;
     bool _interactive;
+    bool _rethrow;
 };
 
 template <typename InputStream, typename OutputStream,
           typename ErrorStream = OutputStream>
 Interpreter<InputStream, OutputStream, ErrorStream> getInterpreter(
-    InputStream &is, OutputStream &os, ErrorStream &es, bool wPrompt = true) {
-    return Interpreter<InputStream, OutputStream, ErrorStream>(is, os, es,
-                                                               wPrompt);
+    InputStream &is, OutputStream &os, ErrorStream &es, bool wPrompt = true,
+    bool rethrow = false) {
+    return Interpreter<InputStream, OutputStream, ErrorStream>(
+        is, os, es, wPrompt, rethrow);
 }
 
 } /* ns: mlogo */
