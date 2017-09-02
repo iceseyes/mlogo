@@ -12,6 +12,7 @@ set(TEST_SRC
   src/test_eval.cpp             # test for eval
   src/test_types.cpp            # test for types
   src/test_geometry.cpp         # test for geometry
+  src/test_interpreter.cpp      # test for interpreter /* high level test */
 )
 
 
