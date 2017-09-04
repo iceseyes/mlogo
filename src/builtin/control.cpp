@@ -50,7 +50,7 @@ struct Repcount : BuiltinProcedure {
 };
 
 struct If : BuiltinProcedure {
-    If() : BuiltinProcedure(1) {}
+    If() : BuiltinProcedure(2) {}
     void operator()() const override {
         bool arg0 = fetchArg(0).toBool();
         auto arg1 = fetchArg(1).toString();
@@ -63,12 +63,69 @@ struct If : BuiltinProcedure {
     }
 };
 
+struct IfElse : BuiltinProcedure {
+    IfElse() : BuiltinProcedure(3) {}
+    void operator()() const override {
+        bool arg0 = fetchArg(0).toBool();
+        auto arg1 = fetchArg(1).toString();
+        auto arg2 = fetchArg(2).toString();
+        auto i = getInterpreter(inputStream(), outputStream(), errorStream());
+
+        if (arg0)
+            i.one(arg1);
+        else
+            i.one(arg2);
+    }
+};
+
+struct Test : BuiltinProcedure {
+    Test() : BuiltinProcedure(1) {}
+    void operator()() const override {
+        Stack::instance().setVariable("__LASTTEST__", fetchArg(0));
+    }
+};
+
+struct IfTrue : BuiltinProcedure {
+    IfTrue() : BuiltinProcedure(1) {}
+    void operator()() const override {
+        auto arg0 = fetchArg(0).toString();
+        bool lastTest = Stack::instance().getVariable("__LASTTEST__").toBool();
+
+        if (lastTest) {
+            auto i =
+                getInterpreter(inputStream(), outputStream(), errorStream());
+            i.one(arg0);
+        }
+    }
+};
+
+struct IfFalse : BuiltinProcedure {
+    IfFalse() : BuiltinProcedure(1) {}
+    void operator()() const override {
+        auto arg0 = fetchArg(0).toString();
+        bool lastTest = Stack::instance().getVariable("__LASTTEST__").toBool();
+
+        if (!lastTest) {
+            auto i =
+                getInterpreter(inputStream(), outputStream(), errorStream());
+            i.one(arg0);
+        }
+    }
+};
+
 } /* ns */
 
 void initControlBuiltInProcedures() {
     // Control
     Stack::instance().setProcedure<Repeat>("repeat");
     Stack::instance().setProcedure<Repcount>("repcount");
+    Stack::instance().setProcedure<If>("if");
+    Stack::instance().setProcedure<IfElse>("ifelse");
+    Stack::instance().setProcedure<Test>("test");
+    Stack::instance().setProcedure<IfTrue>("iftrue");
+    Stack::instance().setProcedure<IfTrue>("ift");
+    Stack::instance().setProcedure<IfFalse>("iffalse");
+    Stack::instance().setProcedure<IfFalse>("iff");
 }
 
 } /* ns: builtin */
