@@ -51,7 +51,8 @@ public:
 
     bool empty() const;
 
-    std::string toString() const;
+    std::string toString(bool wBrackets = false) const;
+    bool toBool() const;
 
     double asDouble() const;
     int32_t asInteger() const;
@@ -137,6 +138,8 @@ bool operator==(const ValueBox &v1, const ValueBox &v2);
 bool operator!=(const ValueBox &v1, const ValueBox &v2);
 bool operator<(const ValueBox &v1, const ValueBox &v2);
 bool in(const ValueBox &v1, const ValueBox &v2);
+
+std::string toString(const ListValue &v, bool withBrackets = false);
 
 } /* ns types */
 

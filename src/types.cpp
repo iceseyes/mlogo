@@ -158,10 +158,15 @@ bool ValueBox::isWord() const {
 
 bool ValueBox::empty() const { return apply_visitor(IsEmptyVisitor(), _value); }
 
-std::string ValueBox::toString() const {
+std::string ValueBox::toString(bool wBrackets) const {
     std::stringstream ss;
 
     ss << _value;
+    if (isList() && !wBrackets) {
+        std::string s{ss.str()};
+        return ss.str().substr(1, s.size() - 2);
+    }
+
     return ss.str();
 }
 
@@ -170,6 +175,8 @@ double ValueBox::asDouble() const { return std::stod(word()); }
 int32_t ValueBox::asInteger() const { return std::stoi(word()); }
 
 uint32_t ValueBox::asUnsigned() const { return std::stoul(word()); }
+
+bool ValueBox::toBool() const { return std::stoi(word()); }
 
 WordValue &ValueBox::word() { return boost::get<WordValue>(_value); }
 

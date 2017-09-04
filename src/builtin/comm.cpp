@@ -19,10 +19,6 @@ struct Print : BuiltinProcedure {
         auto arg = fetchArg(0);
         auto str = arg.toString();
 
-        if (arg.isList())  // if arg is a ListValue
-            str = str.substr(
-                1, str.size() - 2);  // remove first and last square bracket
-
         outputStream() << str << endl;
     }
 };
@@ -33,10 +29,6 @@ struct Type : BuiltinProcedure {
         auto arg = fetchArg(0);
         auto str = arg.toString();
 
-        if (arg.isList())  // if arg is a ListValue
-            str = str.substr(
-                1, str.size() - 2);  // remove first and last square bracket
-
         outputStream() << str;
         outputStream().flush();
     }
@@ -46,7 +38,7 @@ struct Show : BuiltinProcedure {
     Show() : BuiltinProcedure(1) {}
     void operator()() const override {
         auto arg = fetchArg(0);
-        auto str = arg.toString();
+        auto str = arg.toString(true);
 
         outputStream() << str << endl;
     }

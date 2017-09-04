@@ -7,6 +7,7 @@
 
 #include "common.hpp"
 
+#include "../interpreter.hpp"
 #include "../memory.hpp"
 
 using namespace mlogo::memory;
@@ -33,10 +34,9 @@ struct Repeat : BuiltinProcedure {
                 stringstream ss;
                 ss << i;
                 Stack::instance().setVariable("__REPCOUNT__", ss.str());
-                auto stmt = parser::parse(arg1.substr(1, arg1.size() - 2));
-                auto ast = eval::make_ast(stmt);
-
-                ast();
+                auto interpreter = getInterpreter(inputStream(), outputStream(),
+                                                  errorStream());
+                interpreter.one(arg1);
             }
         }
     }
@@ -46,6 +46,20 @@ struct Repcount : BuiltinProcedure {
     Repcount() : BuiltinProcedure(0, true) {}
     void operator()() const override {
         setReturnValue(Stack::instance().getVariable("__REPCOUNT__"));
+    }
+};
+
+struct If : BuiltinProcedure {
+    If() : BuiltinProcedure(1) {}
+    void operator()() const override {
+        bool arg0 = fetchArg(0).toBool();
+        auto arg1 = fetchArg(1).toString();
+
+        if (arg0) {
+            auto i =
+                getInterpreter(inputStream(), outputStream(), errorStream());
+            i.one(arg1);
+        }
     }
 };
 

@@ -132,7 +132,8 @@ TEST(ValueBox, valueBoxCheckType) {
     ListValue v{word, "test", "hi", "logo"};
     ValueBox vbox{v};
 
-    ASSERT_EQ("[word test hi logo]", vbox.toString());
+    ASSERT_EQ("[word test hi logo]", vbox.toString(true));
+    ASSERT_EQ("word test hi logo", vbox.toString());
     ASSERT_EQ(v, vbox);
 
     ListValue v1{v, word};
