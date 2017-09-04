@@ -112,7 +112,7 @@ public:
     void startup() const {
         auto line =
             mlogo::memory::Stack::instance().getVariable("startup").toString();
-        one(line.substr(1, line.size() - 2));
+        one(line);
     }
 
 protected:
