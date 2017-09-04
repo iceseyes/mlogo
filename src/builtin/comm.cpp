@@ -26,16 +26,43 @@ struct Print : BuiltinProcedure {
         outputStream() << str << endl;
     }
 };
-}
+
+struct Type : BuiltinProcedure {
+    Type() : BuiltinProcedure(1) {}
+    void operator()() const override {
+        auto arg = fetchArg(0);
+        auto str = arg.toString();
+
+        if (arg.isList())  // if arg is a ListValue
+            str = str.substr(
+                1, str.size() - 2);  // remove first and last square bracket
+
+        outputStream() << str;
+        outputStream().flush();
+    }
+};
+
+struct Show : BuiltinProcedure {
+    Show() : BuiltinProcedure(1) {}
+    void operator()() const override {
+        auto arg = fetchArg(0);
+        auto str = arg.toString();
+
+        outputStream() << str << endl;
+    }
+};
+
+} /* ns */
 
 /**
  * Register procedures in memory
  */
-
 void initCommBuiltInProcedures() {
     // I/O
     Stack::instance().setProcedure<Print>("print");
     Stack::instance().setProcedure<Print>("pr");
+    Stack::instance().setProcedure<Type>("type");
+    Stack::instance().setProcedure<Show>("show");
 }
 
 } /* ns: builtin */
