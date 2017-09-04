@@ -44,6 +44,15 @@ struct Local : BuiltinProcedure {
     }
 };
 
+struct LocalMake : BuiltinProcedure {
+    LocalMake() : BuiltinProcedure(1) {}
+    void operator()() const override {
+        auto varName = fetchArg(0).word();
+        auto value = fetchArg(1);
+        Stack::instance().currentFrame().setVariable(varName, value);
+    }
+};
+
 struct Global : BuiltinProcedure {
     Global() : BuiltinProcedure(1) {}
     void operator()() const override {
@@ -71,6 +80,7 @@ void initMemoryBuiltInProcedures() {
         .setProcedure<Make>("make")
         .setProcedure<Name>("name")
         .setProcedure<Local>("local")
+        .setProcedure<LocalMake>("localmake")
         .setProcedure<Thing>("thing");
 
     Stack::instance().setVariable("startup", ListValue());
