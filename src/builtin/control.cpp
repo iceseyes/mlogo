@@ -113,6 +113,11 @@ struct IfFalse : BuiltinProcedure {
     }
 };
 
+struct Bye : BuiltinProcedure {
+    Bye() : BuiltinProcedure(0) {}
+    void operator()() const override { InterpreterState::instance().bye(); }
+};
+
 } /* ns */
 
 void initControlBuiltInProcedures() {
@@ -126,6 +131,7 @@ void initControlBuiltInProcedures() {
     Stack::instance().setProcedure<IfTrue>("ift");
     Stack::instance().setProcedure<IfFalse>("iffalse");
     Stack::instance().setProcedure<IfFalse>("iff");
+    Stack::instance().setProcedure<Bye>("bye");
 }
 
 } /* ns: builtin */

@@ -22,6 +22,26 @@
 
 namespace mlogo {
 
+struct InterpreterState {
+    static InterpreterState &instance() {
+        static InterpreterState __instance;
+        return __instance;
+    }
+
+    void bye() { _running = false; }
+    bool running() const { return _running; }
+
+private:
+    InterpreterState() : _running(true) {}
+    InterpreterState(const InterpreterState &) = delete;
+    InterpreterState(InterpreterState &&) = delete;
+
+    InterpreterState &operator=(const InterpreterState &) = delete;
+    InterpreterState &operator=(InterpreterState &&) = delete;
+
+    bool _running;
+};
+
 template <typename InputStream, typename OutputStream,
           typename ErrorStream = OutputStream>
 class Interpreter {
@@ -47,9 +67,8 @@ public:
         Statement stmt;
 
         showPrompt();
-        while (getline(_iStream, str)) {
-            if (to_upper_copy(str) == BYE_BYE_COMMAND) break;
-
+        while (InterpreterState::instance().running() &&
+               getline(_iStream, str)) {
             AST ast;
             try {
                 if (currentProc) {
