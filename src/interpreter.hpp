@@ -125,7 +125,7 @@ public:
             throw exceptions::InvalidStatmentException(line);
 
         auto ast = make_ast(stmt);
-        ast();
+        ast.exec();
     }
 
     void startup() const {

@@ -180,10 +180,18 @@ struct InvalidStatmentException : std::logic_error {
 
 struct StopException : std::logic_error {
     /// Build a new Exception.
-    StopException()
-        : std::logic_error("Program stopped") {}
+    StopException() : std::logic_error("Program stopped") {}
 };
 
+struct LogoErrorException : std::exception {
+    /// Build a new Exception.
+    LogoErrorException(const std::string &msg) : _msg(msg) {}
+
+    const char *what() const noexcept override { return _msg.c_str(); }
+
+private:
+    const std::string _msg;
+};
 
 } /* ns: exceptions */
 

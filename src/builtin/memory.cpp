@@ -84,6 +84,9 @@ void initMemoryBuiltInProcedures() {
         .setProcedure<Thing>("thing");
 
     Stack::instance().setVariable("startup", ListValue());
+    Stack::instance().setVariable("__REPCOUNT__", "-1");
 }
-}
-}
+
+} /* ns: builtin */
+
+} /* ns: mlogo */

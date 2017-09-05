@@ -18,19 +18,61 @@ namespace builtin {
 
 namespace {
 
+struct NewFrameRAII {
+    NewFrameRAII() { Stack::instance().openFrame(); }
+    ~NewFrameRAII() { Stack::instance().closeFrame(); }
+};
+
+struct Run : BuiltinProcedure {
+    Run() : BuiltinProcedure(1) {}
+    void operator()() const override {
+        string arg0 = fetchArg(0).toString();
+
+        try {
+            NewFrameRAII frameGuard;
+            Stack::instance().setVariable("__REPCOUNT__", ss.str());
+            auto interpreter =
+                getInterpreter(inputStream(), outputStream(), errorStream());
+            interpreter.one(arg0);
+        } catch (exceptions::StopException &e) {
+        }
+    }
+};
+
 struct Repeat : BuiltinProcedure {
     Repeat() : BuiltinProcedure(2) {}
     void operator()() const override {
         int arg0 = fetchArg(0).asUnsigned();
         string arg1 = fetchArg(1).toString();
 
-        for (int i = 0; i < arg0; ++i) {
-            stringstream ss;
-            ss << i;
-            Stack::instance().setVariable("__REPCOUNT__", ss.str());
-            auto interpreter = getInterpreter(inputStream(), outputStream(),
-                                              errorStream());
-            interpreter.one(arg1);
+        try {
+            NewFrameRAII frameGuard;
+            for (int i = 0; i < arg0; ++i) {
+                stringstream ss;
+                ss << i;
+                Stack::instance().setVariable("__REPCOUNT__", ss.str());
+                auto interpreter = getInterpreter(inputStream(), outputStream(),
+                                                  errorStream());
+                interpreter.one(arg1);
+            }
+        } catch (exceptions::StopException &e) {
+        }
+    }
+};
+
+struct Forever : BuiltinProcedure {
+    Forever() : BuiltinProcedure(1) {}
+    void operator()() const override {
+        string arg0 = fetchArg(0).toString();
+
+        try {
+            NewFrameRAII frameGuard;
+            while (true) {
+                auto interpreter = getInterpreter(inputStream(), outputStream(),
+                                                  errorStream());
+                interpreter.one(arg0);
+            }
+        } catch (exceptions::StopException &e) {
         }
     }
 };
@@ -49,6 +91,7 @@ struct If : BuiltinProcedure {
         auto arg1 = fetchArg(1).toString();
 
         if (arg0) {
+            NewFrameRAII frameGuard;
             auto i =
                 getInterpreter(inputStream(), outputStream(), errorStream());
             i.one(arg1);
@@ -64,6 +107,7 @@ struct IfElse : BuiltinProcedure {
         auto arg2 = fetchArg(2).toString();
         auto i = getInterpreter(inputStream(), outputStream(), errorStream());
 
+        NewFrameRAII frameGuard;
         if (arg0)
             i.one(arg1);
         else
@@ -85,6 +129,7 @@ struct IfTrue : BuiltinProcedure {
         bool lastTest = Stack::instance().getVariable("__LASTTEST__").toBool();
 
         if (lastTest) {
+            NewFrameRAII frameGuard;
             auto i =
                 getInterpreter(inputStream(), outputStream(), errorStream());
             i.one(arg0);
@@ -99,6 +144,7 @@ struct IfFalse : BuiltinProcedure {
         bool lastTest = Stack::instance().getVariable("__LASTTEST__").toBool();
 
         if (!lastTest) {
+            NewFrameRAII frameGuard;
             auto i =
                 getInterpreter(inputStream(), outputStream(), errorStream());
             i.one(arg0);
@@ -121,6 +167,7 @@ struct Stop : BuiltinProcedure {
 void initControlBuiltInProcedures() {
     // Control
     Stack::instance().setProcedure<Repeat>("repeat");
+    Stack::instance().setProcedure<Forever>("forever");
     Stack::instance().setProcedure<Repcount>("repcount");
     Stack::instance().setProcedure<If>("if");
     Stack::instance().setProcedure<IfElse>("ifelse");
