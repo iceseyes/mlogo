@@ -12,6 +12,8 @@
 #include <sstream>
 #include <string>
 
+#include <boost/algorithm/string.hpp>
+
 #include "eval.hpp"
 #include "memory.hpp"
 
@@ -137,6 +139,8 @@ ValueBox::ValueBox(const char v[]) : _value(std::string(v)) {}
 
 ValueBox::ValueBox(const std::string &v) : _value(v) {}
 
+ValueBox::ValueBox(bool v) : _value(v ? "TRUE" : "FALSE") {}
+
 ValueBox::ValueBox(const ListValue &v) : _value(v) {}
 
 ValueBox::ValueBox(const Value &v) : _value(v) {}
@@ -176,7 +180,7 @@ int32_t ValueBox::asInteger() const { return std::stoi(word()); }
 
 uint32_t ValueBox::asUnsigned() const { return std::stoul(word()); }
 
-bool ValueBox::toBool() const { return std::stoi(word()); }
+bool ValueBox::toBool() const { return boost::to_upper_copy(word()) == "TRUE"; }
 
 WordValue &ValueBox::word() { return boost::get<WordValue>(_value); }
 

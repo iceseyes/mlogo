@@ -68,7 +68,16 @@ struct Thing : BuiltinProcedure {
         setReturnValue(Stack::instance().getVariable(varName));
     }
 };
-}
+
+struct Procedurep : BuiltinProcedure {
+    Procedurep() : BuiltinProcedure(1, true) {}
+    void operator()() const override {
+        auto procName = fetchArg(0).word();
+        setReturnValue(Stack::instance().hasProcedure(procName));
+    }
+};
+
+} /* ns */
 
 /**
  * Register procedures in memory
@@ -81,7 +90,9 @@ void initMemoryBuiltInProcedures() {
         .setProcedure<Name>("name")
         .setProcedure<Local>("local")
         .setProcedure<LocalMake>("localmake")
-        .setProcedure<Thing>("thing");
+        .setProcedure<Thing>("thing")
+        .setProcedure<Procedurep>("procedurep")
+        .setProcedure<Procedurep>("procedure?");
 
     Stack::instance().setVariable("startup", ListValue());
     Stack::instance().setVariable("__REPCOUNT__", "-1");

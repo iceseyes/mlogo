@@ -41,6 +41,7 @@ public:
     ValueBox();
     ValueBox(const char v[]);
     ValueBox(const std::string &v);
+    ValueBox(bool v);
     ValueBox(const ListValue &v);
     ValueBox(const Value &v);
 

@@ -84,6 +84,7 @@ public:
         const std::string &name, ActualArguments args,
         const std::string &returnIn = "___discard_return_value__");
     ProcedurePtr getProcedure(const std::string &name);
+    bool hasProcedure(const std::string &name);
     std::size_t getProcedureNArgs(const std::string &name);
     ValueBox &getVariable(const std::string &name);
     ValueBox &getArgument(uint8_t index);

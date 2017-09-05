@@ -141,6 +141,14 @@ ProcedurePtr Stack::getProcedure(const std::string &name) {
         throw UndefinedProcedure(name);
 }
 
+bool Stack::hasProcedure(const std::string &name) {
+    auto iter =
+        find_if(frames.rbegin(), frames.rend(),
+                [this, &name](Frame &f) { return f.hasProcedure(name); });
+
+    return iter != frames.rend();
+}
+
 std::size_t Stack::getProcedureNArgs(const std::string &name) {
     auto iter =
         find_if(frames.rbegin(), frames.rend(),
