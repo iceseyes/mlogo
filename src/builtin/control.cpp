@@ -30,7 +30,6 @@ struct Run : BuiltinProcedure {
 
         try {
             NewFrameRAII frameGuard;
-            Stack::instance().setVariable("__REPCOUNT__", ss.str());
             auto interpreter =
                 getInterpreter(inputStream(), outputStream(), errorStream());
             interpreter.one(arg0);
@@ -162,10 +161,16 @@ struct Stop : BuiltinProcedure {
     void operator()() const override { throw exceptions::StopException(); }
 };
 
+struct Output : BuiltinProcedure {
+    Output() : BuiltinProcedure(1) {}
+    void operator()() const override { setReturnValue(fetchArg(0)); }
+};
+
 } /* ns */
 
 void initControlBuiltInProcedures() {
     // Control
+    Stack::instance().setProcedure<Run>("run");
     Stack::instance().setProcedure<Repeat>("repeat");
     Stack::instance().setProcedure<Forever>("forever");
     Stack::instance().setProcedure<Repcount>("repcount");
