@@ -108,7 +108,8 @@ public:
 
     AST& operator=(AST&& ast);
 
-    void apply() const;
+    void apply(bool catchStop=true) const;
+    void exec() const { apply(false); };
     void operator()() const { apply(); }
 
     ASTNode* createNode(const std::string& name);

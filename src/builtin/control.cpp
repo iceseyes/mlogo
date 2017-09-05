@@ -24,20 +24,13 @@ struct Repeat : BuiltinProcedure {
         int arg0 = fetchArg(0).asUnsigned();
         string arg1 = fetchArg(1).toString();
 
-        // arg1 is something like [...] where
-        // ... maybe empty string or a very complex
-        // expression. We have to take only string into brackets (like
-        // arg1[1:-1])
-        // for parsing, so check if arg1.size() is at least 2 ([])
-        if (arg1.size() > 2) {
-            for (int i = 0; i < arg0; ++i) {
-                stringstream ss;
-                ss << i;
-                Stack::instance().setVariable("__REPCOUNT__", ss.str());
-                auto interpreter = getInterpreter(inputStream(), outputStream(),
-                                                  errorStream());
-                interpreter.one(arg1);
-            }
+        for (int i = 0; i < arg0; ++i) {
+            stringstream ss;
+            ss << i;
+            Stack::instance().setVariable("__REPCOUNT__", ss.str());
+            auto interpreter = getInterpreter(inputStream(), outputStream(),
+                                              errorStream());
+            interpreter.one(arg1);
         }
     }
 };
@@ -118,6 +111,11 @@ struct Bye : BuiltinProcedure {
     void operator()() const override { InterpreterState::instance().bye(); }
 };
 
+struct Stop : BuiltinProcedure {
+    Stop() : BuiltinProcedure(0) {}
+    void operator()() const override { throw exceptions::StopException(); }
+};
+
 } /* ns */
 
 void initControlBuiltInProcedures() {
@@ -132,6 +130,7 @@ void initControlBuiltInProcedures() {
     Stack::instance().setProcedure<IfFalse>("iffalse");
     Stack::instance().setProcedure<IfFalse>("iff");
     Stack::instance().setProcedure<Bye>("bye");
+    Stack::instance().setProcedure<Stop>("stop");
 }
 
 } /* ns: builtin */

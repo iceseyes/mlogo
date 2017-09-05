@@ -131,12 +131,17 @@ AST &AST::operator=(AST &&ast) {
     return *this;
 }
 
-void AST::apply() const {
-    for (auto s : statements) {
-        auto v = s->apply();
-        if (!v.empty()) {
-            throw logic_error("You don't say what to do with " + v.toString());
+void AST::apply(bool catchStop) const {
+    try {
+        for (auto s : statements) {
+            auto v = s->apply();
+            if (!v.empty()) {
+                throw logic_error("You don't say what to do with " +
+                                  v.toString());
+            }
         }
+    } catch (exceptions::StopException &e) {
+        if (!catchStop) throw;
     }
 }
 

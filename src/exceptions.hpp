@@ -178,6 +178,13 @@ struct InvalidStatmentException : std::logic_error {
         : std::logic_error("Invalid Statment: " + line) {}
 };
 
+struct StopException : std::logic_error {
+    /// Build a new Exception.
+    StopException()
+        : std::logic_error("Program stopped") {}
+};
+
+
 } /* ns: exceptions */
 
 } /* ns: mlogo */
