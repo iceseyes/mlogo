@@ -82,6 +82,8 @@ public:
 
     bool in(const ValueBox &v) const;
 
+    std::size_t size() const;
+
 private:
     Value _value;
 
@@ -115,6 +117,8 @@ protected:
     ValueBox &fetchArg(uint8_t index) const;
     void setReturnValue(const ValueBox &output) const;
     void setReturnValue(bool output) const;
+    void setReturnValue(std::size_t output) const;
+    void setReturnValue(int output) const;
 
 private:
     uint8_t _nArgs;

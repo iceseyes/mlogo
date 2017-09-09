@@ -7,6 +7,8 @@
 
 #include "common.hpp"
 
+#include "../exceptions.hpp"
+
 namespace mlogo {
 
 namespace builtin {
@@ -257,6 +259,27 @@ struct NumberP : BuiltinProcedure {
     }
 };
 
+struct Count : BuiltinProcedure {
+    Count() : BuiltinProcedure(1, true) {}
+    void operator()() const override {
+        auto arg0 = fetchArg(0);
+        setReturnValue(arg0.size());
+    }
+};
+
+struct Ascii : BuiltinProcedure {
+    Ascii() : BuiltinProcedure(1, true) {}
+    void operator()() const override {
+        auto arg0 = fetchArg(0);
+        if (!arg0.isWord() || (arg0.size() != 1)) {
+            throw exceptions::LogoErrorException("you have to provide a char.");
+        }
+
+        int ch = arg0.word()[0];
+        setReturnValue(ch);
+    }
+};
+
 } /* ns */
 
 void initDataBuiltInProcedures() {
@@ -281,6 +304,11 @@ void initDataBuiltInProcedures() {
         .setProcedure<SetFirst>("setfirst")
         .setProcedure<SetFirst>(".setfirst")
 
+        /* Queries */
+        .setProcedure<Count>("count")
+        .setProcedure<Ascii>("ascii")
+        .setProcedure<Ascii>("rawascii")
+
         /* Predicates */
         .setProcedure<WordP>("wordp")
         .setProcedure<WordP>("word?")
@@ -300,6 +328,8 @@ void initDataBuiltInProcedures() {
         .setProcedure<SubstringP>("substringp")
         .setProcedure<NumberP>("numberp")
         .setProcedure<NumberP>("number?");
+
+    // TODO: VBARREDP char
 }
 
 } /* ns: builtin */

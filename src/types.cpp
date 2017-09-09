@@ -43,6 +43,13 @@ struct IsEmptyVisitor : Visitor<bool> {
     }
 };
 
+struct CounterVisitor : Visitor<std::size_t> {
+    template <typename T>
+    std::size_t operator()(const T &v) const {
+        return v.size();
+    }
+};
+
 struct PushAllBack : Visitor<ListValue> {
     PushAllBack(ListValue &container) : _container(container) {}
 
@@ -162,6 +169,10 @@ bool ValueBox::isWord() const {
 
 bool ValueBox::empty() const { return apply_visitor(IsEmptyVisitor(), _value); }
 
+std::size_t ValueBox::size() const {
+    return apply_visitor(CounterVisitor(), _value);
+}
+
 std::string ValueBox::toString(bool wBrackets) const {
     std::stringstream ss;
 
@@ -278,6 +289,20 @@ void BasicProcedure::setReturnValue(bool output) const {
     }
 
     memory::Stack::instance().storeResult(output ? "TRUE" : "FALSE");
+}
+
+void BasicProcedure::setReturnValue(std::size_t output) const {
+    std::stringstream ss;
+    ss << output;
+
+    setReturnValue(ss.str());
+}
+
+void BasicProcedure::setReturnValue(int output) const {
+    std::stringstream ss;
+    ss << output;
+
+    setReturnValue(ss.str());
 }
 
 UserDefinedProcedure::UserDefinedProcedure(const parser::Procedure &definition)
