@@ -430,6 +430,8 @@ double cos(const Angle &angle) { return angle.cos(); }
 
 double tan(const Angle &angle) { return angle.tan(); }
 
+Angle arctan(double t) { return Angle::Rad(atan(t)); }
+
 StraightLine parallel(const StraightLine &r, double q) { return r.parallel(q); }
 
 ostream &operator<<(ostream &s, const Angle::Rad &value) {

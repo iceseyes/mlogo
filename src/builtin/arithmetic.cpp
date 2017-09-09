@@ -7,7 +7,12 @@
 
 #include "common.hpp"
 
+#include "../geometry.hpp"
+
+using namespace mlogo::geometry;
+
 namespace mlogo {
+
 namespace builtin {
 
 namespace {
@@ -136,7 +141,46 @@ struct Ln : ArithmeticUnary {
     Ln() : ArithmeticUnary() {}
     double _result(double arg0) const override { return log(arg0); }
 };
-}
+
+struct Sin : ArithmeticUnary {
+    Sin() : ArithmeticUnary() {}
+    double _result(double arg0) const override {
+        return sin(Angle::Degrees(arg0));
+    }
+};
+
+struct RadSin : ArithmeticUnary {
+    RadSin() : ArithmeticUnary() {}
+    double _result(double arg0) const override { return sin(Angle::Rad(arg0)); }
+};
+
+struct Cos : ArithmeticUnary {
+    Cos() : ArithmeticUnary() {}
+    double _result(double arg0) const override {
+        return cos(Angle::Degrees(arg0));
+    }
+};
+
+struct RadCos : ArithmeticUnary {
+    RadCos() : ArithmeticUnary() {}
+    double _result(double arg0) const override { return cos(Angle::Rad(arg0)); }
+};
+
+struct ArcTan : ArithmeticUnary {
+    ArcTan() : ArithmeticUnary() {}
+    double _result(double arg0) const override {
+        return arctan(arg0).degrees().value();
+    }
+};
+
+struct RadArcTan : ArithmeticUnary {
+    RadArcTan() : ArithmeticUnary() {}
+    double _result(double arg0) const override {
+        return arctan(arg0).radians().value();
+    }
+};
+
+} /* ns */
 
 /**
  * Register procedures in memory
@@ -157,7 +201,15 @@ void initArithmeticBuiltInProcedures() {
         .setProcedure<Power>("power")
         .setProcedure<Exp>("exp")
         .setProcedure<Log10>("log10")
-        .setProcedure<Ln>("ln");
+        .setProcedure<Ln>("ln")
+        .setProcedure<Sin>("sin")
+        .setProcedure<RadSin>("radsin")
+        .setProcedure<Cos>("cos")
+        .setProcedure<RadCos>("radcos")
+        .setProcedure<ArcTan>("arctan")
+        .setProcedure<RadArcTan>("radarctan");
 }
-}
-}
+
+} /* ns: builtin */
+
+} /* ns: mlogo */

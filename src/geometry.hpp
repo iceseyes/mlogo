@@ -193,6 +193,8 @@ double sin(const Angle &angle);
 double cos(const Angle &angle);
 double tan(const Angle &angle);
 
+Angle arctan(double t);
+
 StraightLine parallel(const StraightLine &r, double q);
 
 std::ostream &operator<<(std::ostream &s, const Angle::Rad &value);

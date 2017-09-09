@@ -8,6 +8,7 @@
 #include "common.hpp"
 
 namespace mlogo {
+
 namespace builtin {
 
 namespace {
@@ -150,10 +151,10 @@ struct SetItem : BuiltinProcedure {
 };
 
 struct SetFirst : BuiltinProcedure {
-    SetFirst() : BuiltinProcedure(3, false) {}
+    SetFirst() : BuiltinProcedure(2, false) {}
     void operator()() const override {
-        auto arg0 = fetchArg(1);
-        auto arg1 = fetchArg(2);
+        auto arg0 = fetchArg(0);
+        auto arg1 = fetchArg(1);
 
         arg0.set(0, arg1);
     }
@@ -162,7 +163,7 @@ struct SetFirst : BuiltinProcedure {
 struct WordP : BuiltinProcedure {
     WordP() : BuiltinProcedure(1, true) {}
     void operator()() const override {
-        auto arg0 = fetchArg(1);
+        auto arg0 = fetchArg(0);
 
         setReturnValue(arg0.isWord());
     }
@@ -171,7 +172,7 @@ struct WordP : BuiltinProcedure {
 struct ListP : BuiltinProcedure {
     ListP() : BuiltinProcedure(1, true) {}
     void operator()() const override {
-        auto arg0 = fetchArg(1);
+        auto arg0 = fetchArg(0);
 
         setReturnValue(arg0.isList());
     }
@@ -180,7 +181,7 @@ struct ListP : BuiltinProcedure {
 struct EmptyP : BuiltinProcedure {
     EmptyP() : BuiltinProcedure(1, true) {}
     void operator()() const override {
-        auto arg0 = fetchArg(1);
+        auto arg0 = fetchArg(0);
 
         setReturnValue(arg0.empty());
     }
@@ -189,8 +190,8 @@ struct EmptyP : BuiltinProcedure {
 struct EqualP : BuiltinProcedure {
     EqualP() : BuiltinProcedure(2, true) {}
     void operator()() const override {
-        auto arg0 = fetchArg(1);
-        auto arg1 = fetchArg(2);
+        auto arg0 = fetchArg(0);
+        auto arg1 = fetchArg(1);
 
         setReturnValue(arg0 == arg1);
     }
@@ -199,8 +200,8 @@ struct EqualP : BuiltinProcedure {
 struct NotEqualP : BuiltinProcedure {
     NotEqualP() : BuiltinProcedure(2, true) {}
     void operator()() const override {
-        auto arg0 = fetchArg(1);
-        auto arg1 = fetchArg(2);
+        auto arg0 = fetchArg(0);
+        auto arg1 = fetchArg(1);
 
         setReturnValue(arg0 != arg1);
     }
@@ -209,8 +210,8 @@ struct NotEqualP : BuiltinProcedure {
 struct BeforeP : BuiltinProcedure {
     BeforeP() : BuiltinProcedure(2, true) {}
     void operator()() const override {
-        auto arg0 = fetchArg(1);
-        auto arg1 = fetchArg(2);
+        auto arg0 = fetchArg(0);
+        auto arg1 = fetchArg(1);
 
         setReturnValue(arg0 < arg1);
     }
@@ -219,13 +220,44 @@ struct BeforeP : BuiltinProcedure {
 struct MemberP : BuiltinProcedure {
     MemberP() : BuiltinProcedure(2, true) {}
     void operator()() const override {
-        auto arg0 = fetchArg(1);
-        auto arg1 = fetchArg(2);
+        auto arg0 = fetchArg(0);
+        auto arg1 = fetchArg(1);
 
         setReturnValue(arg1.in(arg0));
     }
 };
-}
+
+struct SubstringP : BuiltinProcedure {
+    SubstringP() : BuiltinProcedure(2, true) {}
+    void operator()() const override {
+        auto arg0 = fetchArg(0);
+        auto arg1 = fetchArg(1);
+
+        bool ris = !arg0.isList() && !arg1.isList();
+        ris =
+            ris && (arg1.toString().find(arg0.toString()) != std::string::npos);
+
+        setReturnValue(ris);
+    }
+};
+
+struct NumberP : BuiltinProcedure {
+    NumberP() : BuiltinProcedure(1, true) {}
+    void operator()() const override {
+        auto arg0 = fetchArg(0);
+
+        bool ris{true};
+        try {
+            arg0.asDouble();
+        } catch (...) {
+            ris = false;
+        }
+
+        setReturnValue(ris);
+    }
+};
+
+} /* ns */
 
 void initDataBuiltInProcedures() {
     /* Constructors */
@@ -264,7 +296,12 @@ void initDataBuiltInProcedures() {
         .setProcedure<BeforeP>("beforep")
         .setProcedure<BeforeP>("before?")
         .setProcedure<MemberP>("memberp")
-        .setProcedure<MemberP>("member?");
+        .setProcedure<MemberP>("member?")
+        .setProcedure<SubstringP>("substringp")
+        .setProcedure<NumberP>("numberp")
+        .setProcedure<NumberP>("number?");
 }
-}
-}
+
+} /* ns: builtin */
+
+} /* ns: mlogo */
