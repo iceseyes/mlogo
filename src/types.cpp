@@ -138,7 +138,35 @@ struct Find : Visitor<bool> {
 
     Value target;
 };
-}
+
+struct Member : Visitor<Value> {
+    Member(const Value &v) : target(v) {}
+
+    template <typename T>
+    Value operator()(const T &v) const {
+        auto pos = v.find(toString(target));
+
+        if (pos != std::string::npos) return v.substr(pos);
+        return "";
+    }
+
+    Value operator()(const ListValue &v) const {
+        ListValue out;
+        auto iter =
+            std::find_if(std::begin(v), std::end(v),
+                         [this](const Value &item) { return item == target; });
+
+        if (iter != std::end(v)) {
+            std::copy(iter, std::end(v), std::back_inserter(out));
+        }
+
+        return out;
+    }
+
+    Value target;
+};
+
+} /* ns */
 
 ValueBox::ValueBox() {}
 
@@ -250,6 +278,10 @@ ValueBox ValueBox::at(std::size_t index) const {
 
 bool ValueBox::in(const ValueBox &v) const {
     return apply_visitor(Find(_value), v._value);
+}
+
+Value ValueBox::member(const ValueBox &v) const {
+    return apply_visitor(Member(_value), v._value);
 }
 
 ActualArguments &ActualArguments::push_back(const ValueBox &value) {

@@ -81,6 +81,7 @@ public:
     ValueBox at(std::size_t index) const;
 
     bool in(const ValueBox &v) const;
+    Value member(const ValueBox &v) const;
 
     std::size_t size() const;
 

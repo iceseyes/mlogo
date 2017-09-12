@@ -7,6 +7,8 @@
 
 #include "common.hpp"
 
+#include <boost/algorithm/string.hpp>
+
 #include "../exceptions.hpp"
 
 namespace mlogo {
@@ -280,6 +282,44 @@ struct Ascii : BuiltinProcedure {
     }
 };
 
+struct Char : BuiltinProcedure {
+    Char() : BuiltinProcedure(1, true) {}
+    void operator()() const override {
+        auto arg0 = fetchArg(0).asInteger();
+
+        char ch = arg0;
+        setReturnValue(std::string() + ch);
+    }
+};
+
+struct Member : BuiltinProcedure {
+    Member() : BuiltinProcedure(2, true) {}
+    void operator()() const override {
+        auto arg0 = fetchArg(0);
+        auto arg1 = fetchArg(1);
+
+        setReturnValue(arg1.member(arg0));
+    }
+};
+
+struct Lowercase : BuiltinProcedure {
+    Lowercase() : BuiltinProcedure(1, true) {}
+    void operator()() const override {
+        auto arg0 = fetchArg(0).word();
+
+        setReturnValue(boost::to_lower_copy(arg0));
+    }
+};
+
+struct Uppercase : BuiltinProcedure {
+    Uppercase() : BuiltinProcedure(1, true) {}
+    void operator()() const override {
+        auto arg0 = fetchArg(0).word();
+
+        setReturnValue(boost::to_upper_copy(arg0));
+    }
+};
+
 } /* ns */
 
 void initDataBuiltInProcedures() {
@@ -308,6 +348,10 @@ void initDataBuiltInProcedures() {
         .setProcedure<Count>("count")
         .setProcedure<Ascii>("ascii")
         .setProcedure<Ascii>("rawascii")
+        .setProcedure<Char>("char")
+        .setProcedure<Member>("member")
+        .setProcedure<Lowercase>("lowercase")
+        .setProcedure<Uppercase>("uppercase")
 
         /* Predicates */
         .setProcedure<WordP>("wordp")
