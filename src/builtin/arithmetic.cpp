@@ -11,6 +11,24 @@
 
 using namespace mlogo::geometry;
 
+/**
+LESSP num1 num2
+GREATERP num1 num2
+LESSEQUALP num1 num2
+GREATEREQUALP num1 num2
+RANDOM num
+RERANDOM
+FORM num width precision
+BITAND num1 num2
+BITOR num1 num2
+BITXOR num1 num2
+BITNOT num
+ASHIFT num1 num2
+LSHIFT num1 num2
+AND tf1 tf2
+OR tf1 tf2
+NOT tf
+*/
 namespace mlogo {
 
 namespace builtin {

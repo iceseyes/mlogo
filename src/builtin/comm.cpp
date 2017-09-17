@@ -7,6 +7,38 @@
 
 #include "common.hpp"
 
+/** TODO
+READLIST
+READWORD
+READRAWLINE
+READCHAR
+READCHARS num
+SHELL command
+SETPREFIX string
+PREFIX
+OPENREAD filename
+OPENWRITE filename
+OPENAPPEND filename
+OPENUPDATE filename
+CLOSE filename
+ALLOPEN
+CLOSEALL                        (library procedure)
+ERASEFILE filename
+DRIBBLE filename
+NODRIBBLE
+SETREAD filename
+SETWRITE filename
+READER
+WRITER
+SETREADPOS charpos
+SETWRITEPOS charpos
+READPOS
+WRITEPOS
+EOFP
+FILEP filename
+KEYP
+CLEARTEXT
+*/
 namespace mlogo {
 
 namespace builtin {

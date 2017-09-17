@@ -316,11 +316,7 @@ void BasicProcedure::setReturnValue(const ValueBox &output) const {
 }
 
 void BasicProcedure::setReturnValue(bool output) const {
-    if (!_funct) {
-        throw std::logic_error("Pure procedure can not return a value");
-    }
-
-    memory::Stack::instance().storeResult(output ? "TRUE" : "FALSE");
+    memory::Stack::instance().storeResult(output);
 }
 
 void BasicProcedure::setReturnValue(std::size_t output) const {

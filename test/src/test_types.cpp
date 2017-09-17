@@ -171,3 +171,41 @@ TEST(ValueBox, streamList) {
     ss << list;
     ASSERT_EQ("[test stream]", ss.str());
 }
+
+TEST(ValueBox, boolValue) {
+    ValueBox b{true};
+
+    ASSERT_TRUE(b.isWord());
+    ASSERT_EQ("TRUE", b.word());
+    ASSERT_TRUE(b.toBool());
+    ASSERT_EQ("TRUE", b.toString());
+
+    b = false;
+
+    ASSERT_TRUE(b.isWord());
+    ASSERT_EQ("FALSE", b.word());
+    ASSERT_FALSE(b.toBool());
+    ASSERT_EQ("FALSE", b.toString());
+
+    b = "TRUE";
+
+    ASSERT_TRUE(b.isWord());
+    ASSERT_EQ("TRUE", b.word());
+    ASSERT_TRUE(b.toBool());
+    ASSERT_EQ("TRUE", b.toString());
+
+    b = "true";
+
+    ASSERT_TRUE(b.isWord());
+    ASSERT_TRUE(b.toBool());
+
+    b = "false";
+
+    ASSERT_TRUE(b.isWord());
+    ASSERT_FALSE(b.toBool());
+
+    b = "0";
+
+    ASSERT_TRUE(b.isWord());
+    ASSERT_FALSE(b.toBool());
+}
