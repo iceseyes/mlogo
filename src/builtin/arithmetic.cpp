@@ -12,8 +12,6 @@
 using namespace mlogo::geometry;
 
 /**
-LESSP num1 num2
-GREATERP num1 num2
 LESSEQUALP num1 num2
 GREATEREQUALP num1 num2
 RANDOM num
@@ -205,6 +203,27 @@ struct Less : BuiltinProcedure {
     }
 };
 
+struct Greater : BuiltinProcedure {
+    Greater() : BuiltinProcedure(2, true) {}
+    void operator()() const override {
+        setReturnValue(fetchArg(0) > fetchArg(1));
+    }
+};
+
+struct LessEq : BuiltinProcedure {
+    LessEq() : BuiltinProcedure(2, true) {}
+    void operator()() const override {
+        setReturnValue(fetchArg(0) <= fetchArg(1));
+    }
+};
+
+struct GreaterEq : BuiltinProcedure {
+    GreaterEq() : BuiltinProcedure(2, true) {}
+    void operator()() const override {
+        setReturnValue(fetchArg(0) >= fetchArg(1));
+    }
+};
+
 } /* ns */
 
 /**
@@ -233,7 +252,10 @@ void initArithmeticBuiltInProcedures() {
         .setProcedure<RadCos>("radcos")
         .setProcedure<ArcTan>("arctan")
         .setProcedure<RadArcTan>("radarctan")
-        .setProcedure<Less>("lessp");
+        .setProcedure<Less>("lessp")
+        .setProcedure<Greater>("greaterp")
+        .setProcedure<LessEq>("lessequalp")
+        .setProcedure<GreaterEq>("greaterequalp");
 }
 
 } /* ns: builtin */

@@ -144,6 +144,9 @@ private:
 bool operator==(const ValueBox &v1, const ValueBox &v2);
 bool operator!=(const ValueBox &v1, const ValueBox &v2);
 bool operator<(const ValueBox &v1, const ValueBox &v2);
+bool operator>(const ValueBox &v1, const ValueBox &v2);
+bool operator<=(const ValueBox &v1, const ValueBox &v2);
+bool operator>=(const ValueBox &v1, const ValueBox &v2);
 bool in(const ValueBox &v1, const ValueBox &v2);
 
 std::string toString(const ListValue &v, bool withBrackets = false);
