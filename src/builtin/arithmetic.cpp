@@ -198,6 +198,13 @@ struct RadArcTan : ArithmeticUnary {
     }
 };
 
+struct Less : BuiltinProcedure {
+    Less() : BuiltinProcedure(2, true) {}
+    void operator()() const override {
+        setReturnValue(fetchArg(0) < fetchArg(1));
+    }
+};
+
 } /* ns */
 
 /**
@@ -225,7 +232,8 @@ void initArithmeticBuiltInProcedures() {
         .setProcedure<Cos>("cos")
         .setProcedure<RadCos>("radcos")
         .setProcedure<ArcTan>("arctan")
-        .setProcedure<RadArcTan>("radarctan");
+        .setProcedure<RadArcTan>("radarctan")
+        .setProcedure<Less>("lessp");
 }
 
 } /* ns: builtin */

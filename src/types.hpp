@@ -89,6 +89,7 @@ private:
     Value _value;
 
     friend bool operator==(const ValueBox &v1, const ValueBox &v2);
+    friend bool operator<(const ValueBox &v1, const ValueBox &v2);
 };
 
 class ActualArguments {
