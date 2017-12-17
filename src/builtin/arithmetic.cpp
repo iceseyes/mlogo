@@ -21,9 +21,6 @@ BITXOR num1 num2
 BITNOT num
 ASHIFT num1 num2
 LSHIFT num1 num2
-AND tf1 tf2
-OR tf1 tf2
-NOT tf
 */
 namespace mlogo {
 
@@ -241,6 +238,20 @@ struct Not : BuiltinProcedure {
     void operator()() const override { setReturnValue(!fetchArg(0).toBool()); }
 };
 
+struct RShift : BuiltinProcedure {
+    RShift() : BuiltinProcedure(2, true) {}
+    void operator()() const override {
+        setReturnValue(fetchArg(0).asUnsigned() >> fetchArg(1).asUnsigned());
+    }
+};
+
+struct LShift : BuiltinProcedure {
+    LShift() : BuiltinProcedure(2, true) {}
+    void operator()() const override {
+        setReturnValue(fetchArg(0).asUnsigned() << fetchArg(1).asUnsigned());
+    }
+};
+
 } /* ns */
 
 /**
@@ -275,7 +286,9 @@ void initArithmeticBuiltInProcedures() {
         .setProcedure<GreaterEq>("greaterequalp")
         .setProcedure<And>("and")
         .setProcedure<Or>("or")
-        .setProcedure<Not>("not");
+        .setProcedure<Not>("not")
+        .setProcedure<RShift>("ashift")
+        .setProcedure<LShift>("lshift");
 }
 
 } /* ns: builtin */
