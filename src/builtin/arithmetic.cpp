@@ -12,8 +12,6 @@
 using namespace mlogo::geometry;
 
 /**
-LESSEQUALP num1 num2
-GREATEREQUALP num1 num2
 RANDOM num
 RERANDOM
 FORM num width precision
@@ -224,6 +222,25 @@ struct GreaterEq : BuiltinProcedure {
     }
 };
 
+struct And : BuiltinProcedure {
+    And() : BuiltinProcedure(2, true) {}
+    void operator()() const override {
+        setReturnValue(fetchArg(0).toBool() && fetchArg(1).toBool());
+    }
+};
+
+struct Or : BuiltinProcedure {
+    Or() : BuiltinProcedure(2, true) {}
+    void operator()() const override {
+        setReturnValue(fetchArg(0).toBool() || fetchArg(1).toBool());
+    }
+};
+
+struct Not : BuiltinProcedure {
+    Not() : BuiltinProcedure(1, true) {}
+    void operator()() const override { setReturnValue(!fetchArg(0).toBool()); }
+};
+
 } /* ns */
 
 /**
@@ -255,7 +272,10 @@ void initArithmeticBuiltInProcedures() {
         .setProcedure<Less>("lessp")
         .setProcedure<Greater>("greaterp")
         .setProcedure<LessEq>("lessequalp")
-        .setProcedure<GreaterEq>("greaterequalp");
+        .setProcedure<GreaterEq>("greaterequalp")
+        .setProcedure<And>("and")
+        .setProcedure<Or>("or")
+        .setProcedure<Not>("not");
 }
 
 } /* ns: builtin */
