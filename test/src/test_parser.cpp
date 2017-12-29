@@ -386,11 +386,15 @@ TEST(Parser, expressionMoveCtor) {
     ASSERT_THROW(e.statement(), std::logic_error);
 }
 
+TEST(Parser, boolExprParsing) {
+    Expression e = boost::get<Expression>(parse("print 1 = 3").arguments[0]);
+    ASSERT_EQ(Expression('=') << Number(1) << Number(3), e);
+}
+
 TEST(Parser, expressionUnsupportedInfixOperator) {
     ASSERT_THROW(Expression('~'), std::logic_error);
     ASSERT_THROW(Expression('!'), std::logic_error);
     ASSERT_THROW(Expression('%'), std::logic_error);
-    ASSERT_THROW(Expression('='), std::logic_error);
 }
 
 TEST(Parser, parseComments) {
