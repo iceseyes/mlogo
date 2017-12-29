@@ -173,6 +173,35 @@ ProcName Expression::functor() const {
     throw std::logic_error("This expression is not a function.");
 }
 
+std::string Expression::debug() const {
+    std::stringstream ss;
+
+    switch (node) {
+    case Expression::Node::NUMBER:
+        ss << "NUMBER:" << name;
+        break;
+
+    case Expression::Node::VARIABLE:
+        ss << "VARIABLE:" << name;
+        break;
+
+    case Expression::Node::FUNCTION:
+        ss << "function:" << name;
+        break;
+
+    case Expression::Node::STATEMENT:
+        if (stmt)
+            ss << *stmt;
+        else
+            throw std::logic_error(
+                "Node Statement does not define any statement");
+    }
+
+    for (auto &child : children) ss << " (" << child.debug() << ") ";
+
+    return ss.str();
+}
+
 Statement::Statement(const Statement &stmt)
     : name(stmt.name), arguments(stmt.arguments) {}
 

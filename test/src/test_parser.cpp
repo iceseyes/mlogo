@@ -389,6 +389,16 @@ TEST(Parser, expressionMoveCtor) {
 TEST(Parser, boolExprParsing) {
     Expression e = boost::get<Expression>(parse("print 1 = 3").arguments[0]);
     ASSERT_EQ(Expression('=') << Number(1) << Number(3), e);
+
+    /*
+    e = boost::get<Expression>(parse("print 1 * 4 = 12 / 3").arguments[0]);
+    auto e1 = Expression('=') << Expression('*') << Number(1) << Number(4)
+                              << Expression('/') << Number(12) << Number(3);
+
+    std::cout << e.debug() << std::endl << e1.debug();
+
+    ASSERT_EQ(e1, e);
+    */
 }
 
 TEST(Parser, expressionUnsupportedInfixOperator) {

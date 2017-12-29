@@ -120,6 +120,8 @@ struct Expression {
     Variable variable() const;
     ProcName functor() const;
 
+    std::string debug() const;
+
     static const Expression MINUS;  ///< The expression for unary minus
 private:
     Statement *stmt{nullptr};
