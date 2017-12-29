@@ -1,0 +1,7 @@
+cs
+
+to twentyptstar :length
+repeat 20 [fd :length rt 162]
+end
+
+repeat 60 [twentyptstar 200 rt 6]

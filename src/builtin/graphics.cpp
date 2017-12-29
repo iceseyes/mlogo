@@ -85,7 +85,7 @@ struct SetXY : BuiltinProcedure {
     void operator()() const override {
         int x = fetchArg(0).asInteger();
         int y = fetchArg(1).asInteger();
-        Turtle::instance().currentPosition(std::make_pair(x, y));
+        Turtle::instance().moveToPosition(std::make_pair(x, y));
     }
 };
 

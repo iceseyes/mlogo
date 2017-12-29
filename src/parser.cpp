@@ -50,6 +50,9 @@ std::string operator2proc_name(char op) {
     case '/':
         return "QUOTIENT";
         break;
+    case '=':
+        return "EQUALP";
+        break;
     case MINUS_SYMBOL:
         return "MINUS";
         break;

@@ -53,6 +53,15 @@ Turtle &Turtle::currentPosition(const Position &pos) {
     return *this;
 }
 
+Turtle &Turtle::moveToPosition(const Position &pos) {
+    auto state = impl->pen.state;
+    penUp();
+    impl->moveTo(pos);
+    impl->pen.state = state;
+    render();
+    return *this;
+}
+
 Turtle &Turtle::currentXPosition(int x) {
     auto pos = currentPosition();
     pos.first = x;

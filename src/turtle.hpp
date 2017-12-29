@@ -42,6 +42,7 @@ public:
 
     Position currentPosition() const;
     Turtle &currentPosition(const Position &pos);
+    Turtle &moveToPosition(const Position &pos);
     Turtle &currentXPosition(int x);
     Turtle &currentYPosition(int y);
 

@@ -1,0 +1,19 @@
+cs
+
+to cube
+repeat 4 [fd 90 rt 90]
+lt 45
+fd 30
+rt 45
+fd 90
+rt 135
+fd 30
+rt 180
+fd 30
+rt 135
+fd 90
+rt 45
+fd 30
+end
+
+repeat 60 [cube rt 6]

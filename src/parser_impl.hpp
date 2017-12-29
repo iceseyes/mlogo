@@ -196,7 +196,7 @@ struct ExpressionParser
 
         term = (factor >> *rfactor)[_val = make_expression(_1, _2)];
 
-        rterm = (char_("+-") >> term)[(_val = _1) << _2];
+        rterm = (char_("=+-") >> term)[(_val = _1) << _2];
 
         start = (term >> *rterm)[_val = make_expression(_1, _2)];
     }

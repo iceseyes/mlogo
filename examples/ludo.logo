@@ -1,0 +1,82 @@
+to drawL
+ rt 180
+ fd 100
+ lt 90
+ fd 50
+end
+
+to space
+ pu
+ fd 20
+ pd
+end
+
+to drawucorner
+ lt 45
+ fd 14.14
+ lt 45
+end
+
+to drawucurve
+ fd 30
+ drawucorner
+end
+
+to drawu
+ pu
+ lt 90
+ fd 50
+ rt 180
+ pd
+ fd 40
+ drawucorner
+ drawucurve
+ fd 40
+ lt 180
+ fd 50
+ lt 90
+end
+
+to drawd
+ pu
+ lt 90
+ fd 40
+ rt 180
+ pd
+ repeat 6 [ drawucurve ]
+ rt 180
+ pu
+ fd 10
+ pd
+ rt 180
+ fd 100
+ pu
+ rt 180
+ fd 100 
+ lt 90
+end
+
+to drawo
+ lt 90
+ pu
+ fd 10
+ pd
+ fd 30
+ rt 180
+ repeat 6 [ drawucurve ] 
+ rt 180
+ pu
+ fd 10 
+ lt 90
+end
+
+cs
+setxy 30 30
+drawL
+space
+drawu
+space
+drawd
+space
+drawo 
+space
