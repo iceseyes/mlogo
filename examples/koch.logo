@@ -7,7 +7,7 @@ to nextline :count :length
 end
 
 to line :count :length
-print :count
+ print :count
  ifelse :count = 1 [fd :length] [nextline :count :length]
 end
 
@@ -18,5 +18,7 @@ to koch :count :length
 end
  
 cs
+pu
 setxy  45 370
+pd
 koch 5 5

@@ -71,7 +71,11 @@ to drawo
 end
 
 cs
+
+pu
 setxy 30 30
+pd
+
 drawL
 space
 drawu
