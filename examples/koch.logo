@@ -1,14 +1,12 @@
 to nextline :count :length
-   make "c :count - 1
-   line :c :length
-   lt 60 line :c :length
-   rt 120 line :c :length
-   lt 60 line :c :length
+   line :count :length
+   lt 60 line :count :length
+   rt 120 line :count :length
+   lt 60 line :count :length
 end
 
 to line :count :length
- print :count
- ifelse :count = 1 [fd :length] [nextline :count :length]
+ ifelse :count = 1 [fd :length] [nextline :count - 1 :length]
 end
 
 to koch :count :length
@@ -19,6 +17,6 @@ end
  
 cs
 pu
-setxy  45 370
+setxy -150 370
 pd
 koch 5 5

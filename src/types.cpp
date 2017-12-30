@@ -356,7 +356,7 @@ void UserDefinedProcedure::operator()() const {
 
     // bind parameters to values
     for (auto &param : paramNames) {
-        memory::Stack::instance().setVariable(param, fetchArg(i++));
+        memory::Stack::instance().setVariable(param, fetchArg(i++), false);
     }
 
     // Apply AST
