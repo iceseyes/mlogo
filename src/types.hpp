@@ -129,16 +129,26 @@ private:
 
 class UserDefinedProcedure : public BasicProcedure {
     using AST = eval::AST;
+    using Definition = parser::Procedure;
     using Parameters = std::vector<std::string>;
 
 public:
-    UserDefinedProcedure(const parser::Procedure &definition);
+    UserDefinedProcedure(const Definition &definition);
     virtual ~UserDefinedProcedure();
 
     void operator()() const override;
 
+    const Parameters &params() const;
+    const AST &ast() const;
+
 private:
-    const parser::Procedure definition;
+    void loadDefinition();
+    void loadParameters();
+    void loadAST();
+
+    AST *_ast;
+    Parameters _params;
+    Definition definition;
 };
 
 bool operator==(const ValueBox &v1, const ValueBox &v2);

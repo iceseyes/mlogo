@@ -334,33 +334,48 @@ void BasicProcedure::setReturnValue(int output) const {
 }
 
 UserDefinedProcedure::UserDefinedProcedure(const parser::Procedure &definition)
-    : BasicProcedure(definition.nParams(), false), definition(definition) {}
+    : BasicProcedure(definition.nParams(), false), definition(definition) {
+    loadDefinition();
+}
 
-UserDefinedProcedure::~UserDefinedProcedure() {}
+UserDefinedProcedure::~UserDefinedProcedure() { delete _ast; }
 
 void UserDefinedProcedure::operator()() const {
-    /* scoping is dynamic, so I have to reload the AST every time
-       I run the procedure to assure that procedures and variables
-       are defined and binded correctly. */
     int i{0};
-    AST ast;
-    Parameters paramNames;
 
+    // copy parameter values into the current stack
+    // (suppose a new frame was opened for current procedure)
+    for (auto &param : _params) {
+        memory::Stack::instance().setLocalVariable(param, fetchArg(i++));
+    }
+
+    ast()();  // Apply AST
+}
+
+const UserDefinedProcedure::Parameters &UserDefinedProcedure::params() const {
+    return _params;
+}
+
+const UserDefinedProcedure::AST &UserDefinedProcedure::ast() const {
+    return *_ast;
+}
+
+void UserDefinedProcedure::loadDefinition() {
+    loadParameters();
+    loadAST();
+}
+
+void UserDefinedProcedure::loadParameters() {
     // Read parameters required
-    for (auto &var : definition.parameters()) paramNames.push_back(var.name);
+    for (auto &var : definition.parameters()) _params.push_back(var.name);
+}
 
-    // Build AST
+void UserDefinedProcedure::loadAST() {
+    _ast = new AST();
+
     for (auto &stmt : definition.lines) {
-        ast.include(eval::make_ast(stmt));
+        _ast->include(eval::make_ast(stmt));
     }
-
-    // bind parameters to values
-    for (auto &param : paramNames) {
-        memory::Stack::instance().setVariable(param, fetchArg(i++), false);
-    }
-
-    // Apply AST
-    ast();
 }
 
 bool operator==(const ValueBox &v1, const ValueBox &v2) {
