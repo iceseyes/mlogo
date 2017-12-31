@@ -350,6 +350,10 @@ const UserDefinedProcedure::Parameters &UserDefinedProcedure::params() const {
     return _params;
 }
 
+const std::string UserDefinedProcedure::paramName(std::size_t index) const {
+    return _params.at(index);
+}
+
 const UserDefinedProcedure::AST UserDefinedProcedure::ast() const {
     AST ast;
 

@@ -139,6 +139,8 @@ public:
     void operator()() const override;
 
     const Parameters &params() const;
+    const std::string paramName(std::size_t index) const;
+
     const AST ast() const;
 
 private:

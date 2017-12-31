@@ -232,3 +232,20 @@ TEST(UserDefinedProcedure, buildFromParse) {
     ASSERT_EQ("c", udp.params().at(2));
     ASSERT_FALSE(udp.isFunction());
 }
+
+TEST(UserDefinedProcedure, arguments) {
+    Procedure p{parse("TO TEST :a :b :c")};
+    p.addLine("PR [:a :b :c]");
+
+    UserDefinedProcedure udp{p};
+    ASSERT_EQ(3u, udp.nArgs());
+    ASSERT_EQ(3u, udp.params().size());
+    ASSERT_EQ("a", udp.paramName(0));
+    ASSERT_EQ("b", udp.paramName(1));
+    ASSERT_EQ("c", udp.paramName(2));
+    ASSERT_ANY_THROW(udp.paramName(4));
+    ASSERT_FALSE(udp.isFunction());
+
+    FAIL() << "you have to test that actual arguments was passed has it is in "
+              "local scope";
+}
