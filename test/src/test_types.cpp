@@ -11,9 +11,11 @@
 
 #include <boost/variant.hpp>
 
+#include "parser.hpp"
 #include "types.hpp"
 
 using namespace mlogo::types;
+using namespace mlogo::parser;
 
 TEST(Value, creationAndStreaming) {
     Value word;
@@ -208,4 +210,25 @@ TEST(ValueBox, boolValue) {
 
     ASSERT_TRUE(b.isWord());
     ASSERT_FALSE(b.toBool());
+}
+
+TEST(UserDefinedProcedure, buildFromParse) {
+    Procedure p{parse("TO TEST")};
+    p.addLine("PR [HELLO WORLD]");
+
+    UserDefinedProcedure udp{p};
+    ASSERT_EQ(0u, udp.nArgs());
+    ASSERT_EQ(0u, udp.params().size());
+    ASSERT_FALSE(udp.isFunction());
+
+    p = parse("TO TEST :a :b :c");
+    p.addLine("PR [:a :b :c]");
+
+    udp = UserDefinedProcedure(p);
+    ASSERT_EQ(3u, udp.nArgs());
+    ASSERT_EQ(3u, udp.params().size());
+    ASSERT_EQ("a", udp.params().at(0));
+    ASSERT_EQ("b", udp.params().at(1));
+    ASSERT_EQ("c", udp.params().at(2));
+    ASSERT_FALSE(udp.isFunction());
 }

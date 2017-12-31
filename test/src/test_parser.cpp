@@ -621,6 +621,16 @@ TEST(Parser, procNameEquality) {
     ASSERT_EQ(d, d);
 }
 
+TEST(Parser, procedure) {
+    Procedure p{parse("TO TEST")};
+    p.addLine("PR [HELLO WORLD]");
+
+    ASSERT_EQ(0u, p.nParams());
+    ASSERT_EQ("TEST", p.name());
+    ASSERT_TRUE(p.parameters().empty());
+    ASSERT_EQ(1L, p.lines.size());
+}
+
 TEST(Parser, syntaxError) {
     ASSERT_THROW(parse("TO SUM 2+2 :a"), SyntaxError);
     ASSERT_THROW(parse("TO X :a :b :c 7"), SyntaxError);
