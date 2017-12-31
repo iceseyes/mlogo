@@ -15,6 +15,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "eval.hpp"
+#include "exceptions.hpp"
 #include "memory.hpp"
 
 using bad_get = boost::bad_get;
@@ -335,20 +336,13 @@ void BasicProcedure::setReturnValue(int output) const {
 
 UserDefinedProcedure::UserDefinedProcedure(const parser::Procedure &definition)
     : BasicProcedure(definition.nParams(), false), definition(definition) {
-    loadDefinition();
+    loadParameters();
 }
 
-UserDefinedProcedure::~UserDefinedProcedure() { delete _ast; }
+UserDefinedProcedure::~UserDefinedProcedure() {}
 
 void UserDefinedProcedure::operator()() const {
-    int i{0};
-
-    // copy parameter values into the current stack
-    // (suppose a new frame was opened for current procedure)
-    for (auto &param : _params) {
-        memory::Stack::instance().setLocalVariable(param, fetchArg(i++));
-    }
-
+    loadArguments();
     ast()();  // Apply AST
 }
 
@@ -356,26 +350,27 @@ const UserDefinedProcedure::Parameters &UserDefinedProcedure::params() const {
     return _params;
 }
 
-const UserDefinedProcedure::AST &UserDefinedProcedure::ast() const {
-    return *_ast;
+const UserDefinedProcedure::AST UserDefinedProcedure::ast() const {
+    AST ast;
+
+    for (auto &stmt : definition.lines) {
+        ast.include(eval::make_ast(stmt));
+    }
+
+    return ast;
 }
 
-void UserDefinedProcedure::loadDefinition() {
-    loadParameters();
-    loadAST();
+void UserDefinedProcedure::loadArguments() const {
+    // copy parameter values into the current stack
+    // (suppose a new frame was opened for current procedure)
+    int i{0};
+    for (auto &param : _params) {
+        memory::Stack::instance().setLocalVariable(param, fetchArg(i++));
+    }
 }
 
 void UserDefinedProcedure::loadParameters() {
-    // Read parameters required
     for (auto &var : definition.parameters()) _params.push_back(var.name);
-}
-
-void UserDefinedProcedure::loadAST() {
-    _ast = new AST();
-
-    for (auto &stmt : definition.lines) {
-        _ast->include(eval::make_ast(stmt));
-    }
 }
 
 bool operator==(const ValueBox &v1, const ValueBox &v2) {

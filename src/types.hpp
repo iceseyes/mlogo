@@ -139,14 +139,12 @@ public:
     void operator()() const override;
 
     const Parameters &params() const;
-    const AST &ast() const;
+    const AST ast() const;
 
 private:
-    void loadDefinition();
     void loadParameters();
-    void loadAST();
+    void loadArguments() const;
 
-    AST *_ast;
     Parameters _params;
     Definition definition;
 };
