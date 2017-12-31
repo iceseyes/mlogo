@@ -188,6 +188,10 @@ Stack &Stack::setVariable(const std::string &name, const ValueBox &v,
     return *this;
 }
 
+Stack &Stack::setLocalVariable(const std::string &name, const ValueBox &v) {
+    return setVariable(name, v, false);
+}
+
 Stack &Stack::setProcedure(const std::string &name, ProcedurePtr v,
                            bool global) {
     if (global) {

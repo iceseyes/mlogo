@@ -91,6 +91,8 @@ public:
 
     Stack &setVariable(const std::string &name, const ValueBox &v,
                        bool global = true);
+    Stack &setLocalVariable(const std::string &name, const ValueBox &v);
+
     Stack &setProcedure(const std::string &name, ProcedurePtr v,
                         bool global = true);
     template <typename Proc, typename... Args>
