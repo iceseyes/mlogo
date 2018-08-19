@@ -31,7 +31,8 @@ const char Stack::__ARGUMENT_PREFIX[]{"_p"};
 namespace {
 
 std::string formatName(const std::string &name) { return to_lower_copy(name); }
-}
+
+}  // namespace
 
 bool Frame::hasVariable(const std::string &name) const {
     auto iter = variables.find(formatName(name));
@@ -255,6 +256,6 @@ Stack &Stack::clear() {
     return *this;
 }
 
-} /* ns: memory */
+}  // namespace memory
 
-} /* ns: mlogo */
+}  // namespace mlogo

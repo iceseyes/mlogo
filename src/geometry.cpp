@@ -17,20 +17,22 @@ constexpr double EPSILON{1e-5};
 constexpr double M{1e4};
 constexpr double RADIANS4DEGREES{M_PI / 180};
 constexpr double MAX_RAD{M_PI * 2};
+constexpr double MAX_DEG{360};
 
-double radNormalize(double r) {
-    while (r < 0) r += MAX_RAD;
-    while (r >= MAX_RAD) r -= MAX_RAD;
+double degNormalize(double r) {
+    while (r < 0) r += MAX_DEG;
+    while (r >= MAX_RAD) r -= MAX_DEG;
 
     return r;
 }
 
-double deg2rad(double d) { return radNormalize(d * RADIANS4DEGREES); }
+double rad2deg(double d) { return degNormalize(d / RADIANS4DEGREES); }
 
 int myround(double v) {
     int sgn = v / fabs(v);
+    double v1 = round(fabs(v) * 1e6) / 1e6;
 
-    return sgn * round(fabs(v));
+    return sgn * round(v1);
 }
 
 bool isZero(double d) { return fabs(d) < EPSILON; }
@@ -38,55 +40,57 @@ bool isZero(double d) { return fabs(d) < EPSILON; }
 bool isInf(double d) { return fabs(d) > M; }
 
 double square(double x) { return x * x; }
-}
+}  // namespace
 
 const double StraightLine::VERTICAL{std::tan(M_PI / 2)};
 
-Angle::Angle(const Rad &angle) : _value(radNormalize(angle.value())) {}
+Angle::Angle(const Rad &angle) : _value(rad2deg(angle.value())) {}
 
-Angle::Angle(Rad &&angle) : _value(radNormalize(angle.value())) {}
+Angle::Angle(Rad &&angle) : _value(rad2deg(angle.value())) {}
 
-Angle::Angle(const Degrees &angle) : _value(deg2rad(angle.value())) {}
+Angle::Angle(const Degrees &angle) : _value(degNormalize(angle.value())) {}
 
-Angle::Angle(Degrees &&angle) : _value(deg2rad(angle.value())) {}
+Angle::Angle(Degrees &&angle) : _value(degNormalize(angle.value())) {}
 
-Angle::Degrees Angle::degrees() const {
-    return Degrees(_value / RADIANS4DEGREES);
-}
+double Angle::asDegrees() const { return _value; }
 
-Angle::Rad Angle::radians() const { return Rad(_value); }
+double Angle::asRadians() const { return _value * RADIANS4DEGREES; }
+
+Angle::Degrees Angle::degrees() const { return Degrees(asDegrees()); }
+
+Angle::Rad Angle::radians() const { return Rad(asRadians()); }
 
 bool Angle::equals(const Angle &angle) const {
     return isZero(angle._value - _value);
 }
 
 Angle &Angle::operator+=(const Angle &another) {
-    _value = radNormalize(_value + another._value);
+    _value = degNormalize(_value + another._value);
     return *this;
 }
 
 Angle &Angle::operator-=(const Angle &another) {
-    _value = radNormalize(_value - another._value);
+    _value = degNormalize(_value - another._value);
     return *this;
 }
 
 Angle &Angle::operator*=(double k) {
-    _value = radNormalize(k * _value);
+    _value = degNormalize(k * _value);
     return *this;
 }
 
 Angle &Angle::operator/=(double k) {
-    _value = radNormalize(_value / k);
+    _value = degNormalize(_value / k);
     return *this;
 }
 
 Angle &Angle::inv() {
-    _value = radNormalize(1 / _value);
+    _value = degNormalize(1 / _value);
     return *this;
 }
 
 double Angle::sin() const {
-    double v = std::sin(_value);
+    double v = std::sin(asRadians());
 
     if (isZero(v)) v = 0.0;
 
@@ -94,7 +98,7 @@ double Angle::sin() const {
 }
 
 double Angle::cos() const {
-    double v = std::cos(_value);
+    double v = std::cos(asRadians());
 
     if (isZero(v)) v = 0.0;
 
@@ -102,7 +106,7 @@ double Angle::cos() const {
 }
 
 double Angle::tan() const {
-    double v = std::tan(_value);
+    double v = std::tan(asRadians());
 
     if (isInf(v)) throw logic_error("Tangent for right angle is undefined.");
     if (isZero(v)) v = 0.0;
@@ -463,6 +467,6 @@ std::ostream &operator<<(std::ostream &s, const StraightLine &value) {
     return s;
 }
 
-} /* ns: geometry */
+}  // namespace geometry
 
-} /* ns: mlogo */
+}  // namespace mlogo

@@ -55,6 +55,9 @@ public:
     double tan() const;
 
 private:
+    double asRadians() const;
+    double asDegrees() const;
+
     double _value;
 };
 
@@ -203,8 +206,8 @@ std::ostream &operator<<(std::ostream &s, const Angle &value);
 std::ostream &operator<<(std::ostream &s, const Point &value);
 std::ostream &operator<<(std::ostream &s, const StraightLine &value);
 
-} /* ns: geometry */
+}  // namespace geometry
 
-} /* ns: mlogo */
+}  // namespace mlogo
 
 #endif /* __GEOMETRY_HPP_ */

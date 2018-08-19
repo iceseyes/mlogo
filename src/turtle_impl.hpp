@@ -231,8 +231,8 @@ Path createTurle(const Reference &turtleSystem) {
     return _turtle;
 }
 
-} /* ns: turtle */
+}  // namespace turtle
 
-} /* ns: mlogo */
+}  // namespace mlogo
 
 #endif /* __TURTLE_IMPL_HPP__ */
