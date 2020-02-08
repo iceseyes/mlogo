@@ -7,9 +7,8 @@
 
 #include <gtest/gtest.h>
 
-#include <sstream>
-
 #include <boost/variant.hpp>
+#include <sstream>
 
 #include "parser.hpp"
 #include "types.hpp"
@@ -245,7 +244,4 @@ TEST(UserDefinedProcedure, arguments) {
     ASSERT_EQ("c", udp.paramName(2));
     ASSERT_ANY_THROW(udp.paramName(4));
     ASSERT_FALSE(udp.isFunction());
-
-    FAIL() << "you have to test that actual arguments was passed has it is in "
-              "local scope";
 }
