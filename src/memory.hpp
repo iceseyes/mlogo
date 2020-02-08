@@ -9,6 +9,7 @@
 #define MEMORY_HPP_
 
 #include <cinttypes>
+#include <cstdlib>
 #include <map>
 #include <memory>
 #include <string>
@@ -143,8 +144,35 @@ private:
     FrameList frames;
 };
 
-} /* ns memory */
+class RandomGeneratorDevice {
+public:
+    static RandomGeneratorDevice &instance() {
+        static RandomGeneratorDevice _instance;
+        return _instance;
+    }
 
-} /* ns mlogo */
+    void rerandom(size_t seed = 0) {
+        _seed = seed;
+        init();
+    }
+
+    double random(double x) const { return rand() * x / RAND_MAX; }
+    size_t seed() const { return _seed; }
+
+private:
+    RandomGeneratorDevice() : _seed(time(NULL)) { init(); }
+    RandomGeneratorDevice(const RandomGeneratorDevice &) = delete;
+    RandomGeneratorDevice(RandomGeneratorDevice &&) = delete;
+
+    RandomGeneratorDevice &operator=(const RandomGeneratorDevice &) = delete;
+    RandomGeneratorDevice &operator=(RandomGeneratorDevice &&) = delete;
+
+    void init() { srand(_seed); }
+
+    size_t _seed;
+};
+}  // namespace memory
+
+}  // namespace mlogo
 
 #endif /* MEMORY_HPP_ */

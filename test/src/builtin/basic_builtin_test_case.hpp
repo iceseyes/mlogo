@@ -23,9 +23,7 @@ namespace mlogo::test {
 class BasicBuiltInTestCase : public ::testing::Test {
 protected:
     void SetUp() override {
-        ss.str("");
-        ss.clear();
-
+        reset();
         memory::Stack::instance().clear(); /* clear memory state */
         interpreter = getInterpreterPtr(std::cin, std::cout, std::cerr, false);
 
@@ -37,7 +35,14 @@ protected:
 
     std::string run(const std::string &line) {
         interpreter->one(line);
-        return ss.str();
+        auto out = ss.str();
+        reset();
+        return out;
+    }
+
+    void reset() {
+        ss.str("");
+        ss.clear();
     }
 
 private:

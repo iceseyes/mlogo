@@ -6,13 +6,12 @@
  */
 
 #include "../geometry.hpp"
+#include "../memory.hpp"
 #include "common.hpp"
 
 using namespace mlogo::geometry;
 
 /**
-RANDOM num
-RERANDOM
 FORM num width precision
 BITAND num1 num2
 BITOR num1 num2
@@ -240,8 +239,18 @@ struct Not : BuiltinProcedure {
 struct Random : ArithmeticUnary {
     Random() {}
     double _result(double arg0) const override {
-        auto arg = fetchArg(0);
-        return round(rand() * arg.asDouble() / RAND_MAX);
+        using memory::RandomGeneratorDevice;
+        double v = fetchArg(0).asDouble();
+        if (v < 0) v = 0;
+        return round(RandomGeneratorDevice::instance().random(v));
+    }
+};
+
+struct Rerandom : BuiltinProcedure {
+    Rerandom() : BuiltinProcedure(1, false) {}
+    void operator()() const override {
+        using memory::RandomGeneratorDevice;
+        RandomGeneratorDevice::instance().rerandom(fetchArg(0).asUnsigned());
     }
 };
 
@@ -252,8 +261,6 @@ struct Random : ArithmeticUnary {
  */
 
 void initArithmeticBuiltInProcedures() {
-    srand(time(NULL));
-
     Stack::instance()
         .setProcedure<Sum>("sum")
         .setProcedure<Difference>("difference")
@@ -282,7 +289,8 @@ void initArithmeticBuiltInProcedures() {
         .setProcedure<And>("and")
         .setProcedure<Or>("or")
         .setProcedure<Not>("not")
-        .setProcedure<Random>("random");
+        .setProcedure<Random>("random")
+        .setProcedure<Rerandom>("rerandom");
 }
 
 }  // namespace builtin
