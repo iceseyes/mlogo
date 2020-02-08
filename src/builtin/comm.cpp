@@ -5,6 +5,9 @@
  *      Author: Massimo Bianchi <bianchi.massimo@gmail.com>
  */
 
+#include <iomanip>
+#include <iostream>
+
 #include "common.hpp"
 
 /** TODO
@@ -76,19 +79,41 @@ struct Show : BuiltinProcedure {
     }
 };
 
-} /* ns */
+struct Form : BuiltinProcedure {
+    Form() : BuiltinProcedure(3) {}
+    void operator()() const override {
+        double num = fetchArg(0).asDouble();
+        int width = fetchArg(1).asInteger();
+        auto format = fetchArg(2);
+
+        if (width > -1) {
+            std::streamsize ss = outputStream().precision();
+            outputStream() << setw(width) << setprecision(format.asInteger())
+                           << num << endl
+                           << setprecision(ss);
+        } else {
+            char buffer[256 + 1];
+            sprintf(buffer, format.toString().c_str(), num);
+            outputStream() << buffer << endl;
+        }
+    }
+};
+
+}  // namespace
 
 /**
  * Register procedures in memory
  */
 void initCommBuiltInProcedures() {
     // I/O
-    Stack::instance().setProcedure<Print>("print");
-    Stack::instance().setProcedure<Print>("pr");
-    Stack::instance().setProcedure<Type>("type");
-    Stack::instance().setProcedure<Show>("show");
+    Stack::instance()
+        .setProcedure<Print>("print")
+        .setProcedure<Print>("pr")
+        .setProcedure<Form>("form")
+        .setProcedure<Type>("type")
+        .setProcedure<Show>("show");
 }
 
-} /* ns: builtin */
+}  // namespace builtin
 
-} /* ns: mlogo */
+}  // namespace mlogo
