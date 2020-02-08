@@ -8,11 +8,10 @@
 #ifndef __INTERPRETER_HPP__
 #define __INTERPRETER_HPP__
 
+#include <boost/algorithm/string.hpp>
 #include <iostream>
 #include <stdexcept>
 #include <string>
-
-#include <boost/algorithm/string.hpp>
 
 #include "defines.hpp"
 #include "eval.hpp"
@@ -156,6 +155,18 @@ Interpreter<InputStream, OutputStream, ErrorStream> getInterpreter(
         is, os, es, wPrompt, rethrow);
 }
 
-} /* ns: mlogo */
+template <typename InputStream, typename OutputStream,
+          typename ErrorStream = OutputStream>
+Interpreter<InputStream, OutputStream, ErrorStream> *getInterpreterPtr(
+    InputStream &is, OutputStream &os, ErrorStream &es, bool wPrompt = true,
+    bool rethrow = false) {
+    return new Interpreter<InputStream, OutputStream, ErrorStream>(
+        is, os, es, wPrompt, rethrow);
+}
+
+using StdDynamicInterpreter =
+    Interpreter<std::istream, std::ostream, std::ostream>;
+
+}  // namespace mlogo
 
 #endif /* __INTERPRETER_HPP__ */

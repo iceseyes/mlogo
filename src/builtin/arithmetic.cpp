@@ -5,9 +5,8 @@
  *      Author: Massimo Bianchi <bianchi.massimo@gmail.com>
  */
 
-#include "common.hpp"
-
 #include "../geometry.hpp"
+#include "common.hpp"
 
 using namespace mlogo::geometry;
 
@@ -238,13 +237,23 @@ struct Not : BuiltinProcedure {
     void operator()() const override { setReturnValue(!fetchArg(0).toBool()); }
 };
 
-} /* ns */
+struct Random : ArithmeticUnary {
+    Random() {}
+    double _result(double arg0) const override {
+        auto arg = fetchArg(0);
+        return round(rand() * arg.asDouble() / RAND_MAX);
+    }
+};
+
+}  // namespace
 
 /**
  * Register procedures in memory
  */
 
 void initArithmeticBuiltInProcedures() {
+    srand(time(NULL));
+
     Stack::instance()
         .setProcedure<Sum>("sum")
         .setProcedure<Difference>("difference")
@@ -272,9 +281,10 @@ void initArithmeticBuiltInProcedures() {
         .setProcedure<GreaterEq>("greaterequalp")
         .setProcedure<And>("and")
         .setProcedure<Or>("or")
-        .setProcedure<Not>("not");
+        .setProcedure<Not>("not")
+        .setProcedure<Random>("random");
 }
 
-} /* ns: builtin */
+}  // namespace builtin
 
-} /* ns: mlogo */
+}  // namespace mlogo
