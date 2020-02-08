@@ -13,24 +13,26 @@ namespace mlogo {
 namespace geometry {
 
 namespace {
+
 constexpr double EPSILON{1e-5};
 constexpr double M{1e4};
 constexpr double RADIANS4DEGREES{M_PI / 180};
 constexpr double MAX_RAD{M_PI * 2};
 constexpr double MAX_DEG{360};
+constexpr double ROUND_PRECISION{1e6};
 
 double degNormalize(double r) {
     while (r < 0) r += MAX_DEG;
-    while (r >= MAX_RAD) r -= MAX_DEG;
+    while (r >= MAX_DEG) r -= MAX_DEG;
 
     return r;
 }
 
 double rad2deg(double d) { return degNormalize(d / RADIANS4DEGREES); }
 
-int myround(double v) {
+double myround(double v) {
     int sgn = v / fabs(v);
-    double v1 = round(fabs(v) * 1e6) / 1e6;
+    double v1 = round(fabs(v) * ROUND_PRECISION) / ROUND_PRECISION;
 
     return sgn * round(v1);
 }
@@ -54,7 +56,12 @@ Angle::Angle(Degrees &&angle) : _value(degNormalize(angle.value())) {}
 
 double Angle::asDegrees() const { return _value; }
 
-double Angle::asRadians() const { return _value * RADIANS4DEGREES; }
+double Angle::asRadians() const {
+    double c = RADIANS4DEGREES;
+    if (_inverse) c = 1 / c;
+
+    return _value * c;
+}
 
 Angle::Degrees Angle::degrees() const { return Degrees(asDegrees()); }
 
@@ -85,6 +92,7 @@ Angle &Angle::operator/=(double k) {
 }
 
 Angle &Angle::inv() {
+    _inverse = !_inverse;
     _value = degNormalize(1 / _value);
     return *this;
 }
@@ -136,13 +144,14 @@ bool Reference::operator!=(const Reference &ref) const {
 
 bool Reference::global() const { return (*this == Reference()); }
 
-Point::Point(int x, int y, const Reference &system)
+Point::Point(double x, double y, const Reference &system)
     : x(x), y(y), system(system) {}
 
 bool Point::same(const Point &p) const { return this->toGPS() == p.toGPS(); }
 
 bool Point::operator==(const Point &p) const {
-    return (p.x == x) && (p.y == y) && (p.system == system);
+    return abs(p.x - x) <= EPSILON && abs(p.y - y) <= EPSILON &&
+           (p.system == system);
 }
 
 bool Point::operator!=(const Point &p) const { return !(*this == p); }
@@ -205,8 +214,8 @@ Point Point::rotate(const Angle &a) const {
     double cos_a = cos(a);
 
     Point p{*this};
-    p.x = myround(x * cos_a - y * sin_a);
-    p.y = myround(x * sin_a + y * cos_a);
+    p.x = x * cos_a - y * sin_a;
+    p.y = x * sin_a + y * cos_a;
 
     return p;
 }
@@ -312,22 +321,22 @@ StraightLine::StraightLine(double m, const Point &a)
 
 Angle StraightLine::angle() const { return Angle::Rad(atan(m)); }
 
-Point StraightLine::whenX(int x) const {
+Point StraightLine::whenX(double x) const {
     if (isVertical())
         throw logic_error(
             "straight line is vertical and Y coordinate cannot be computed "
             "from X.");
-    return Point(x, myround(m * x + q), system);
+    return Point(x, m * x + q, system);
 }
 
-Point StraightLine::whenY(int y) const {
+Point StraightLine::whenY(double y) const {
     if (isHorizontal())
         throw logic_error(
             "straight line is horizontal and X coordinate cannot be computed "
             "from Y.");
     if (isVertical()) return Point(myround(q), y, system);
 
-    return Point(myround((y - q) / m), y, system);
+    return Point((y - q) / m, y, system);
 }
 
 Point StraightLine::where(const StraightLine &line) const {
@@ -348,7 +357,7 @@ bool StraightLine::belongTo(const Point &p) const {
 
     if (isInf(m)) return q == p1.x;
 
-    int y = myround(m * p1.x + q);
+    double y = m * p1.x + q;
 
     return !(p1.y - y);
 }

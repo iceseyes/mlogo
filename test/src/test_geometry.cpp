@@ -4,9 +4,8 @@
 
 #include <gtest/gtest.h>
 
-#include "geometry.hpp"
-
 #include "exceptions.hpp"
+#include "geometry.hpp"
 
 using Angle = mlogo::geometry::Angle;
 using Reference = mlogo::geometry::Reference;
@@ -65,7 +64,7 @@ TEST(Angle, strangeAngles) {
 
     anAngle = Angle::Rad(0.401426);
     ASSERT_NEAR(23.0, anAngle.degrees().value(), MAX_DEG_ERROR);
-    ASSERT_EQ(Angle::Degrees(23.0), anAngle);
+    ASSERT_EQ(Angle::Degrees(23.00002), anAngle);
 
     anAngle = Angle::Degrees(101.3);
     ASSERT_NEAR(1.768, anAngle.radians().value(), MAX_RAD_ERROR);
@@ -89,13 +88,13 @@ TEST(Angle, turnEquivalence) {
     ASSERT_EQ(anAngle, another);
 
     anAngle = Angle::Rad(0.401426);
-    another = Angle::Degrees(360 + 23);
+    another = Angle::Degrees(360 + 23.00002);
     ASSERT_EQ(anAngle, another);
 
-    another = Angle::Degrees(-4 * 360 + 23);
+    another = Angle::Degrees(-4 * 360 + 23.00002);
     ASSERT_EQ(anAngle, another);
 
-    another = Angle::Degrees(7 * 360 + 23);
+    another = Angle::Degrees(7 * 360 + 23.00002);
     ASSERT_EQ(anAngle, another);
 
     another = Angle::Rad(6 * M_PI + 0.401426);
@@ -405,12 +404,12 @@ TEST(Point, localPosition) {
 
     p2 /= 2;
     ASSERT_EQ(50, p2.x);
-    ASSERT_EQ(-12, p2.y);  // TRUNC-ed!
+    ASSERT_EQ(-12.5, p2.y);
     ASSERT_EQ(system, p2.system);
 
     p2 *= 2;
     ASSERT_EQ(100, p2.x);
-    ASSERT_EQ(-24, p2.y);
+    ASSERT_EQ(-25, p2.y);
     ASSERT_EQ(system, p2.system);
 }
 
@@ -447,7 +446,7 @@ TEST(Point, division) {
 
     ASSERT_EQ(Point(5, 4), p1 / 2);
     ASSERT_EQ(Point(3, 6), p2 / 2);
-    ASSERT_EQ(Point(2, 8 / 5), p1 / 5);
+    ASSERT_EQ(Point(2.0, 8.0 / 5), p1 / 5);
     ASSERT_EQ(Point(10, 0), p3 / 2);
     ASSERT_EQ(Point(4, 0), p3 / 5);
 }
@@ -512,10 +511,10 @@ TEST(Path, turtleRotate) {
     t1 = t1.rotate(Angle(Angle::Degrees(-45)));
 
     i = t1.begin();
-    ASSERT_EQ(Point(6, 6, ref), *(i++));
-    ASSERT_EQ(Point(-9, -2, ref), *(i++));
-    ASSERT_EQ(Point(-2, -9, ref), *(i++));
-    ASSERT_EQ(Point(6, 6, ref), *(i++));
+    ASSERT_EQ(Point(5.65685, 5.65685, ref), *(i++));
+    ASSERT_EQ(Point(-9.19239, -2.12132, ref), *(i++));
+    ASSERT_EQ(Point(-2.12132, -9.19239, ref), *(i++));
+    ASSERT_EQ(Point(5.65685, 5.65685, ref), *(i++));
     ASSERT_EQ(i, t1.end());
 
     t1 = t1.rotate(Angle(Angle::Degrees(-45)));
@@ -580,28 +579,28 @@ TEST(Path, turtleRotateAndTranslate) {
     auto t1 = turtle.rotate(Angle::Degrees(30));
 
     auto i = t1.begin();
-    ASSERT_EQ(Point(7, 4, ref), *(i++));
-    ASSERT_EQ(Point(-9, 0, ref), *(i++));
-    ASSERT_EQ(Point(-4, -8, ref), *(i++));
-    ASSERT_EQ(Point(7, 4, ref), *(i++));
+    ASSERT_EQ(Point(6.9282, 4.0, ref), *(i++));
+    ASSERT_EQ(Point(-9.4282, 0.330127, ref), *(i++));
+    ASSERT_EQ(Point(-4.4282, -8.33013, ref), *(i++));
+    ASSERT_EQ(Point(6.9282, 4.0, ref), *(i++));
     ASSERT_EQ(i, t1.end());
 
     t1 = t1.translate(100, 100);
 
     i = t1.begin();
-    ASSERT_EQ(Point(107, 104, ref), *(i++));
-    ASSERT_EQ(Point(91, 100, ref), *(i++));
-    ASSERT_EQ(Point(96, 92, ref), *(i++));
-    ASSERT_EQ(Point(107, 104, ref), *(i++));
+    ASSERT_EQ(Point(106.9282, 104.0, ref), *(i++));
+    ASSERT_EQ(Point(90.5718, 100.33012, ref), *(i++));
+    ASSERT_EQ(Point(95.5718, 91.66987, ref), *(i++));
+    ASSERT_EQ(Point(106.9282, 104.0, ref), *(i++));
     ASSERT_EQ(i, t1.end());
 
     t1 = t1.translate(-100, -100);
 
     i = t1.begin();
-    ASSERT_EQ(Point(7, 4, ref), *(i++));
-    ASSERT_EQ(Point(-9, 0, ref), *(i++));
-    ASSERT_EQ(Point(-4, -8, ref), *(i++));
-    ASSERT_EQ(Point(7, 4, ref), *(i++));
+    ASSERT_EQ(Point(6.9282, 4.0, ref), *(i++));
+    ASSERT_EQ(Point(-9.4282, 0.330127, ref), *(i++));
+    ASSERT_EQ(Point(-4.4282, -8.33013, ref), *(i++));
+    ASSERT_EQ(Point(6.9282, 4.0, ref), *(i++));
     ASSERT_EQ(i, t1.end());
 
     i = turtle.begin();
@@ -787,9 +786,9 @@ TEST(StraightLine, othersLines) {
     StraightLine halfLine{0.5, 2};  // from m and q
 
     ASSERT_EQ(Point(0, 2), halfLine.whenX(0));
-    ASSERT_EQ(Point(1, 3), halfLine.whenX(1));
+    ASSERT_EQ(Point(1.0, 2.5), halfLine.whenX(1));
     ASSERT_EQ(Point(2, 3), halfLine.whenX(2));
-    ASSERT_EQ(Point(3, 4), halfLine.whenX(3));
+    ASSERT_EQ(Point(3.0, 3.5), halfLine.whenX(3));
     ASSERT_EQ(Point(10, 7), halfLine.whenX(10));
 
     ASSERT_EQ(Point(-4, 0), halfLine.whenY(0));
@@ -809,12 +808,12 @@ TEST(StraightLine, othersLines) {
     ASSERT_NEAR(30, thirtyLine.angle().degrees().value(), 0.001);
 
     ASSERT_EQ(Point(0, 1), thirtyLine.whenX(0));
-    ASSERT_EQ(Point(2, 2), thirtyLine.whenX(2));
-    ASSERT_EQ(Point(10, 7), thirtyLine.whenX(10));
+    ASSERT_EQ(Point(2.0, 2.1547), thirtyLine.whenX(2));
+    ASSERT_EQ(Point(10.0, 6.7735), thirtyLine.whenX(10));
 
     ASSERT_EQ(Point(0, 1), thirtyLine.whenY(1));
-    ASSERT_EQ(Point(2, 2), thirtyLine.whenY(2));
-    ASSERT_EQ(Point(10, 7), thirtyLine.whenY(7));
+    ASSERT_EQ(Point(1.73205, 2.0), thirtyLine.whenY(2));
+    ASSERT_EQ(Point(10.3923, 7.0), thirtyLine.whenY(7));
 
     ASSERT_FALSE(thirtyLine.isHorizontal());
     ASSERT_FALSE(thirtyLine.isVertical());

@@ -59,6 +59,7 @@ private:
     double asDegrees() const;
 
     double _value;
+    bool _inverse{false};
 };
 
 class Reference {
@@ -81,7 +82,9 @@ private:
 };
 
 struct Point {
-    Point(int x, int y, const Reference &system = Reference());
+    Point(double x, double y, const Reference &system = Reference());
+    Point(int x, int y, const Reference &system = Reference())
+        : Point(double(x), double(y), system) {}
 
     bool same(const Point &p) const;
 
@@ -103,8 +106,8 @@ struct Point {
 
     double distance(const Point &p);
 
-    int x;
-    int y;
+    double x;
+    double y;
     Reference system;
 };
 
@@ -154,8 +157,8 @@ public:
     StraightLine(double m, const Point &a);
 
     Angle angle() const;
-    Point whenX(int x) const;
-    Point whenY(int y) const;
+    Point whenX(double x) const;
+    Point whenY(double y) const;
     Point where(const StraightLine &line) const;
     bool belongTo(const Point &p) const;
 
