@@ -86,16 +86,21 @@ struct Form : BuiltinProcedure {
         int width = fetchArg(1).asInteger();
         auto format = fetchArg(2);
 
-        if (width > -1) {
-            std::streamsize ss = outputStream().precision();
-            outputStream() << setw(width) << setprecision(format.asInteger())
-                           << num << endl
-                           << setprecision(ss);
-        } else {
-            char buffer[256 + 1];
-            sprintf(buffer, format.toString().c_str(), num);
-            outputStream() << buffer << endl;
-        }
+        std::streamsize ss = outputStream().precision();
+        outputStream() << setw(width) << setprecision(format.asInteger()) << num
+                       << endl
+                       << setprecision(ss);
+    }
+};
+
+struct Format : BuiltinProcedure {
+    Format() : BuiltinProcedure(2) {}
+    void operator()() const override {
+        int num = fetchArg(0).asInteger();
+        auto format = fetchArg(1);
+        char buffer[256 + 1];
+        sprintf(buffer, format.toString().c_str(), num);
+        outputStream() << buffer << endl;
     }
 };
 
@@ -110,6 +115,7 @@ void initCommBuiltInProcedures() {
         .setProcedure<Print>("print")
         .setProcedure<Print>("pr")
         .setProcedure<Form>("form")
+        .setProcedure<Format>("format")
         .setProcedure<Type>("type")
         .setProcedure<Show>("show");
 }

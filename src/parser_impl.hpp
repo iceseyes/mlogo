@@ -5,10 +5,7 @@
 #ifndef PARSER_IMPL_HPP
 #define PARSER_IMPL_HPP
 
-#include "parser.hpp"
-
 #include <boost/optional/optional_io.hpp>
-
 #include <boost/spirit/include/phoenix_core.hpp>
 #include <boost/spirit/include/phoenix_fusion.hpp>
 #include <boost/spirit/include/phoenix_object.hpp>
@@ -21,6 +18,7 @@
 #include <boost/spirit/include/qi_rule.hpp>
 
 #include "exceptions.hpp"
+#include "parser.hpp"
 
 namespace mlogo {
 
@@ -80,15 +78,15 @@ struct VariableParser : qi::grammar<Iterator, Variable()> {
 template <typename Iterator>
 struct ListParser : qi::grammar<Iterator, List()> {
     ListParser() : ListParser::base_type(start, "List") {
-        using qi::lexeme;
-        using qi::char_;
         using ascii::alnum;
         using ascii::alpha;
-        using ascii::space;
         using ascii::punct;
-        using phoenix::val;
+        using ascii::space;
         using phoenix::construct;
         using phoenix::push_back;
+        using phoenix::val;
+        using qi::char_;
+        using qi::lexeme;
         using namespace qi::labels;
 
         start =
@@ -117,8 +115,8 @@ struct ProcNameParser : qi::grammar<Iterator, ProcName()> {
 template <typename Iterator>
 struct NumberParser : qi::grammar<Iterator, Number()> {
     NumberParser() : NumberParser::base_type(start, "Number") {
-        using ascii::digit;
         using ascii::char_;
+        using ascii::digit;
         using phoenix::val;
         using namespace qi::labels;
 
@@ -165,17 +163,17 @@ struct ExpressionParser
     phoenix::function<make_expression_impl> make_expression;
 
     ExpressionParser() : ExpressionParser::base_type(start, "Expression") {
-        using ascii::digit;
         using ascii::char_;
-        using phoenix::val;
+        using ascii::digit;
         using phoenix::at_c;
-        using phoenix::push_back;
         using phoenix::construct;
+        using phoenix::push_back;
+        using phoenix::val;
         using namespace qi::labels;
 
         static std::vector<Expression> MINUS{Expression::MINUS};
 
-        // In UCBLogo if you have a variable like :a45+4, :45+4+4 is a valid
+        // In UCBLogo if you have a variable like :a45+4, :a45+4+4 is a valid
         // expression.
         // In mLogo this is not possible, or at least you should handle this
         // case like a variable
@@ -221,16 +219,16 @@ struct StatementParser : qi::grammar<Iterator, Statement(), ascii::space_type> {
         using qi::lexeme;
         using qi::no_case;
 
-        using ascii::char_;
         using ascii::alnum;
+        using ascii::char_;
         using ascii::punct;
         using ascii::space;
         using ascii::string;
 
-        using phoenix::val;
-        using phoenix::construct;
         using phoenix::at_c;
+        using phoenix::construct;
         using phoenix::push_back;
+        using phoenix::val;
 
         using namespace qi::labels;
 
@@ -298,8 +296,8 @@ Result parse(const std::string &line) {
     return stmt;
 }
 
-} /* ns parser */
+}  // namespace parser
 
-} /* ns mlogo */
+}  // namespace mlogo
 
 #endif

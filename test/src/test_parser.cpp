@@ -2,8 +2,7 @@
  * @file: test_parser.cpp
  *
  */
-
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 #include <string>
 
@@ -137,11 +136,13 @@ TEST(Parser, parseExpr) {
     ASSERT_EQ(Expression('-') << (Expression('+') << Number("4") << Number("5"))
                               << Number("6"),
               f("4 + 5 - 6"));
-    ASSERT_EQ(Expression('+') << Number("4") << (Expression('*')
-                                                 << Number("5") << Number("6")),
+    ASSERT_EQ(Expression('+')
+                  << Number("4")
+                  << (Expression('*') << Number("5") << Number("6")),
               f("4 + 5 * 6"));
-    ASSERT_EQ(Expression('+') << Number("4") << (Expression('/')
-                                                 << Number("5") << Number("6")),
+    ASSERT_EQ(Expression('+')
+                  << Number("4")
+                  << (Expression('/') << Number("5") << Number("6")),
               f("4 + 5 / 6"));
 
     ASSERT_EQ(Expression('+') << (Expression('*') << Number("4") << Number("5"))
@@ -628,7 +629,7 @@ TEST(Parser, procedure) {
     ASSERT_EQ(0u, p.nParams());
     ASSERT_EQ("TEST", p.name());
     ASSERT_TRUE(p.parameters().empty());
-    ASSERT_EQ(1L, p.lines.size());
+    ASSERT_EQ(1u, p.lines.size());
 }
 
 TEST(Parser, syntaxError) {
