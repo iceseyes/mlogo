@@ -34,18 +34,6 @@ find_package(Threads)
 find_package(Boost REQUIRED)
 find_package(SDL2 REQUIRED)
 
-if (WITH_COVERAGE)
-    find_program(GCOV_PATH gcov)
-    find_program(LCOV_PATH lcov)
-
-    if (GCOV_PATH AND LCOV_PATH)
-        include(CodeCoverage)
-        append_coverage_compiler_flags()
-        set(ENABLE_COVERAGE YES)
-    else ()
-        message(WARNING "Coverage disabled: install gcov/lcov")
-    endif ()
-endif ()
 
 if (WITH_WINDOW_ALWAYS_ON_TOP)
     add_definitions(-DWITH_WINDOW_ALWAYS_ON_TOP)
@@ -61,7 +49,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif ()
 
 set(MLOGO_DEPS
-    ${Boost_LIBRARIES} rt ${CMAKE_THREAD_LIBS_INIT} ${SDL2_LIBRARY})
+    ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${SDL2_LIBRARY})
 
 include_directories(${Boost_INCLUDE_DIRS} ${SDL2_INCLUDE_DIR})
 
